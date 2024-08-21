@@ -1,10 +1,9 @@
 
-import os
 import numpy as np
 from pathlib import Path
 
 #import CLIMADA modules:
-from climada.hazard import Centroids, TCTracks, TropCyclone
+from climada.hazard import Centroids, tc_tracks, TropCyclone
 from climada.entity import LitPop
 
 
@@ -13,34 +12,61 @@ HAZARD_DIR = 'C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard'
 CENT_STR = 'C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks_centroids_0300as_global.hdf5'
 
 
-def init_STORM_tracks(basin):
-    """ Load all STORM tracks for the basin of interest."""
-    all_tracks = []
-    for i in range(10):
-        # Construct the file path based on the basin and file index
-        file_path = os.path.join(STORM_DIR, f"STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt")
-        # Load the storm tracks from the file
-        try:
-            tracks_STORM = TCTracks.from_simulations_storm(file_path)
-            # Append the data from this file to the all_tracks list
-            all_tracks.extend(tracks_STORM.data)
-        except Exception as e:
-            print(f"Error loading {file_path}: {e}")
-    # Create a new TCTracks object to hold the combined data
-    combined_tracks_STORM = TCTracks()
-    combined_tracks_STORM.data = all_tracks
+#Load all STORM tracks for the basin of interest.
+def init_STORM_tracks(basins):
+
+    print("Starting function")
+
+    storms_basin = {}
+
+    for basin in basins:
+        storms = {
+            f"storm_{i:02}": tc_tracks.TCTracks.from_simulations_storm(
+                f"C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks/STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
+            )
+            for i in range(10)
+            }
+        
+        print(f"Loaded storms for basin {basin}")
+
+        storms_combined = storms[next(iter(storms))]
     
-    # Ensure the time steps are consistent
-    combined_tracks_STORM.equal_timestep(time_step_h=1.)
+        for key in list(storms.keys())[1:]:
+            storms_combined.append(storms[key].data)
+        
+        print(f"Combined storms for basin {basin}")
 
-    return combined_tracks_STORM
+        # Ensure the time steps are consistent  
+        #storms_combined.equal_timestep(time_step_h=1.)
+        
+        #print('Equal time steps ensured')
 
-def filter_tc_tracks(tracks, exp, buffer):
-    tracks_storm_sub = tracks.tracks_in_exp(exp, buffer=buffer)
-    return tracks_storm_sub
+        storms_basin[basin] = storms_combined
 
-def generate_exposure(country, fin, year, res):
-    exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
+        print(f"Number of tracks in {basin} basin:",storms_basin[basin].size)
+    
+    return storms_basin
+
+def filter_tc_tracks(tracks_dic, basins, exp, buffer):
+
+    storm_basin_sub = {}
+
+    for basin in basins:
+        sub = tracks_dic[basin].tracks_in_exp(exp, buffer)
+        storm_basin_sub[basin] = sub
+
+        print(f"Number of tracks in {basin} basin:",storm_basin_sub[basin].size)    
+        
+    return storm_basin_sub
+
+def generate_exposure(countries, fin, year, res):
+
+    exp = {}
+
+    for cty in countries:
+        exp_var = LitPop.from_countries(cty, fin_mode=fin, reference_year=year, res_arcsec=res)
+        exp[cty] = exp_var
+    
     return exp
 
 def construct_centroids(exp):
