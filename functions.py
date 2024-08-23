@@ -59,13 +59,21 @@ def filter_tc_tracks(tracks_dic, basins, exp, buffer):
         
     return storm_basin_sub
 
-def generate_exposure(countries, fin, year, res):
+def init_tc_hazard(tracks_dic, basins, frequ_corr):
+    """initiate TC hazard from tracks and exposure"""
+    tc_storms = {}
 
-    exp = {}
+    for basin in basins:
+        #generate TropCyclone class from previously loaded TC tracks for one storm data set
+        tc_storms[basin] = TropCyclone.from_tracks(tracks_dic[basin], centroids=centrs)
+        tc_storms[basin].frequency = np.ones(tc_storms[basin].event_id.size) * frequ_corr
+        tc_storms[basin].check()
 
-    for cty in countries:
-        exp_var = LitPop.from_countries(cty, fin_mode=fin, reference_year=year, res_arcsec=res)
-        exp[cty] = exp_var
+def generate_exposure(country, fin, year, res):
+
+    exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
+    exp.plot_raster()
+    exp.plot_scatter()
     
     return exp
 
@@ -74,21 +82,3 @@ def construct_centroids(exp):
     lon = exp.gdf['longitude'].values
     centrs = Centroids.from_lat_lon(lat, lon)
     return centrs
-
-
-def init_tc_hazard(tracks, cent, load_haz=False):
-    """initiate TC hazard from tracks and exposure"""
-     # initiate new instance of TropCyclone(Hazard) class:
-    haz_str = f"TC_{reg}_0300as_STORM.hdf5"
-    if load_haz and Path.is_file(HAZARD_DIR.joinpath(haz_str)):
-        print("----------------------Loading Hazard----------------------")
-        tc_hazard = TropCyclone.from_hdf5(HAZARD_DIR.joinpath(haz_str))
-    else:
-        print("----------------------Initiating Hazard----------------------")
-        # hazard is initiated from tracks, windfield computed:
-        tc_hazard = TropCyclone.from_tracks(tracks, centroids=cent)
-        freq_corr_STORM = 1/10000
-        tc_hazard.frequency = np.ones(tc_hazard.event_id.size) * freq_corr_STORM
-        tc_hazard.check()
-        tc_hazard.write_hdf5(HAZARD_DIR.joinpath(haz_str))
-    return tc_hazard
