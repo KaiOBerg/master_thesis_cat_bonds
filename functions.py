@@ -4,46 +4,43 @@ from pathlib import Path
 
 #import CLIMADA modules:
 from climada.hazard import Centroids, tc_tracks, TropCyclone
-from climada.entity import LitPop
 
+#define directories
+HAZARD_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard")
+TC_TRACKS_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks")
 
-STORM_DIR = 'C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks'
-HAZARD_DIR = 'C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard'
-CENT_STR = 'C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks_centroids_0300as_global.hdf5'
 
 
 #Load all STORM tracks for the basin of interest.
-def init_STORM_tracks(basins):
+def init_STORM_tracks(basins, load_haz=False):
 
-    print("Starting function")
-
+    #create empty dictionary for each basin 
     storms_basin = {}
 
+    #loop through each basin and save tc_tracks
     for basin in basins:
-        storms = {
-            f"storm_{i:02}": tc_tracks.TCTracks.from_simulations_storm(
-                f"C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks/STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
-            )
-            for i in range(10)
-            }
+        tc_track_str = f"TC_tracks_{basin}_STORM.hdf5"
+        if load_haz and Path.is_file(TC_TRACKS_DIR.joinpath(tc_track_str)):
+            print("----------------------Loading Hazard----------------------")
+            storms_basin[basin] = TropCyclone.from_hdf5(TC_TRACKS_DIR.joinpath(tc_track_str))
+        else:
+            print("----------------------Initiating Hazard----------------------")
+            
+            storms = {
+                f"storm_{i:02}": tc_tracks.TCTracks.from_simulations_storm(
+                    f"C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks/STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
+                )                    
+                for i in range(10)
+                }
         
-        print(f"Loaded storms for basin {basin}")
-
-        storms_combined = storms[next(iter(storms))]
+            storms_combined = storms[next(iter(storms))]
     
-        for key in list(storms.keys())[1:]:
-            storms_combined.append(storms[key].data)
-        
-        print(f"Combined storms for basin {basin}")
+            for key in list(storms.keys())[1:]:
+                storms_combined.append(storms[key].data)
+                
+            storms_combined.write_hdf5(TC_TRACKS_DIR.joinpath(tc_track_str))
 
-        # Ensure the time steps are consistent  
-        #storms_combined.equal_timestep(time_step_h=1.)
-        
-        #print('Equal time steps ensured')
-
-        storms_basin[basin] = storms_combined
-
-        print(f"Number of tracks in {basin} basin:",storms_basin[basin].size)
+            storms_basin[basin] = storms_combined
     
     return storms_basin
 
@@ -68,17 +65,3 @@ def init_tc_hazard(tracks_dic, basins, frequ_corr):
         tc_storms[basin] = TropCyclone.from_tracks(tracks_dic[basin], centroids=centrs)
         tc_storms[basin].frequency = np.ones(tc_storms[basin].event_id.size) * frequ_corr
         tc_storms[basin].check()
-
-def generate_exposure(country, fin, year, res):
-
-    exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
-    exp.plot_raster()
-    exp.plot_scatter()
-    
-    return exp
-
-def construct_centroids(exp):
-    lat = exp.gdf['latitude'].values
-    lon = exp.gdf['longitude'].values
-    centrs = Centroids.from_lat_lon(lat, lon)
-    return centrs
