@@ -19,28 +19,20 @@ def init_STORM_tracks(basins, load_haz=False):
 
     #loop through each basin and save tc_tracks
     for basin in basins:
-        tc_track_str = f"TC_tracks_{basin}_STORM.hdf5"
-        if load_haz and Path.is_file(TC_TRACKS_DIR.joinpath(tc_track_str)):
-            print("----------------------Loading Hazard----------------------")
-            storms_basin[basin] = TropCyclone.from_hdf5(TC_TRACKS_DIR.joinpath(tc_track_str))
-        else:
-            print("----------------------Initiating Hazard----------------------")
-            
-            storms = {
-                f"storm_{i:02}": tc_tracks.TCTracks.from_simulations_storm(
-                    f"C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks/STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
-                )                    
-                for i in range(10)
-                }
+        print("----------------------Initiating Hazard----------------------")
+        storms = {
+            f"storm_{i:02}": tc_tracks.TCTracks.from_simulations_storm(
+                f"C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/storm_tc_tracks/STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
+            )                    
+            for i in range(10)
+            }
         
-            storms_combined = storms[next(iter(storms))]
+        storms_combined = storms[next(iter(storms))]
     
-            for key in list(storms.keys())[1:]:
-                storms_combined.append(storms[key].data)
+        for key in list(storms.keys())[1:]:
+            storms_combined.append(storms[key].data)
                 
-            storms_combined.write_hdf5(TC_TRACKS_DIR.joinpath(tc_track_str))
-
-            storms_basin[basin] = storms_combined
+        storms_basin[basin] = storms_combined
     
     return storms_basin
 
@@ -56,7 +48,7 @@ def filter_tc_tracks(tracks_dic, basins, exp, buffer):
         
     return storm_basin_sub
 
-def init_tc_hazard(tracks_dic, basins, frequ_corr):
+def init_tc_hazard(tracks_dic, basins, centrs, frequ_corr):
     """initiate TC hazard from tracks and exposure"""
     tc_storms = {}
 

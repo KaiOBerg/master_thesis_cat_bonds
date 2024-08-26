@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 
 #import CLIMADA modules:
-from climada.hazard import Centroids
+from climada.hazard import Centroids, tc_tracks
 from climada.entity import LitPop
 
 #define directories
@@ -30,8 +30,9 @@ basins_countries = {
 fin = 'gdp'
 year = 2020
 res = 30
+buffer = 1.0
 
-def generate_exposure(country, fin, year, res, load_exp=False):
+def generate_exposure(country, tracks_dic, load_exp=False):
 
     exp_str = f"Exp_{country}_{fin}_{year}_{res}.hdf5"
     if load_exp and Path.is_file(EXPOSURE_DIR.joinpath(exp_str)):
@@ -53,28 +54,23 @@ def generate_exposure(country, fin, year, res, load_exp=False):
         if country in countries:
             applicable_basins.append(basin)
 
-    #plot exposure and centroids
+    print("----------------------Filter TC Tracks----------------------")
+    storm_basin_sub = {}
+
+    for basin in applicable_basins:
+        sub = tracks_dic[basin].tracks_in_exp(exp, buffer)
+        storm_basin_sub[basin] = sub
+
+        print(f"Number of tracks in {basin} basin:",storm_basin_sub[basin].size)   
+
+    #plot exposure, centroids, and state STORM basin(s)
     exp.plot_raster()
     exp.plot_scatter()
     centrs.plot()
+    print('STORM basin of country: ', applicable_basins)
+
     
     if applicable_basins:
-        return exp, centrs, applicable_basins
+        return exp, centrs, applicable_basins, storm_basin_sub
     else:
-        return exp, centrs, "Country code not found in basin"
-    
-
-def construct_centroids(exp):
-    lat = exp.gdf['latitude'].values
-    lon = exp.gdf['longitude'].values
-    centrs = Centroids.from_lat_lon(lat, lon)
-    return centrs
-
-def find_storm_basins(country_code):
-
-    applicable_basins = []
-
-    for basin, countries in basins_countries.items():
-        if country_code in countries:
-            applicable_basins.append(basin)
-    return applicable_basins if applicable_basins else ["Country code not found in any basin"]
+        return exp, centrs, "Country code not found in basin", storm_basin_sub
