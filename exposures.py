@@ -2,11 +2,12 @@ import numpy as np
 from pathlib import Path
 
 #import CLIMADA modules:
-from climada.hazard import Centroids, tc_tracks
+from climada.hazard import Centroids, tc_tracks, TropCyclone
 from climada.entity import LitPop
 
 #define directories
 EXPOSURE_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/EXPOSURE")
+HAZARD_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard")
 
 #define countries per tropical cyclone basin according to STORM dataset
 NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
@@ -30,47 +31,60 @@ basins_countries = {
 fin = 'gdp'
 year = 2020
 res = 30
-buffer = 1.0
+buffer = 0.1
 
-def generate_exposure(country, tracks_dic, load_exp=False):
+#define variables for TC class
+freq_corr_STORM = 1/10000
+
+
+def init_TC_exp(track_dic, country, load_fls=False):
 
     exp_str = f"Exp_{country}_{fin}_{year}_{res}.hdf5"
-    if load_exp and Path.is_file(EXPOSURE_DIR.joinpath(exp_str)):
-        print("----------------------Loading Exposure----------------------")
+    if load_fls and Path.is_file(EXPOSURE_DIR.joinpath(exp_str)):
+        """Loading Exposure"""
         exp = LitPop.from_hdf5(EXPOSURE_DIR.joinpath(exp_str))
     else:
-        print("----------------------Initiating Exposure----------------------")
+        """Initiating Exposure"""
         exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
         exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
+        
+    exp.plot_raster()
+    exp.plot_scatter()
 
-    print("----------------------Generating Centroids----------------------")
+    """Generating Centroids"""
     lat = exp.gdf['latitude'].values
     lon = exp.gdf['longitude'].values
     centrs = Centroids.from_lat_lon(lat, lon)
+    centrs.plot()
 
-    print("----------------------Define STORM Basins----------------------")
-    applicable_basins = []
+    """Define STORM Basins"""
     for basin, countries in basins_countries.items():
         if country in countries:
-            applicable_basins.append(basin)
+            applicable_basin = basin
+    print('STORM basin of country: ', applicable_basin)
 
-    print("----------------------Filter TC Tracks----------------------")
+
+    """Filter TC Tracks"""
     storm_basin_sub = {}
 
-    for basin in applicable_basins:
-        sub = tracks_dic[basin].tracks_in_exp(exp, buffer)
-        storm_basin_sub[basin] = sub
+    storm_basin_sub = track_dic[applicable_basin].tracks_in_exp(exp, buffer)
 
-        print(f"Number of tracks in {basin} basin:",storm_basin_sub[basin].size)   
+    print(f"Number of tracks in {applicable_basin} basin:",storm_basin_sub.size)   
 
-    #plot exposure, centroids, and state STORM basin(s)
-    exp.plot_raster()
-    exp.plot_scatter()
-    centrs.plot()
-    print('STORM basin of country: ', applicable_basins)
-
-    
-    if applicable_basins:
-        return exp, centrs, applicable_basins, storm_basin_sub
+    """initiate TC hazard from tracks and exposure"""
+    # initiate new instance of TropCyclone(Hazard) class:
+    haz_str = f"TC_sub_{applicable_basin}_{country}_{res}_STORM.hdf5"
+    if load_fls and Path.is_file(HAZARD_DIR.joinpath(haz_str)):
+        print("----------------------Loading Hazard----------------------")
+        tc_storms = TropCyclone.from_hdf5(HAZARD_DIR.joinpath(haz_str))
     else:
-        return exp, centrs, "Country code not found in basin", storm_basin_sub
+        #generate TropCyclone class from previously loaded TC tracks for one storm data set
+        tc_storms = TropCyclone.from_tracks(storm_basin_sub, centroids=centrs)
+        tc_storms.frequency = np.ones(tc_storms.event_id.size) * freq_corr_STORM
+        tc_storms.check()
+        tc_storms.write_hdf5(HAZARD_DIR.joinpath(haz_str))    
+    
+    if applicable_basin:
+        return exp, centrs, applicable_basin, storm_basin_sub, tc_storms
+    else:
+        return exp, centrs, "Country code not found in basin", storm_basin_sub, tc_storms
