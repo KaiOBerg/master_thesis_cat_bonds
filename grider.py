@@ -11,8 +11,8 @@ from shapely.geometry import box, shape
 
 # Define raster properties
 pixel_size = 0.0083  # Size of each pixel in degrees (adjust this value as needed)
-buffer_size = 0.12  # Buffer size in degrees to expand the raster bounds (adjust this value as needed)
-grid_size = 0.15 # Size of each grid cell in degrees (adjust this value as needed)
+buffer_size = 0.139  # Buffer size in degrees to expand the raster bounds (adjust this value as needed)
+grid_size = 0.19 # Size of each grid cell in degrees (adjust this value as needed)
 
 
 def init_grid(exp):
@@ -85,7 +85,12 @@ def init_grid(exp):
     islands_gdf = gpd.GeoDataFrame({'geometry': island_polygons}, crs=crs)
 
     # Select grid cells that intersect with the islands
-    intersecting_cells = gpd.sjoin(grid_gdf, islands_gdf, how='inner')
+    intersecting_cells = gpd.sjoin(grid_gdf, islands_gdf, how='inner', predicate='intersects')
+    intersecting_cells = intersecting_cells.drop_duplicates(subset='geometry') #remove duplicates
+    intersecting_cells['index_right'] = [chr(65 + i) for i in range(len(intersecting_cells))] #assign unique letter to each grid cell
+    intersecting_cells.rename(columns = {'index_right': 'grid_letter'}, inplace = True)
+
+
     fig, ax = plt.subplots(figsize=(10, 10))
     # Plot the original raster
     islands_gdf.plot(ax=ax, color='blue', legend=True, legend_kwds={'label': 'Grid Cells'})

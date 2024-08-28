@@ -6,7 +6,7 @@ from climada.hazard import Centroids, tc_tracks, TropCyclone
 from climada.entity import LitPop
 
 #define directories
-EXPOSURE_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/EXPOSURE")
+EXPOSURE_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/exposure")
 HAZARD_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard")
 
 #define countries per tropical cyclone basin according to STORM dataset
@@ -31,7 +31,7 @@ basins_countries = {
 fin = 'gdp'
 year = 2020
 res = 30
-buffer = 0.1
+buffer = 1
 
 #define variables for TC class
 freq_corr_STORM = 1/10000
@@ -49,7 +49,6 @@ def init_TC_exp(track_dic, country, load_fls=False):
         exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
         
     exp.plot_raster()
-    exp.plot_scatter()
 
     """Generating Centroids"""
     lat = exp.gdf['latitude'].values
