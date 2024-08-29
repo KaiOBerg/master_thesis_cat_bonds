@@ -12,7 +12,7 @@ from shapely.geometry import box, shape
 # Define raster properties
 pixel_size = 0.0083  # Size of each pixel in degrees (adjust this value as needed)
 buffer_size = 0.139  # Buffer size in degrees to expand the raster bounds (adjust this value as needed)
-grid_size = 0.19 # Size of each grid cell in degrees (adjust this value as needed)
+grid_size = 0.3 # Size of each grid cell in degrees (adjust this value as needed)
 
 
 def init_grid(exp):

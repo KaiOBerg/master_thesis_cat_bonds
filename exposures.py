@@ -31,7 +31,7 @@ basins_countries = {
 fin = 'gdp'
 year = 2020
 res = 30
-buffer = 1
+buffer = 0.1
 
 #define variables for TC class
 freq_corr_STORM = 1/10000
