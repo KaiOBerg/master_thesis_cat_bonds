@@ -1,9 +1,11 @@
+import pandas as pd
+
 #import climada stuff
 from climada.entity.impact_funcs import trop_cyclone
 from climada.engine import ImpactCalc
 
 
-def init_imp(exp, haz):
+def init_imp(exp, haz, grid):
     #import regional calibrated impact function for TC
     # prepare impact calcuation - after Samuel Eberenz
     # The iso3n codes need to be consistent with the column “region_id” in the 
@@ -30,4 +32,30 @@ def init_imp(exp, haz):
     frequ_curve.plot()
     imp_per_exp = imp.imp_mat
 
-    return imp, imp_per_exp
+    # Perform a spatial join to associate each exposure point with calculated impact with a grid cell
+    exp_to_grid = exp.gdf.sjoin(grid,how='left', predicate="within")
+
+    #group each exposure point according to grid cell letter
+    agg_exp = exp_to_grid.groupby('grid_letter').apply(lambda x: x.index.tolist())
+
+    # Dictionary to store the selected values for each letter
+    imp_grid_csr = {}
+
+    # Loop through each letter and its corresponding line numbers
+    for letter, line_numbers in agg_exp.items():
+        # Select all rows for the specified columns in the CRS matrix
+        selected_values = imp_per_exp[:, line_numbers]
+    
+        # Store the selected values in the dictionary
+        imp_grid_csr[letter] = selected_values
+
+    imp_grid_evt = {} #total damage for each event per grid cell
+
+    for i in imp_grid_csr:
+        imp_grid_evt[i] = imp_grid_csr[i].sum(axis=1)
+        imp_grid_evt[i] = [matrix.item() for matrix in imp_grid_evt[i]]
+
+    imp_grid_evt = pd.DataFrame.from_dict(imp_grid_evt)
+
+    return imp, imp_per_exp, agg_exp, imp_grid_evt
+
