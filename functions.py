@@ -24,7 +24,12 @@ def calc_rp(df, return_period, damage=True):
     """
 
     if damage == True:
-        df['Rank'] = df['Damage'].rank(ascending=False, method='min')
+        # Create a DataFrame to sort the values and assign ranks
+        df = df.sort_values(by='Damage', ascending=False)
+        # Assign unique ranks
+        df['Rank'] = range(1, len(df) + 1)
+        # Map the ranks back to the original DataFrame
+        # Sort the original DataFrame to match the original order
         df['RP'] = (r + 1)/df['Rank']
         df = df.sort_values(by='RP')
         # Extract sorted return periods and impacts
@@ -34,7 +39,12 @@ def calc_rp(df, return_period, damage=True):
         # Interpolate impacts for the given return periods
         calc_value = np.interp(return_period, sorted_rp, sorted_impact)
     else: 
-        df['Rank'] = df['pay'].rank(ascending=False, method='min')
+        # Create a DataFrame to sort the values and assign ranks
+        df = df.sort_values(by='pay', ascending=False)
+        # Assign unique ranks
+        df['Rank'] = range(1, len(df) + 1)
+        # Map the ranks back to the original DataFrame
+        # Sort the original DataFrame to match the original order
         df['RP'] = (r + 1)/df['Rank']
         df = df.sort_values(by='RP')
         # Extract sorted return periods and impacts
