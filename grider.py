@@ -5,12 +5,11 @@ import rasterio
 from rasterio.io import MemoryFile
 from rasterio.features import shapes
 from rasterio.transform import from_origin
-from pathlib import Path
 from shapely.geometry import box, shape
 
 
 # Define raster properties
-pixel_size = 0.0083  # Size of each pixel in degrees (adjust this value as needed)
+pixel_size = 0.008333  # Size of each pixel in degrees (adjust this value as needed)
 buffer_size = 0.139  # Buffer size in degrees to expand the raster bounds (adjust this value as needed)
 grid_size = 0.3 # Size of each grid cell in degrees (adjust this value as needed)
 
@@ -31,7 +30,7 @@ def init_grid(exp):
     # Define the transformation matrix
     transform = from_origin(minx, maxy, pixel_size, pixel_size)
 
-    # Initialize the raster grid with NaNs (or zeros if appropriate)
+    # Initialize the raster grid with NaNs 
     raster = np.full((nrows, ncols), np.nan)
 
     # Loop through each point in the GeoDataFrame to assign values to the raster
@@ -68,12 +67,7 @@ def init_grid(exp):
     x_coords = np.arange(minx, maxx, grid_size)
     y_coords = np.arange(miny, maxy, grid_size)
 
-    grid_cells = []
-    for x in x_coords:
-        for y in y_coords:
-            cell = box(x, y, x + grid_size, y + grid_size)
-            grid_cells.append(cell)
-
+    grid_cells = [box(x, y, x + grid_size, y + grid_size) for x in x_coords for y in y_coords]
     grid_gdf = gpd.GeoDataFrame(grid_cells, columns=['geometry'], crs=crs)
     
     # Extract the shapes of the non-zero areas (islands)
@@ -87,15 +81,14 @@ def init_grid(exp):
     # Select grid cells that intersect with the islands
     intersecting_cells = gpd.sjoin(grid_gdf, islands_gdf, how='inner', predicate='intersects')
     intersecting_cells = intersecting_cells.drop_duplicates(subset='geometry') #remove duplicates
-    intersecting_cells['index_right'] = [chr(65 + i) for i in range(len(intersecting_cells))] #assign unique letter to each grid cell
-    intersecting_cells.rename(columns = {'index_right': 'grid_letter'}, inplace = True)
-
+    intersecting_cells['grid_letter'] = [chr(65 + i) for i in range(len(intersecting_cells))]
+    intersecting_cells = intersecting_cells.drop(columns=['index_right'])
 
     fig, ax = plt.subplots(figsize=(10, 10))
     # Plot the original raster
-    islands_gdf.plot(ax=ax, color='blue', legend=True, legend_kwds={'label': 'Grid Cells'})
+    islands_gdf.plot(ax=ax, color='blue', legend=True, label='Islands')
     # Plot the intersecting grid cells
-    intersecting_cells.plot(ax=ax, edgecolor='red', facecolor = 'none')
+    intersecting_cells.plot(ax=ax, edgecolor='red', facecolor = 'none', label='Grid cells')
     plt.title("Grid Cells Over Islands")
     plt.legend()
     plt.show()

@@ -25,36 +25,37 @@ def init_imp(exp, haz, grid):
         for country_iso3n in iso3n_per_region[calibration_region]:
             exp.gdf.loc[exp.gdf.region_id== country_iso3n, 'impf_TC'] = code_regions[calibration_region]
 
+    #perform impact calcualtion
     imp = ImpactCalc(exp, impf_set, haz).impact(save_mat=True)
 
     #compute exceedance frequency curve
     frequ_curve = imp.calc_freq_curve()
     frequ_curve.plot()
+    #save impact per exposure point
     imp_per_exp = imp.imp_mat
 
-    # Perform a spatial join to associate each exposure point with calculated impact with a grid cell
-    exp_to_grid = exp.gdf.sjoin(grid,how='left', predicate="within")
+    #Perform a spatial join to associate each exposure point with calculated impact with a grid cell
+    exp_to_grid = exp.gdf.sjoin(grid, how='left', predicate="within")
 
     #group each exposure point according to grid cell letter
     agg_exp = exp_to_grid.groupby('grid_letter').apply(lambda x: x.index.tolist())
 
-    # Dictionary to store the selected values for each letter
+    #Dictionary to store the impacts for each grid cell
     imp_grid_csr = {}
 
-    # Loop through each letter and its corresponding line numbers
+    #Loop through each grid cell and its corresponding line numbers
     for letter, line_numbers in agg_exp.items():
-        # Select all rows for the specified columns in the CRS matrix
-        selected_values = imp_per_exp[:, line_numbers]
-    
-        # Store the selected values in the dictionary
-        imp_grid_csr[letter] = selected_values
+        selected_values = imp_per_exp[:, line_numbers] #Select all impact values per grid cell
+        imp_grid_csr[letter] = selected_values #Store them in dictionary per grid cell
 
     imp_grid_evt = {} #total damage for each event per grid cell
 
+    #sum all impacts per grid cell
     for i in imp_grid_csr:
-        imp_grid_evt[i] = imp_grid_csr[i].sum(axis=1)
-        imp_grid_evt[i] = [matrix.item() for matrix in imp_grid_evt[i]]
+        imp_grid_evt[i] = imp_grid_csr[i].sum(axis=1) #calculate sum of impacts per frid cell
+        imp_grid_evt[i] = [matrix.item() for matrix in imp_grid_evt[i]] #single values per event are stored in 1:1 matrix -> only save value
 
+    #transform matrix to data frame
     imp_grid_evt = pd.DataFrame.from_dict(imp_grid_evt)
 
     return imp, imp_per_exp, agg_exp, imp_grid_evt
