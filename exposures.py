@@ -37,7 +37,8 @@ res = 30 #resolution in arcsec
 buffer = 0.1 #buffer in arcsex
 
 #define variables for TC class
-freq_corr_STORM = 1/10000
+r = 10000 #number of simulated years in tc dataset
+freq_corr_STORM = 1 / r
 
 
 
