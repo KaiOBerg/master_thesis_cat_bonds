@@ -21,7 +21,7 @@ def init_prem_ibrd():
     squaredDiffs = np.square(ibrd_bonds['Risk Multiple'] - monoExp(ibrd_bonds['Expected Loss'], a, k, b))
     squaredDiffsFromMean = np.square(ibrd_bonds['Risk Multiple'] - np.mean(ibrd_bonds['Risk Multiple']))
     rSquared = 1 - np.sum(squaredDiffs) / np.sum(squaredDiffsFromMean)
-    print(f"Risk multiple variance explained -> R² = {rSquared}")
+    #print(f"Risk multiple variance explained -> R² = {rSquared}")
 
 
     plt.scatter(ibrd_bonds['Expected Loss'], ibrd_bonds['Risk Multiple'])

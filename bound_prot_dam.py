@@ -4,7 +4,7 @@ import numpy as np
 
 r = 10000 #number of simulated years in tc dataset
 
-def init_dam_ret_per_grid(imp_grid_evt, lower_rp, nominal, adj_max=False, plt_dam_rp_grid=None):
+def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, plt_dam_rp_grid=None):
     """
     Initializes the return period grid by calculating damages per grid cell and their corresponding return periods.
     
@@ -13,7 +13,7 @@ def init_dam_ret_per_grid(imp_grid_evt, lower_rp, nominal, adj_max=False, plt_da
         lower_rp (float): A parameter used for calculating the lower return period damage.
         nominal (float): Nominal of the bond which can be used as maximum boundary of to be protected damages.
         adj_max (bool): Flag to adjust the maximum damage. Default is False.
-        plt_dam_rp_grid (str or None): Grid identifier to plot. Fefault is set to None to skip plotting. If plot is desired input must correspond to grid letter e.g. 'A'.
+        plt_dam_rp_grid (str or None): Grid identifier to plot. Default is set to None to skip plotting. If plot is desired input must correspond to grid letter e.g. 'A'.
 
     Returns:
         tuple: A tuple containing:
@@ -46,12 +46,12 @@ def init_dam_ret_per_grid(imp_grid_evt, lower_rp, nominal, adj_max=False, plt_da
         plt.title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid}')
         plt.show()
 
-    imp_grid_evt_flt = adj_imp_grid_evt(imp_grid_evt, nominal, adj_max)
+    imp_grid_evt_flt = adj_imp_grid_evt(imp_grid_evt, nominal, rp_dam_grid, adj_max)
 
     return rp_dam_grid, dam_rp_per_grid, imp_grid_evt_flt
 
 
-def adj_imp_grid_evt(imp_grid_evt, nominal, adj_max=False):
+def adj_imp_grid_evt(imp_grid_evt, rp_dam_grid, adj_max=False, nominal=None):
 
     imp_grid_evt_flt = imp_grid_evt.copy()
 

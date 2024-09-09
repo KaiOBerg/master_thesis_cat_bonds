@@ -1,14 +1,11 @@
 from climada.engine import ImpactCalc
 
-upper_rp = 200
-rel_prot = 0.05
-
-def init_nominal(impact=None, exposure=None):
+def init_nominal(impact, exposure, prot_rp=None, prot_share=None):
     tot_exp = exposure.gdf['value'].sum()
     if impact is not None:
-        nominal = impact.calc_freq_curve(200).impact
+        nominal = impact.calc_freq_curve(prot_rp).impact
     else:
-        nominal = tot_exp * rel_prot
+        nominal = tot_exp * prot_share
     
     nom_rel_exp = nominal/tot_exp
 
