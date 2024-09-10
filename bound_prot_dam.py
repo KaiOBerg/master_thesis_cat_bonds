@@ -46,7 +46,7 @@ def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, p
         plt.title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid}')
         plt.show()
 
-    imp_grid_evt_flt = adj_imp_grid_evt(imp_grid_evt, nominal, rp_dam_grid, adj_max)
+    imp_grid_evt_flt = adj_imp_grid_evt(imp_grid_evt, rp_dam_grid, adj_max=False, nominal=None)
 
     return rp_dam_grid, dam_rp_per_grid, imp_grid_evt_flt
 
@@ -60,7 +60,7 @@ def adj_imp_grid_evt(imp_grid_evt, rp_dam_grid, adj_max=False, nominal=None):
         min_val = rp_dam_grid.loc[i,'Lower']
         for j in range(len(imp_grid_evt)):
             sel_val = imp_grid_evt.iloc[j,i]
-            if sel_val > nominal and adj_max:
+            if adj_max and sel_val > nominal:
                 imp_grid_evt_flt.iloc[j,i] = nominal
             if sel_val < min_val:
                 imp_grid_evt_flt.iloc[j,i] = 0

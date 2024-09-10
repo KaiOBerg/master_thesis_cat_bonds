@@ -85,7 +85,7 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rates, event_probability, nomi
         else:
             pass
 
-        metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann","VaR_01_ann", "ES_01_ann", "Attachment_probability_ann", "Annual_expected_loss",
+        metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann", "Cond_sharpe_ratio_01", "Cond_sharpe_ratio_05", "VaR_01_ann", "ES_01_ann", "Attachment_probability_ann", "Annual_expected_loss",
                                                                               "Sharpe_ratio_tot","VaR_01_tot", "ES_01_tot", "Attachment_probability_bond", "Bond_expected_loss",
                                                                                 "Coverage", "Basis_risk", "Average Payments"])
     
@@ -123,8 +123,12 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rates, event_probability, nomi
             metrics_sim_mean = {key: np.nanmean(values_sim) for key, values_sim in metrics_sim.items()}
             VaR_01_ann = annual_returns.quantile(0.01)
             VaR_01_tot = tot_returns.quantile(0.01)
+            VaR_05_ann = annual_returns.quantile(0.05)
+            VaR_05_tot = tot_returns.quantile(0.05)
             ES_01_ann = annual_returns[annual_returns < VaR_01_ann].mean()
             ES_01_tot = tot_returns[tot_returns < VaR_01_tot].mean()
+            ES_05_ann = annual_returns[annual_returns < VaR_05_ann].mean()
+            ES_05_tot = tot_returns[tot_returns < VaR_05_tot].mean()
             exp_loss_ann = init_expected_loss(annual_returns)
             exp_loss_tot = init_expected_loss(tot_returns)
             att_prob_tot =  sum(1 for value in metrics_sim['tot_pay'] if value > 0) / num_simulations
@@ -132,8 +136,11 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rates, event_probability, nomi
     
             sharpe_ratio_ann = init_sharpe_ratio(annual_returns, rf_annual)
             sharpe_ratio_tot = init_sharpe_ratio(tot_returns, rf_total)
+            cond_sharpe_ratio_01 = init_sharpe_ratio(annual_returns, rf_total, ES_01_ann)
+            cond_sharpe_ratio_05 = init_sharpe_ratio(annual_returns, rf_total, ES_05_ann)
+
     
-            metrics_per_premium.loc[i] = [premium_float, sharpe_ratio_ann, VaR_01_ann, ES_01_ann, metrics_sim_mean['att_prob'], exp_loss_ann,
+            metrics_per_premium.loc[i] = [premium_float, sharpe_ratio_ann, cond_sharpe_ratio_01, cond_sharpe_ratio_05, VaR_01_ann, ES_01_ann, metrics_sim_mean['att_prob'], exp_loss_ann,
                                           sharpe_ratio_tot, VaR_01_tot, ES_01_tot, att_prob_tot, exp_loss_tot, 
                                           metrics_sim_mean['coverage'], metrics_sim_mean['basis_risk'], metrics_sim_mean['tot_pay']]  
             
@@ -245,10 +252,13 @@ def display_premiums(requ_premiums, requ_sharpe_ratio, rf_rates, simulated_metri
         plt.ylabel('Sharpe ratio')
         plt.show()
 
-def init_sharpe_ratio(rel_returns, risk_free_rate):
-    std = np.std(rel_returns)
+def init_sharpe_ratio(rel_returns, risk_free_rate, exp_short=None):
     exp_ret = np.mean(rel_returns)
     rf = np.mean(risk_free_rate)
+    if exp_short: 
+        std = exp_short
+    else:
+        std = np.std(rel_returns)
     sharpe_ratio = (exp_ret - rf) / std
     return sharpe_ratio
 

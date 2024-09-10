@@ -9,7 +9,7 @@ length = 20
 initial_params = np.tile(sequence, length // len(sequence))
 
 #Define bounds for minimum and maximum wind speeds
-bounds = [(30, 32) if i % 2 == 0 else (41, 43) for i in range(len(initial_params))]
+bounds = [(20, 40) if i % 2 == 0 else (41, 200) for i in range(len(initial_params))]
 
 def slope(x, y, min_pay, nominal):
     m = (nominal - min_pay) / (y - x)
