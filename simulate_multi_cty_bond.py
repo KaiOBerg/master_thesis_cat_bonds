@@ -11,35 +11,44 @@ term = 3
 num_simulations = 20000
 
 
-def init_bond_exp_loss(pay_dam_df, nominal, event_probability):
-    payouts = pay_dam_df['pay'].to_numpy()
-    losses = []
+def init_bond_exp_loss(pay_dam_df_dic, nominal, event_probabilities):
+    payouts = []
+    for key in pay_dam_df_dic.keys():
+        payouts.append(pay_dam_df_dic[key]['pay'].to_numpy())    
+    ann_loss = []
     cur_nominal = nominal
     payout_count = 0
 
     for i in range(term):
         #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
-        num_events = np.random.poisson(lam=event_probability)
-        #If there are events in the year, sample that many payouts and the associated damages
-        if num_events == 0 or cur_nominal == 0:
-            sum_payouts = 0
-        elif num_events > 0:
-            random_indices = np.random.randint(0, len(payouts), size=num_events)
-            sum_payouts = np.sum(payouts[random_indices]) 
-            if sum_payouts > 0:
-                cur_nominal -= sum_payouts
-                payout_count += 1
-                if cur_nominal < 0:
-                    sum_payouts += cur_nominal
-                    cur_nominal = 0
-                else:
-                    pass
+        num_events = []
+        losses = []
+        for j in range(event_probabilities):
+            num_events.append(np.random.poisson(lam=event_probabilities[j]))
+            #If there are events in the year, sample that many payouts and the associated damages
+            if num_events[j] == 0 or cur_nominal == 0:
+                sum_payouts = 0
+            elif num_events[j] > 0:
+                random_indices = np.random.randint(0, len(payouts[j]), size=num_events)
+                sum_payouts = np.sum(payouts[j][random_indices]) 
+                if sum_payouts > 0:
+                    cur_nominal -= sum_payouts
+                    if cur_nominal < 0:
+                        sum_payouts += cur_nominal
+                        cur_nominal = 0
+                    else:
+                        pass
+            
 
-        losses.append(sum_payouts)
+            losses.append(sum_payouts)
+        ann_pay = np.sum(sum_payouts)
+        if ann_pay > 0:
+            payout_count += 1
+        ann_loss.append(ann_pay)
     att_prob = payout_count / term
-    losses = np.mean(losses)
-    rel_losses = losses / nominal
-    return losses, rel_losses, att_prob
+    ann_avg_losses = np.mean(ann_loss)
+    rel_ann_avg_losses = losses / nominal
+    return ann_avg_losses, rel_ann_avg_losses, att_prob
 
 
 
@@ -65,7 +74,7 @@ def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, event_probability):
 
     return exp_loss_ann, att_prob
 
-def init_bond_simulation(pay_dam_df, premiums, rf_rates, event_probability, nominal, want_ann_returns=True, model_rf=False):
+def init_bond_simulation(pay_dam_df_dic, premiums, rf_rates, event_probabilities, nominal, want_ann_returns=True, model_rf=False):
 
     metric_names = ['att_prob', 'tot_payout', 'tot_damage', 'tot_pay']
 
@@ -99,7 +108,7 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rates, event_probability, nomi
                 else:
                     pass
 
-                simulated_ncf_rel, metrics, rf_rates_list = init_bond(pay_dam_df, premium, rf_iter, nominal, event_probability, model_rf)
+                simulated_ncf_rel, metrics, rf_rates_list = init_bond(pay_dam_df_dic, premium, rf_iter, nominal, event_probabilities, model_rf)
         
                 metrics_sim['att_prob'].append(metrics['att_prob'])
                 metrics_sim['tot_payout'].append(metrics['tot_payout'])
@@ -152,9 +161,12 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rates, event_probability, nomi
 
     return metrics_rf, returns_rf
 
-def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, model_rf=False):
-    payouts = pay_dam_df['pay'].to_numpy()
-    damages = pay_dam_df['damage'].to_numpy()
+def init_bond(pay_dam_df_dic, premium, risk_free_rates, nominal, event_probabilities, model_rf=False):
+    payouts = []
+    damages = []
+    for key in pay_dam_df_dic.keys():
+        payouts.append(pay_dam_df_dic[key]['pay'].to_numpy())    
+        damages.append(pay_dam_df_dic[key]['damage'].to_numpy())    
     simulated_ncf = []
     tot_payout = []
     tot_damage = []
@@ -168,35 +180,44 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
         rf = check_rf(risk_free_rates, i)
         rf_rates_list.append(rf)
         net_cash_flow = 0
-        #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
-        num_events = np.random.poisson(lam=event_probability)
-        #If there are events in the year, sample that many payouts and the associated damages
-        if num_events == 0 and not payout_happened or cur_nominal == 0:
-            net_cash_flow = cur_nominal * (premium + rf)
-            sum_damages = 0
-            sum_payouts = 0
-        elif num_events > 0:
-            random_indices = np.random.randint(0, len(payouts), size=num_events)
-            sum_payouts = np.sum(payouts[random_indices])
-            sum_damages = np.sum(damages[random_indices])
-            if sum_payouts == 0 and not payout_happened:
+        num_events = []
+        country_payouts = []
+        country_damages = []
+        country_ncf = []
+        for j in range(event_probabilities):
+            #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
+            num_events.append(np.random.poisson(lam=event_probabilities[j]))
+            #If there are events in the year, sample that many payouts and the associated damages
+            if num_events == 0 and not payout_happened or cur_nominal == 0:
                 net_cash_flow = cur_nominal * (premium + rf)
-            elif sum_payouts > 0:
-                net_cash_flow = 0 - sum_payouts
-                cur_nominal += net_cash_flow
-                payout_count += 1
-                payout_happened = True
-                if cur_nominal < 0:
-                    net_cash_flow = (cur_nominal - net_cash_flow) * -1
-                    sum_payouts = sum_payouts - cur_nominal
-                    cur_nominal = 0
-                else:
-                    pass
+                sum_damages = 0
+                sum_payouts = 0
+            elif num_events > 0:
+                random_indices = np.random.randint(0, len(payouts[j]), size=num_events)
+                sum_payouts = np.sum(payouts[j][random_indices])
+                sum_damages = np.sum(damages[j][random_indices])
+                if sum_payouts == 0 and not payout_happened:
+                    net_cash_flow = cur_nominal * (premium + rf)
+                elif sum_payouts > 0:
+                    net_cash_flow = 0 - sum_payouts
+                    cur_nominal += net_cash_flow
+                    payout_happened = True
+                    if cur_nominal < 0:
+                        net_cash_flow = (cur_nominal - net_cash_flow) * -1
+                        sum_payouts = sum_payouts - cur_nominal
+                        cur_nominal = 0
+                    else:
+                        pass
             
-
-        simulated_ncf.append(net_cash_flow)
-        tot_payout.append(sum_payouts)
-        tot_damage.append(sum_damages)
+            country_payouts.append(sum_payouts)
+            country_damages.append(sum_damages)
+            country_ncf.append(net_cash_flow)
+        ann_pay = np.sum(country_payouts)
+        if ann_pay > 0:
+            payout_count += 1
+        tot_payout.append(np.sum(ann_pay))
+        simulated_ncf.append(np.sum(country_ncf))
+        tot_damage.append(np.sum(country_damages))
     simulated_ncf_rel = simulated_ncf / nominal
     metrics['tot_payout'] = np.sum(tot_payout)
     metrics['tot_damage'] = np.sum(tot_damage)

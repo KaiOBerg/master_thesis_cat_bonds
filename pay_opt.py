@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.optimize import minimize
+from scipy.optimize import minimize, differential_evolution
 
 sequence = [30, 41]
 length = 20
@@ -26,13 +26,17 @@ def init_optimization(imp_grid_evt_flt, haz_int, max_min_pay, nominal):
     nominal = nominal
 
     #Perform optimization
-    result = minimize(
-        fun=objective_function,
+    result = differential_evolution(
+        func=objective_function,
         x0=initial_params,
         args=(imp_grid_evt_flt, haz_int, max_min_pay, nominal), 
-        method='L-BFGS-B',  #How to choose optimization method?
-        bounds=bounds  
-    )
+        strategy='best1bin',  #How to choose optimization method?
+        bounds=bounds,
+        maxiter=1000,
+        tol=1e-6,
+        workers=-1,  # Enable parallelism
+        polish=True,  # Refine the solution further
+        seed=42)
 
     #Extract the optimized parameters
     optimized_params = result.x

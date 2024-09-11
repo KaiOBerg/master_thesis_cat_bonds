@@ -44,7 +44,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(basins, country, load_fls=False):
+def init_TC_exp(country, load_fls=False):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -88,11 +88,10 @@ def init_TC_exp(basins, country, load_fls=False):
         centrs = Centroids.from_lat_lon(lat, lon)
         centrs.plot()
 
-        track_dic = init_STORM_tracks(basins, load_fls)
+        track_dic = init_STORM_tracks(applicable_basin)
 
         """Filter TC Tracks"""
         storm_basin_sub = {}
-
         storm_basin_sub = track_dic[applicable_basin].tracks_in_exp(exp, buffer)
         storm_basin_sub.write_hdf5(HAZARD_DIR.joinpath(track_str)) 
 
@@ -110,24 +109,17 @@ def init_TC_exp(basins, country, load_fls=False):
 
 
 #Load all STORM tracks for the basin of interest.
-def init_STORM_tracks(basins, load_fls=False):
+def init_STORM_tracks(basin, load_fls=False):
     """Import TC Tracks"""
-    #create empty dictionary for each basin 
+    all_tracks = []
     storms_basin = {}
+    print("----------------------Initiating TC Tracks----------------------")
+    fname = lambda i: f"STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
+    for i in range(10):
+        tracks_STORM = TCTracks.from_simulations_storm(STORM_dir.joinpath(fname(i)))
+        all_tracks.extend(tracks_STORM.data)
+    tracks_STORM.data = all_tracks
+            
+    storms_basin[basin] = tracks_STORM
 
-    #loop through each basin and save tc_tracks
-    for basin in basins:
-        print("----------------------Initiating TC Tracks----------------------")
-        storm_str = [f"STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt" for i in range(10)]
-        storm_paths = [STORM_dir.joinpath(storm_file) for storm_file in storm_str]
-
-        storms = [TCTracks.from_simulations_storm(storm_path) for storm_path in storm_paths]
-        
-        storms_combined = []
-    
-        for storm in storms:
-            storms_combined.append(storm.data)
-                
-        storms_basin[basin] = storms_combined
-    
     return storms_basin
