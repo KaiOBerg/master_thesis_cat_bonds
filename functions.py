@@ -10,3 +10,12 @@ def check_scalar(variable):
     
     return cor_var
 
+def get_all_values(d):
+    values = []
+    for value in d.values():
+        if isinstance(value, dict):
+            values.extend(get_all_values(value))
+        else:
+            values.append(value)
+    return values
+

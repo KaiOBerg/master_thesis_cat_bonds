@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import random
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
@@ -39,118 +40,101 @@ def init_bond_exp_loss(pay_dam_df, nominal, event_probability):
     att_prob = payout_count / term
     losses = np.mean(losses)
     rel_losses = losses / nominal
-    return losses, rel_losses, att_prob
+    return rel_losses, att_prob
 
 
 
-def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, event_probability):
+def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, event_probability, print_prob=True):
     att_prob_list = []
     #Monte Carlo Simulation
     annual_losses = []
-    annual_losses_rel = []
     for _ in range(num_simulations):
-        losses, rel_losses, att_prob = init_bond_exp_loss(pay_dam_df, nominal, event_probability)
+        losses, att_prob = init_bond_exp_loss(pay_dam_df, nominal, event_probability)
 
         att_prob_list.append(att_prob)
         annual_losses.append(losses)
-        annual_losses_rel.append(rel_losses)
 
-    # Convert simulated net cash flows to a series
     att_prob = np.mean(att_prob_list)
-    annual_losses = pd.Series(annual_losses)
-    annual_losses_rel = pd.Series(annual_losses_rel)
-    #calculate finacial metrics
-    exp_loss_ann = annual_losses_rel.mean()
-            
+    exp_loss_ann = np.mean(annual_losses)
+
+    if print_prob:
+        print(f'Expected Loss = {exp_loss_ann}')
+        print(f'Attachment Probability = {att_prob}')
 
     return exp_loss_ann, att_prob
 
-def init_bond_simulation(pay_dam_df, premiums, rf_rates, event_probability, nominal, want_ann_returns=True, model_rf=False):
+def init_bond_simulation(pay_dam_df, premiums, rf_rate, event_probability, nominal, want_ann_returns=True, model_rf=False):
 
-    metric_names = ['att_prob', 'tot_payout', 'tot_damage', 'tot_pay']
+    metric_names = ['tot_payout', 'tot_damage', 'tot_pay']
 
     #Check if premiums/rf_rates are single values
     premiums = fct.check_scalar(premiums)
-    rf_rates = fct.check_scalar(rf_rates)
 
-    returns_rf = {}
-    metrics_rf = {}
+    metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann", "Cond_sharpe_ratio_01", "Cond_sharpe_ratio_05", "VaR_01_ann", "ES_01_ann",
+                                                                              "Sharpe_ratio_tot","VaR_01_tot", "ES_01_tot",
+                                                                              "Coverage", "Basis_risk", "Average Payments"])
 
-    for rf_iter in rf_rates:
-        rf_str = str(rf_iter)
+    returns_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium","Annual", "Total"])
 
-        metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann", "Cond_sharpe_ratio_01", "Cond_sharpe_ratio_05", "VaR_01_ann", "ES_01_ann", "Attachment_probability_ann", "Annual_expected_loss",
-                                                                              "Sharpe_ratio_tot","VaR_01_tot", "ES_01_tot", "Attachment_probability_bond", "Bond_expected_loss",
-                                                                                "Coverage", "Basis_risk", "Average Payments"])
+    for i, premium in enumerate(premiums):
+        #Monte Carlo Simulation
+        annual_returns = []
+        tot_returns = []
+        rf_annual = []
+        rf_total = []
+        metrics_sim = {key: [] for key in metric_names}
+        for _ in range(num_simulations):
+            #model interest rates if wanted
+            if model_rf:
+                rf = init_model_rf(rf_rate)
+            else:
+                rf = rf_rate
+            simulated_ncf_rel, metrics, rf_rates_list = init_bond(pay_dam_df, premium, rf, nominal, event_probability, model_rf)
     
-        returns_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium","Annual", "Total"])
+            metrics_sim['tot_payout'].append(metrics['tot_payout'])
+            metrics_sim['tot_damage'].append(metrics['tot_damage'])
+            metrics_sim['tot_pay'].append(metrics['tot_pay'])
 
-        for i, premium in enumerate(premiums):
-            #Monte Carlo Simulation
-            annual_returns = []
-            tot_returns = []
-            rf_annual = []
-            rf_total = []
-            metrics_sim = {key: [] for key in metric_names}
-            for _ in range(num_simulations):
-                #model interest rates if wanted
-                if model_rf:
-                    rf_iter = init_model_rf(rf_iter)
-                else:
-                    pass
+            if want_ann_returns:
+                ann_return = np.mean(simulated_ncf_rel)
+            else:
+                ann_return = (1 + sum(simulated_ncf_rel)) ** (1/term) - 1
+            
+            annual_returns.append(ann_return)
+            tot_returns.append(np.sum(simulated_ncf_rel))
+            rf_annual.append(np.mean(rf_rates_list))
+            rf_total.append(np.sum(rf_rates_list))
 
-                simulated_ncf_rel, metrics, rf_rates_list = init_bond(pay_dam_df, premium, rf_iter, nominal, event_probability, model_rf)
+        # Convert simulated net cash flows to a series
+        annual_returns = pd.Series(annual_returns)
+        tot_returns = pd.Series(tot_returns)
+        #calculate finacial metrics
+        metrics_sim_sum = {}
+        metrics_sim_sum['tot_payout'] = np.sum(metrics_sim['tot_payout'])
+        metrics_sim_sum['tot_damage'] = np.sum(metrics_sim['tot_damage'])
+        metrics_sim_sum['tot_pay'] = np.nanmean(metrics_sim['tot_pay'])
+        VaR_01_ann = annual_returns.quantile(0.01)
+        VaR_01_tot = tot_returns.quantile(0.01)
+        VaR_05_ann = annual_returns.quantile(0.05)
+        VaR_05_tot = tot_returns.quantile(0.05)
+        ES_01_ann = annual_returns[annual_returns < VaR_01_ann].mean()
+        ES_01_tot = tot_returns[tot_returns < VaR_01_tot].mean()
+        ES_05_ann = annual_returns[annual_returns < VaR_05_ann].mean()
+        ES_05_tot = tot_returns[tot_returns < VaR_05_tot].mean()
+        premium_float = np.float64(premium)
+
+        sharpe_ratio_ann = init_sharpe_ratio(annual_returns, rf_annual)
+        sharpe_ratio_tot = init_sharpe_ratio(tot_returns, rf_total)
+        cond_sharpe_ratio_01 = init_sharpe_ratio(annual_returns, rf_annual, ES_01_ann * -1)
+        cond_sharpe_ratio_05 = init_sharpe_ratio(annual_returns, rf_annual, ES_05_ann * -1)
+
+        metrics_per_premium.loc[i] = [premium_float, sharpe_ratio_ann, cond_sharpe_ratio_01, cond_sharpe_ratio_05, VaR_01_ann, ES_01_ann,
+                                      sharpe_ratio_tot, VaR_01_tot, ES_01_tot, 
+                                      metrics_sim_sum['tot_payout']/metrics_sim_sum['tot_damage'], metrics_sim_sum['tot_payout']-metrics_sim_sum['tot_damage'], metrics_sim_sum['tot_pay']]  
         
-                metrics_sim['att_prob'].append(metrics['att_prob'])
-                metrics_sim['tot_payout'].append(metrics['tot_payout'])
-                metrics_sim['tot_damage'].append(metrics['tot_damage'])
-                metrics_sim['tot_pay'].append(metrics['tot_pay'])
-    
-                if want_ann_returns:
-                    ann_return = np.mean(simulated_ncf_rel)
-                else:
-                    ann_return = (1 + sum(simulated_ncf_rel)) ** (1/term) - 1
-                
-                annual_returns.append(ann_return)
-                tot_returns.append(np.sum(simulated_ncf_rel))
-                rf_annual.append(np.mean(rf_rates_list))
-                rf_total.append(np.sum(rf_rates_list))
-    
-            # Convert simulated net cash flows to a series
-            annual_returns = pd.Series(annual_returns)
-            tot_returns = pd.Series(tot_returns)
-            #calculate finacial metrics
-            metrics_sim_mean = {key: np.nanmean(values_sim) for key, values_sim in metrics_sim.items()}
-            VaR_01_ann = annual_returns.quantile(0.01)
-            VaR_01_tot = tot_returns.quantile(0.01)
-            VaR_05_ann = annual_returns.quantile(0.05)
-            VaR_05_tot = tot_returns.quantile(0.05)
-            ES_01_ann = annual_returns[annual_returns < VaR_01_ann].mean()
-            ES_01_tot = tot_returns[tot_returns < VaR_01_tot].mean()
-            ES_05_ann = annual_returns[annual_returns < VaR_05_ann].mean()
-            ES_05_tot = tot_returns[tot_returns < VaR_05_tot].mean()
-            exp_loss_ann = init_expected_loss(annual_returns)
-            exp_loss_tot = init_expected_loss(tot_returns)
-            att_prob_tot =  sum(1 for value in metrics_sim['tot_pay'] if value > 0) / num_simulations
-            premium_float = np.float64(premium)
-    
-            sharpe_ratio_ann = init_sharpe_ratio(annual_returns, rf_annual)
-            sharpe_ratio_tot = init_sharpe_ratio(tot_returns, rf_total)
-            cond_sharpe_ratio_01 = init_sharpe_ratio(annual_returns, rf_total, ES_01_ann)
-            cond_sharpe_ratio_05 = init_sharpe_ratio(annual_returns, rf_total, ES_05_ann)
+        returns_per_premium.loc[i] = [premium_float, annual_returns, tot_returns]
 
-    
-            metrics_per_premium.loc[i] = [premium_float, sharpe_ratio_ann, cond_sharpe_ratio_01, cond_sharpe_ratio_05, VaR_01_ann, ES_01_ann, metrics_sim_mean['att_prob'], exp_loss_ann,
-                                          sharpe_ratio_tot, VaR_01_tot, ES_01_tot, att_prob_tot, exp_loss_tot, 
-                                          metrics_sim_mean['tot_payout']/metrics_sim_mean['tot_damage'], metrics_sim_mean['tot_payout']-metrics_sim_mean['tot_damage'], metrics_sim_mean['tot_pay']]  
-            
-            returns_per_premium.loc[i] = [premium_float, annual_returns, tot_returns]
-
-            
-        returns_rf[rf_str] = returns_per_premium
-        metrics_rf[rf_str] = metrics_per_premium
-
-    return metrics_rf, returns_rf
+    return metrics_per_premium, returns_per_premium
 
 def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, model_rf=False):
     payouts = pay_dam_df['pay'].to_numpy()
@@ -159,10 +143,8 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
     tot_payout = []
     tot_damage = []
     rf_rates_list = []
-    payout_count = 0
     metrics = {}    
     cur_nominal = nominal
-    payout_happened = False
 
     for i in range(term):
         rf = check_rf(risk_free_rates, i)
@@ -171,7 +153,7 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
         #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
         num_events = np.random.poisson(lam=event_probability)
         #If there are events in the year, sample that many payouts and the associated damages
-        if num_events == 0 and not payout_happened or cur_nominal == 0:
+        if num_events == 0:
             net_cash_flow = cur_nominal * (premium + rf)
             sum_damages = 0
             sum_payouts = 0
@@ -179,19 +161,17 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
             random_indices = np.random.randint(0, len(payouts), size=num_events)
             sum_payouts = np.sum(payouts[random_indices])
             sum_damages = np.sum(damages[random_indices])
-            if sum_payouts == 0 and not payout_happened:
+            if sum_payouts == 0:
                 net_cash_flow = cur_nominal * (premium + rf)
             elif sum_payouts > 0:
                 net_cash_flow = 0 - sum_payouts
                 cur_nominal += net_cash_flow
-                payout_count += 1
-                payout_happened = True
                 if cur_nominal < 0:
                     net_cash_flow = (cur_nominal - net_cash_flow) * -1
                     sum_payouts = sum_payouts - cur_nominal
                     cur_nominal = 0
                 else:
-                    pass
+                    net_cash_flow = (cur_nominal * (premium + rf)) + net_cash_flow
             
 
         simulated_ncf.append(net_cash_flow)
@@ -200,7 +180,6 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
     simulated_ncf_rel = simulated_ncf / nominal
     metrics['tot_payout'] = np.sum(tot_payout)
     metrics['tot_damage'] = np.sum(tot_damage)
-    metrics['att_prob'] = payout_count / term
     if np.sum(tot_payout) == 0:
         tot_pay = np.nan
     else:
@@ -209,51 +188,43 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
 
     return simulated_ncf_rel, metrics, rf_rates_list
 
-def init_requ_premium(requ_sharpe_ratio, simulation_matrix, rf_rates):
+def init_requ_premium(requ_sharpe_ratio, simulation_matrix, rf_rate, print_prem=True):
 
     # Define the difference function between Sharpe ratio curve and required Sharpe ratio
     def intersection_func(x):
         return np.float64(sharpe_interp(x).item()) - requ_sharpe_ratio
     
-    requ_premiums = {}
+    premiums = simulation_matrix['Premium']
+    sharpe_ratios = simulation_matrix['Sharpe_ratio_tot']
+    # Interpolate the Sharpe ratio curve
+    sharpe_interp = interp1d(premiums, sharpe_ratios, kind='linear')
+    # Use fsolve to find the intersection point(s), provide a guess
+    x_guess = 0.01  # Initial guess based on the range of premiums
+    x_intersection = fsolve(intersection_func, x_guess)[0]
+    # Calculate the corresponding Sharpe ratio at the intersection point
+    y_intersection = sharpe_interp(x_intersection)
+    requ_premium = x_intersection
 
-    rf_rates = fct.check_scalar(rf_rates)
+    if print_prem:
+        print(f"Intersection point using risk free interest rate of {rf_rate*100}%: Premium = {x_intersection:.4f}, Sharpe Ratio = {y_intersection:.4f}")
 
-    for rf in rf_rates:
-        rf_str = str(rf)
-        premiums = simulation_matrix[rf_str]['Premium']
-        sharpe_ratios = simulation_matrix[rf_str]['Sharpe_ratio_tot']
+    return requ_premium
 
-        # Interpolate the Sharpe ratio curve
-        sharpe_interp = interp1d(premiums, sharpe_ratios, kind='linear')
+def display_premiums(requ_premiums, requ_sharpe_ratio, rf_rate, simulated_metrics, exp_loss):
+    
+    fig, ax1 = plt.subplots()
 
-        # Use fsolve to find the intersection point(s), provide a guess
-        x_guess = 0.01  # Initial guess based on the range of premiums
-        x_intersection = fsolve(intersection_func, x_guess)[0]
+    ax1.set_xlabel('Premium')
+    ax1.set_ylabel('Sharpe ratio')
+    ax1.plot(simulated_metrics['Premium'], simulated_metrics['Sharpe_ratio_ann'])
 
-        # Calculate the corresponding Sharpe ratio at the intersection point
-        y_intersection = sharpe_interp(x_intersection)
+    for i in range(len(requ_sharpe_ratio)):
+        risk_multiple = requ_premiums[i]/exp_loss
+        color = (random.random(), random.random(), random.random())
 
-        requ_premiums[rf_str] = x_intersection
-
-        print(f"Intersection point using risk free interest rate of {rf*100}%: Premium = {x_intersection:.4f}, Sharpe Ratio = {y_intersection:.4f}")
-
-    return requ_premiums
-
-def display_premiums(requ_premiums, requ_sharpe_ratio, rf_rates, simulated_metrics):
-    rf_rates = fct.check_scalar(rf_rates)
-    for rf in rf_rates:
-        rf_str = str(rf)
-        risk_multiple = requ_premiums[rf_str]/simulated_metrics[rf_str]['Annual_expected_loss'][1]
-        
-        plt.plot(simulated_metrics[rf_str]['Premium'], simulated_metrics[rf_str]['Sharpe_ratio_ann'])
-        plt.axhline(y = requ_sharpe_ratio, color = 'r', linestyle = '-', label='Required Sharpe Ratio') 
-        plt.text(0.1, 0.4, f'Risk free rate: {round(rf*100,3)}%', fontsize = 12)
-        plt.text(0.1, 0.3, f'Required Premium: {round(requ_premiums[rf_str]*100,3)}%', fontsize = 12)
-        plt.text(0.1, 0.2, f'Risk Multiple: {round(risk_multiple,3)}', fontsize = 12)
-        plt.xlabel('Premium')
-        plt.ylabel('Sharpe ratio')
-        plt.show()
+        ax1.axhline(y = requ_sharpe_ratio[i], color = color, linestyle = '-', label='Required Sharpe Ratio') 
+        print(f'Required Sharpe Ratio: {requ_sharpe_ratio[i]}; Risk free rate: {round(rf_rate*100,3)}%; Required Premium: {round(requ_premiums[i]*100,3)}%; Risk Multiple: {round(risk_multiple,3)}', )
+    plt.show()
 
 def init_sharpe_ratio(rel_returns, risk_free_rate, exp_short=None):
     exp_ret = np.mean(rel_returns)

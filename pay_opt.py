@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.optimize import minimize, differential_evolution
+from scipy.optimize import minimize
 
 sequence = [30, 41]
 length = 20
@@ -26,17 +26,12 @@ def init_optimization(imp_grid_evt_flt, haz_int, max_min_pay, nominal):
     nominal = nominal
 
     #Perform optimization
-    result = differential_evolution(
-        func=objective_function,
+    result = minimize(
+        fun=objective_function,
         x0=initial_params,
         args=(imp_grid_evt_flt, haz_int, max_min_pay, nominal), 
-        strategy='best1bin',  #How to choose optimization method?
-        bounds=bounds,
-        maxiter=1000,
-        tol=1e-6,
-        workers=-1,  # Enable parallelism
-        polish=True,  # Refine the solution further
-        seed=42)
+        method='L-BFGS-B',  #How to choose optimization method?
+        bounds=bounds)
 
     #Extract the optimized parameters
     optimized_params = result.x
@@ -107,7 +102,7 @@ def calculate_payout(x, y, haz_int, max_min_pay, nominal, grid):
 def pay_vs_damage(imp_grid_evt_flt, optimized_xs, optimized_ys, ws_grid, rp_dam_grid, nominal, include_plot=False):
     b = len(imp_grid_evt_flt)
     payout_evt_grd = pd.DataFrame({letter: [None] * b for letter in ws_grid.columns})
-    pay_dam_df = pd.DataFrame({'pay': [0] * b, 'damage': [0] * b})
+    pay_dam_df = pd.DataFrame({'pay': [0.0] * b, 'damage': [0.0] * b})
 
     for i in range(len(imp_grid_evt_flt)):
         tot_dam = np.sum(imp_grid_evt_flt.iloc[i, :])
@@ -142,4 +137,3 @@ def pay_vs_damage(imp_grid_evt_flt, optimized_xs, optimized_ys, ws_grid, rp_dam_
         pass
 
     return pay_dam_df
-

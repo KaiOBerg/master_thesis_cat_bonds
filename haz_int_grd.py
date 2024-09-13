@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import statistics
 
 def init_ws_grid(tc_storms, agg_exp, stat='max'):
     """
@@ -30,7 +31,7 @@ def init_ws_grid(tc_storms, agg_exp, stat='max'):
             if stat == 'mean':
                 ws_grid[letter][i] = selected_values.mean()
             elif stat == 'median':
-                ws_grid[letter][i] = np.median(selected_values)
+                ws_grid[letter][i] = statistics.median(selected_values)
             elif stat == 'max':
                 ws_grid[letter][i] = selected_values.max()
             else:
