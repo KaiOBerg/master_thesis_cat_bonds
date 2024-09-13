@@ -167,8 +167,8 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
                 net_cash_flow = 0 - sum_payouts
                 cur_nominal += net_cash_flow
                 if cur_nominal < 0:
-                    net_cash_flow = (cur_nominal - net_cash_flow) * -1
-                    sum_payouts = sum_payouts - cur_nominal
+                    sum_payouts = sum_payouts + cur_nominal
+                    net_cash_flow = 0 - sum_payouts
                     cur_nominal = 0
                 else:
                     net_cash_flow = (cur_nominal * (premium + rf)) + net_cash_flow

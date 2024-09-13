@@ -175,9 +175,9 @@ def init_bond(pay_dam_df_dic, premium, risk_free_rates, nominal, event_probabili
                 sum_payouts = np.sum(payouts[j][random_indices])
                 sum_damages = np.sum(damages[j][random_indices])
                 if sum_payouts > 0:
-                    cur_nominal += net_cash_flow
+                    cur_nominal -= sum_payouts
                     if cur_nominal < 0:
-                        sum_payouts = sum_payouts - cur_nominal
+                        sum_payouts = sum_payouts + cur_nominal
                         cur_nominal = 0
                     else:
                         pass
@@ -191,7 +191,7 @@ def init_bond(pay_dam_df_dic, premium, risk_free_rates, nominal, event_probabili
         if ann_pay == 0:
             net_cash_flow = cur_nominal * (premium + rf)
         else: 
-            net_cash_flow = (cur_nominal * (premium + rf)) + ann_pay
+            net_cash_flow = (cur_nominal * (premium + rf)) - ann_pay
 
         tot_payout.append(ann_pay)
         simulated_ncf.append(np.sum(net_cash_flow))
