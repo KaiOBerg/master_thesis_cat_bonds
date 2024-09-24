@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import re
 
 from scipy.optimize import minimize
 
@@ -8,7 +9,7 @@ minimum_payout = 0.1
 
 #Define bounds for minimum and maximum wind speeds
 initial_guess = [20, 61]  # Example initial guess
-bounds = [(20, 40), (51, 150)]  # Bounds for thresholds
+bounds = [(20, 40), (51, 250)]  # Bounds for thresholds
 
 def init_alt_payout(min_speed, max_speed, haz_int, nominal):
     payouts = []
@@ -30,7 +31,7 @@ def init_alt_objective_function(params, haz_int, damages, nominal):
 
 def init_alt_optimization(haz_int, damages, nominal, print_params=True):
     # Define bounds and initial guesses for each grid cell
-    grid_cells = range(len(haz_int.columns))  # Assuming 10 grid cells
+    grid_cells = range(len(haz_int.columns)-1)  # Assuming 10 grid cells
     grid_specific_results = {}
 
     for cell in grid_cells:
@@ -56,13 +57,14 @@ def init_alt_optimization(haz_int, damages, nominal, print_params=True):
 
 def alt_pay_vs_damage(damages, optimized_xs, optimized_ys, haz_int, nominal, include_plot=False):
     b = len(damages)
-    payout_evt_grd = pd.DataFrame({letter: [None] * b for letter in haz_int.columns})
-    pay_dam_df = pd.DataFrame({'pay': [0.0] * b, 'damage': [0.0] * b})
+    payout_evt_grd = pd.DataFrame({letter: [None] * b for letter in haz_int.columns[:-1]})
+    pay_dam_df = pd.DataFrame({'pay': [0.0] * b, 'damage': [0.0] * b, 'year': [0] * b})
 
     for i in range(len(damages)):
         tot_dam = np.sum(damages.iloc[i, :])
         pay_dam_df.loc[i,"damage"] = tot_dam
-        for j in range(len(haz_int.columns)):
+        pay_dam_df.loc[i,"year"] = int(haz_int['year'][i])
+        for j in range(len(haz_int.columns)-1):
             grid_hazint = haz_int.iloc[:,j] 
             payouts = init_alt_payout(optimized_xs[j], optimized_ys[j], grid_hazint, nominal)
             payout_evt_grd.iloc[:,j] = payouts

@@ -11,7 +11,7 @@ def init_nominal(impact, exposure, prot_rp=None, prot_share=None, print_nom=True
 
     if print_nom:
         print(f'The principal of the cat bond is: {nominal}')
-        print(f'Principal as perecntage of GDP: {nom_rel_exp}')
+        print(f'Principal as percentage of GDP: {nom_rel_exp}')
 
 
     return nominal, tot_exp, nom_rel_exp

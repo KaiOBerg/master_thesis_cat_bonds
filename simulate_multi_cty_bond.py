@@ -8,105 +8,158 @@ import functions as fct
 
 
 term = 3
-num_simulations = 20000
+simulated_years = 10000
 
 
-def init_bond_exp_loss(pay_dam_df_dic, nominal, event_probabilities):
-    payouts = []
-    for key in pay_dam_df_dic.keys():
-        payouts.append(pay_dam_df_dic[key]['pay'].to_numpy())    
+def init_bond_exp_loss(events_per_year, nominal):
     ann_loss = []
     cur_nominal = nominal
     payout_count = 0
+    cty_losses = {k: [] for k in range(len(events_per_year))}
 
-    for i in range(term):
-        #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
+    for k in range(term):
         losses = []
-        for j in range(len(event_probabilities)):
-            num_events = np.random.poisson(lam=event_probabilities[j])
+        for q in range(len(events_per_year)):
+            payouts = np.sum(events_per_year[k][q]['pay'].to_numpy())
             #If there are events in the year, sample that many payouts and the associated damages
-            if num_events == 0 or cur_nominal == 0:
+            if payouts == 0 or cur_nominal == 0:
                 sum_payouts = 0
-            elif num_events > 0:
-                random_indices = np.random.randint(0, len(payouts[j]), size=num_events)
-                sum_payouts = np.sum(payouts[j][random_indices]) 
-                if sum_payouts > 0:
-                    cur_nominal -= sum_payouts
-                    if cur_nominal < 0:
-                        sum_payouts += cur_nominal
-                        cur_nominal = 0
-                    else:
-                        pass
+            elif payouts > 0:
+                sum_payouts = payouts 
+                cur_nominal -= sum_payouts
+                if cur_nominal < 0:
+                    sum_payouts += cur_nominal
+                    cur_nominal = 0
+                else:
+                    pass
             
-
             losses.append(sum_payouts)
+            cty_losses[q].append(sum_payouts)
         ann_pay = np.sum(losses)
         if ann_pay > 0:
             payout_count += 1
         ann_loss.append(ann_pay)
+
     att_prob = payout_count / term
-    tot_loss = np.mean(ann_loss)
-    rel_losses = tot_loss / nominal
-    return rel_losses, att_prob
+    rel_tot_loss = np.sum(ann_loss) / nominal
+    rel_losses = ann_loss / nominal
+    for key in cty_losses:
+        cty_losses[key] = [cty_abs_loss / nominal for cty_abs_loss in cty_losses[key]]
+
+    return rel_losses, att_prob, rel_tot_loss, cty_losses
 
 
 
-def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, event_probabilities, print_prob=True):
+def init_exp_loss_att_prob_simulation(pay_dam_df_dic, nominal, print_prob=True):
     att_prob_list = []
-    #Monte Carlo Simulation
     annual_losses = []
-    for _ in range(num_simulations):
-        losses, att_prob = init_bond_exp_loss(pay_dam_df, nominal, event_probabilities)
+    total_losses = []
+    ann_cty_losses = {u: [] for u in range(len(pay_dam_df_dic))}
+
+    for i in range(simulated_years-3):
+        events_per_year = {u: [] for u in range(len(pay_dam_df_dic))}
+        for j in range(term):
+                for r in range(len(pay_dam_df_dic)):
+                    if 'year' in pay_dam_df_dic.columns:
+                        events_per_year[r].append(pay_dam_df_dic[pay_dam_df_dic['year'] == (i+j)])
+                    else:
+                        events_per_year[r].append(pd.DataFrame({'pay': [0], 'damage': [0]}))
+        losses, att_prob, rel_tot_loss, cty_losses = init_bond_exp_loss(events_per_year, nominal)
 
         att_prob_list.append(att_prob)
-        annual_losses.append(losses)
+        annual_losses.extend(losses)
+        total_losses.append(rel_tot_loss)
+
+        for key in cty_losses:
+            ann_cty_losses[key].extend(cty_losses[key])
 
     # Convert simulated net cash flows to a series
     att_prob = np.mean(att_prob_list)
     exp_loss_ann = np.mean(annual_losses)
+
+    annual_losses = pd.Series(annual_losses)
+    total_losses = pd.Series(total_losses)
+
+    VaR_99_ann = annual_losses.quantile(0.99)
+    VaR_99_tot = total_losses.quantile(0.99)
+    VaR_95_ann = annual_losses.quantile(0.95)
+    VaR_95_tot = total_losses.quantile(0.95)
+    ES_99_ann = annual_losses[annual_losses > VaR_99_ann].mean()
+    ES_99_tot = total_losses[total_losses > VaR_99_tot].mean()
+    ES_95_ann = annual_losses[annual_losses > VaR_95_ann].mean()
+    ES_95_tot = total_losses[total_losses > VaR_95_tot].mean()
+    MES_cty = {country: {'95': None, '99': None} for country in ann_cty_losses.keys()}
+    for country, ann_cty_losses_iter in ann_cty_losses.items():
+        ann_cty_losses_iter = pd.Series(ann_cty_losses_iter)
+        MES_cty[country]['95'] = ann_cty_losses_iter[annual_losses > VaR_95_ann].mean()
+        MES_cty[country]['99'] = ann_cty_losses_iter[annual_losses > VaR_99_ann].mean()
+
+    es_metrics = {'VaR_99_ann': VaR_99_ann, 'VaR_99_tot': VaR_99_tot, 'VaR_95_ann': VaR_95_ann, 'VaR_95_tot': VaR_95_tot,
+                  'ES_99_ann': ES_99_ann, 'ES_99_tot': ES_99_tot, 'ES_95_ann': ES_95_ann, 'ES_95_tot': ES_95_tot}
+    
     if print_prob:
         print(f'Expected Loss = {exp_loss_ann}')
         print(f'Attachment Probability = {att_prob}')
 
-    return exp_loss_ann, att_prob
+    return exp_loss_ann, att_prob, es_metrics, MES_cty
 
-def init_bond_simulation(pay_dam_df_dic, premiums, rf_rate, event_probabilities, nominal, want_ann_returns=True, model_rf=False):
+def init_bond_simulation(pay_dam_df_dic, premiums, rf_rate, nominal, countries, want_ann_returns=True, model_rf=False):
 
     metric_names = ['tot_payout', 'tot_damage', 'tot_pay']
 
     #Check if premiums/rf_rates are single values
     premiums = fct.check_scalar(premiums)
 
-    metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann", "Cond_sharpe_ratio_01", "Cond_sharpe_ratio_05", "VaR_01_ann", "ES_01_ann",
-                                                                              "Sharpe_ratio_tot","VaR_01_tot", "ES_01_tot",
+    metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann", "Sharpe_ratio_tot",
                                                                               "Coverage", "Basis_risk", "Average Payments"])
 
     returns_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium","Annual", "Total"])
-    for i, premium in enumerate(premiums):
+
+    tot_coverage_prem_cty = {}
+    for code in countries:
+        tot_coverage_prem_cty[code] = {'payout': [], 'damage': [], 'coverage': [], 'count_zero': 0}
+
+    for z, premium in enumerate(premiums):
         #Monte Carlo Simulation
         annual_returns = []
         tot_returns = []
         rf_annual = []
         rf_total = []
+        tot_coverage_cty = {}
+        for code in countries:
+            tot_coverage_cty[code] = {'payout': [], 'damage': [], 'count_zero': 0}
         metrics_sim = {key: [] for key in metric_names}
-        for _ in range(num_simulations):
+        for i in range(simulated_years-3):
             #model interest rates if wanted
             if model_rf:
                 rf = init_model_rf(rf_rate)
             else:
                 rf = rf_rate
-            simulated_ncf_rel, metrics, rf_rates_list = init_bond(pay_dam_df_dic, premium, rf, nominal, event_probabilities, model_rf)
+            events_per_year = {u: [] for u in range(len(pay_dam_df_dic))}
+            for j in range(term):
+                for r in range(len(pay_dam_df_dic)):
+                    if 'year' in pay_dam_df_dic.columns:
+                        events_per_year[r].append(pay_dam_df_dic[pay_dam_df_dic['year'] == (i+j)])
+                    else:
+                        events_per_year[r].append(pd.DataFrame({'pay': [0], 'damage': [0]}))
+            simulated_ncf_rel, metrics, rf_rates_list, coverage_cty = init_bond(pay_dam_df_dic, premium, rf, nominal, countries, model_rf)
     
             metrics_sim['tot_payout'].append(metrics['tot_payout'])
             metrics_sim['tot_damage'].append(metrics['tot_damage'])
             metrics_sim['tot_pay'].append(metrics['tot_pay'])
+            for key in coverage_cty.keys():
+                tot_coverage_cty[key]['payout'].append(coverage_cty[key]['payout'])
+                if coverage_cty[key]['payout'] == 0:
+                    tot_coverage_cty[key]['count_zero'] += 1
+                tot_coverage_cty[key]['damage'].append(coverage_cty[key]['damage'])
 
             if want_ann_returns:
-                ann_return = np.mean(simulated_ncf_rel)
+                annual_returns.append(np.mean(simulated_ncf_rel))
+
             else:
                 ann_return = (1 + sum(simulated_ncf_rel)) ** (1/term) - 1
-            
-            annual_returns.append(ann_return)
+                annual_returns.append(ann_return)
+
             tot_returns.append(np.sum(simulated_ncf_rel))
             rf_annual.append(np.mean(rf_rates_list))
             rf_total.append(np.sum(rf_rates_list))
@@ -119,93 +172,91 @@ def init_bond_simulation(pay_dam_df_dic, premiums, rf_rate, event_probabilities,
         metrics_sim_sum['tot_payout'] = np.sum(metrics_sim['tot_payout'])
         metrics_sim_sum['tot_damage'] = np.sum(metrics_sim['tot_damage'])
         metrics_sim_sum['tot_pay'] = np.nanmean(metrics_sim['tot_pay'])
-        VaR_01_ann = annual_returns.quantile(0.01)
-        VaR_01_tot = tot_returns.quantile(0.01)
-        VaR_05_ann = annual_returns.quantile(0.05)
-        VaR_05_tot = tot_returns.quantile(0.05)
-        ES_01_ann = annual_returns[annual_returns < VaR_01_ann].mean()
-        ES_01_tot = tot_returns[tot_returns < VaR_01_tot].mean()
-        ES_05_ann = annual_returns[annual_returns < VaR_05_ann].mean()
-        ES_05_tot = tot_returns[tot_returns < VaR_05_tot].mean()
+        for key in tot_coverage_cty.keys():
+            tot_coverage_prem_cty[key]['coverage'].append(sum(tot_coverage_cty[key]['payout']) / sum(tot_coverage_cty[key]['damage']))
+            tot_coverage_prem_cty[key]['payout'].append(sum(tot_coverage_cty[key]['payout']))
+            tot_coverage_prem_cty[key]['damage'].append(sum(tot_coverage_cty[key]['damage']))
+            tot_coverage_prem_cty[key]['count_zero'] += tot_coverage_cty[key]['count_zero']
+
         premium_float = np.float64(premium)
 
         sharpe_ratio_ann = init_sharpe_ratio(annual_returns, rf_annual)
         sharpe_ratio_tot = init_sharpe_ratio(tot_returns, rf_total)
-        cond_sharpe_ratio_01 = init_sharpe_ratio(annual_returns, rf_total, ES_01_ann)
-        cond_sharpe_ratio_05 = init_sharpe_ratio(annual_returns, rf_total, ES_05_ann)
 
-        metrics_per_premium.loc[i] = [premium_float, sharpe_ratio_ann, cond_sharpe_ratio_01, cond_sharpe_ratio_05, VaR_01_ann, ES_01_ann,
-                                      sharpe_ratio_tot, VaR_01_tot, ES_01_tot, 
+        metrics_per_premium.loc[i] = [premium_float, sharpe_ratio_ann, sharpe_ratio_tot,
                                       metrics_sim_sum['tot_payout']/metrics_sim_sum['tot_damage'], metrics_sim_sum['tot_payout']-metrics_sim_sum['tot_damage'], metrics_sim_sum['tot_pay']]  
         
         returns_per_premium.loc[i] = [premium_float, annual_returns, tot_returns]
 
             
-    return metrics_per_premium, returns_per_premium
+    return metrics_per_premium, returns_per_premium, tot_coverage_prem_cty
 
-def init_bond(pay_dam_df_dic, premium, risk_free_rates, nominal, event_probabilities, model_rf=False):
-    payouts = []
-    damages = []
-    for key in pay_dam_df_dic.keys():
-        payouts.append(pay_dam_df_dic[key]['pay'].to_numpy())    
-        damages.append(pay_dam_df_dic[key]['damage'].to_numpy())    
+def init_bond(events_per_year, premium, risk_free_rates, nominal, countries):   
     simulated_ncf = []
     tot_payout = []
     tot_damage = []
+    coverage_cty = {}
+    for code in countries:
+        coverage_cty[code] = {'payout': [], 'damage': []}
     rf_rates_list = []
     metrics = {}    
     cur_nominal = nominal
 
-    for i in range(term):
+    for k in range(term):
         rf = check_rf(risk_free_rates, i)
         rf_rates_list.append(rf)
         net_cash_flow = 0
-        country_payouts = []
-        country_damages = []
+        country_tot_payouts = []
+        country_tot_damages = []
+        country_payouts = {code: [] for code in countries}
+        country_damages = {code: [] for code in countries}
         country_ncf = []
-        for j in range(len(event_probabilities)):
+        for q in range(len(events_per_year)):
             #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
-            num_events = np.random.poisson(lam=event_probabilities[j])
+            payouts = np.sum(events_per_year[q][k]['pay'].to_numpy()) 
+            damages = np.sum(events_per_year[q][k]['damage'].to_numpy())  
             #If there are events in the year, sample that many payouts and the associated damages
-            if num_events == 0:
-                sum_damages = 0
+            sum_damages = damages
+            if payouts == 0:
                 sum_payouts = 0
-            elif num_events > 0:
-                random_indices = np.random.randint(0, len(payouts[j]), size=num_events)
-                sum_payouts = np.sum(payouts[j][random_indices])
-                sum_damages = np.sum(damages[j][random_indices])
-                if sum_payouts > 0:
-                    cur_nominal -= sum_payouts
-                    if cur_nominal < 0:
-                        sum_payouts = sum_payouts + cur_nominal
-                        cur_nominal = 0
-                    else:
-                        pass
+            elif payouts > 0:
+                sum_payouts = payouts
+                cur_nominal -= sum_payouts
+                if cur_nominal < 0:
+                    sum_payouts += cur_nominal
+                    cur_nominal = 0
+                else:
+                    pass
             
-            country_payouts.append(sum_payouts)
-            country_damages.append(sum_damages)
-            country_ncf.append(net_cash_flow)
+            country_payouts[countries[j]].append(sum_payouts)
+            country_damages[countries[j]].append(sum_damages)
+            country_tot_payouts.append(sum_payouts)
+            country_tot_damages.append(sum_damages)
 
-        ann_pay = np.sum(country_payouts)
+        ann_pay = np.sum(country_tot_payouts)
 
         if ann_pay == 0:
             net_cash_flow = cur_nominal * (premium + rf)
         else: 
             net_cash_flow = (cur_nominal * (premium + rf)) - ann_pay
 
+        country_ncf.append(net_cash_flow)
         tot_payout.append(ann_pay)
-        simulated_ncf.append(np.sum(net_cash_flow))
-        tot_damage.append(np.sum(country_damages))
+        simulated_ncf.append(net_cash_flow)
+        tot_damage.append(np.sum(country_tot_damages))
     simulated_ncf_rel = simulated_ncf / nominal
     metrics['tot_payout'] = np.sum(tot_payout)
     metrics['tot_damage'] = np.sum(tot_damage)
+    for key in country_payouts.keys():
+        coverage_cty[key]['payout'] = sum(country_payouts[key])
+        coverage_cty[key]['damage'] = sum(country_damages[key])
     if np.sum(tot_payout) == 0:
         tot_pay = np.nan
     else:
         tot_pay = np.sum(tot_payout)
     metrics['tot_pay'] = tot_pay
 
-    return simulated_ncf_rel, metrics, rf_rates_list
+    return simulated_ncf_rel, metrics, rf_rates_list, coverage_cty
 
 def init_requ_premium(requ_sharpe_ratio, simulation_matrix, rf_rates):
 
@@ -220,7 +271,7 @@ def init_requ_premium(requ_sharpe_ratio, simulation_matrix, rf_rates):
     for rf in rf_rates:
         rf_str = str(rf)
         premiums = simulation_matrix[rf_str]['Premium']
-        sharpe_ratios = simulation_matrix[rf_str]['Sharpe_ratio_tot']
+        sharpe_ratios = simulation_matrix[rf_str]['Sharpe_ratio_ann']
 
         # Interpolate the Sharpe ratio curve
         sharpe_interp = interp1d(premiums, sharpe_ratios, kind='linear')
@@ -249,7 +300,7 @@ def display_premiums(requ_premiums, requ_sharpe_ratio, rf_rates, simulated_metri
         plt.text(0.1, 0.4, f'Risk free rate: {round(rf*100,3)}%', fontsize = 12)
         plt.text(0.1, 0.3, f'Required Premium: {round(requ_premiums[rf_str]*100,3)}%', fontsize = 12)
         plt.text(0.1, 0.2, f'Risk Multiple: {round(risk_multiple,3)}', fontsize = 12)
-        plt.xlabel('Premium')
+        plt.xlabel('Premium [share of nominal]')
         plt.ylabel('Sharpe ratio')
         plt.show()
 

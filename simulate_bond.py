@@ -9,98 +9,121 @@ import functions as fct
 
 
 term = 3
-num_simulations = 20000
+simulated_years = 10000
 
-
-def init_bond_exp_loss(pay_dam_df, nominal, event_probability):
-    payouts = pay_dam_df['pay'].to_numpy()
+def init_bond_exp_loss(events_per_year, nominal):
     losses = []
     cur_nominal = nominal
     payout_count = 0
 
-    for i in range(term):
+    for k in range(term):
         #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
-        num_events = np.random.poisson(lam=event_probability)
+        payouts = np.sum(events_per_year[k]['pay'].to_numpy())
         #If there are events in the year, sample that many payouts and the associated damages
-        if num_events == 0 or cur_nominal == 0:
+        if payouts == 0 or cur_nominal == 0:
             sum_payouts = 0
-        elif num_events > 0:
-            random_indices = np.random.randint(0, len(payouts), size=num_events)
-            sum_payouts = np.sum(payouts[random_indices]) 
-            if sum_payouts > 0:
-                cur_nominal -= sum_payouts
-                payout_count += 1
-                if cur_nominal < 0:
-                    sum_payouts += cur_nominal
-                    cur_nominal = 0
-                else:
-                    pass
+        elif payouts > 0:
+            sum_payouts = payouts 
+            cur_nominal -= sum_payouts
+            payout_count += 1
+            if cur_nominal < 0:
+                sum_payouts += cur_nominal
+                cur_nominal = 0
+            else:
+                pass
 
         losses.append(sum_payouts)
     att_prob = payout_count / term
-    losses = np.mean(losses)
+    tot_loss = np.sum(losses) /nominal
     rel_losses = losses / nominal
-    return rel_losses, att_prob
+    return rel_losses, att_prob, tot_loss
 
 
 
-def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, event_probability, print_prob=True):
+def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=True):
     att_prob_list = []
-    #Monte Carlo Simulation
     annual_losses = []
-    for _ in range(num_simulations):
-        losses, att_prob = init_bond_exp_loss(pay_dam_df, nominal, event_probability)
+    total_losses = []
+    for i in range(simulated_years-3):
+        events_per_year = []
+        for j in range(term):
+                if 'year' in pay_dam_df.columns:
+                    events_per_year.append(pay_dam_df[pay_dam_df['year'] == (i+j)])
+                else:
+                    events_per_year.append(pd.DataFrame({'pay': [0], 'damage': [0]}))
+        losses, att_prob, tot_loss = init_bond_exp_loss(events_per_year, nominal)
 
         att_prob_list.append(att_prob)
-        annual_losses.append(losses)
+        annual_losses.extend(losses)
+        total_losses.append(tot_loss)
 
     att_prob = np.mean(att_prob_list)
     exp_loss_ann = np.mean(annual_losses)
+
+    annual_losses = pd.Series(annual_losses)
+    total_losses = pd.Series(total_losses)
+
+    VaR_99_ann = annual_losses.quantile(0.99)
+    VaR_99_tot = total_losses.quantile(0.99)
+    VaR_95_ann = annual_losses.quantile(0.95)
+    VaR_95_tot = total_losses.quantile(0.95)
+    ES_99_ann = annual_losses[annual_losses > VaR_99_ann].mean()
+    ES_99_tot = total_losses[total_losses > VaR_99_tot].mean()
+    ES_95_ann = annual_losses[annual_losses > VaR_95_ann].mean()
+    ES_95_tot = total_losses[total_losses > VaR_95_tot].mean()
+    es_metrics = {'VaR_99_ann': VaR_99_ann, 'VaR_99_tot': VaR_99_tot, 'VaR_95_ann': VaR_95_ann, 'VaR_95_tot': VaR_95_tot,
+                  'ES_99_ann': ES_99_ann, 'ES_99_tot': ES_99_tot, 'ES_95_ann': ES_95_ann, 'ES_95_tot': ES_95_tot}
 
     if print_prob:
         print(f'Expected Loss = {exp_loss_ann}')
         print(f'Attachment Probability = {att_prob}')
 
-    return exp_loss_ann, att_prob
+    return exp_loss_ann, att_prob, es_metrics
 
-def init_bond_simulation(pay_dam_df, premiums, rf_rate, event_probability, nominal, want_ann_returns=True, model_rf=False):
+def init_bond_simulation(pay_dam_df, premiums, rf_rate, nominal, want_ann_returns=True, model_rf=False):
 
     metric_names = ['tot_payout', 'tot_damage', 'tot_pay']
 
     #Check if premiums/rf_rates are single values
     premiums = fct.check_scalar(premiums)
 
-    metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann", "Cond_sharpe_ratio_01", "Cond_sharpe_ratio_05", "VaR_01_ann", "ES_01_ann",
-                                                                              "Sharpe_ratio_tot","VaR_01_tot", "ES_01_tot",
+    metrics_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium", "Sharpe_ratio_ann", "Sharpe_ratio_tot",
                                                                               "Coverage", "Basis_risk", "Average Payments"])
 
     returns_per_premium = pd.DataFrame(index = range(len(premiums)), columns=["Premium","Annual", "Total"])
 
-    for i, premium in enumerate(premiums):
+    for z, premium in enumerate(premiums):
         #Monte Carlo Simulation
         annual_returns = []
         tot_returns = []
         rf_annual = []
         rf_total = []
         metrics_sim = {key: [] for key in metric_names}
-        for _ in range(num_simulations):
+        for i in range(simulated_years-3):
             #model interest rates if wanted
             if model_rf:
                 rf = init_model_rf(rf_rate)
             else:
                 rf = rf_rate
-            simulated_ncf_rel, metrics, rf_rates_list = init_bond(pay_dam_df, premium, rf, nominal, event_probability, model_rf)
+            #create events per year of bond term
+            events_per_year = []
+            for j in range(term):
+                if 'year' in pay_dam_df.columns:
+                    events_per_year.append(pay_dam_df[pay_dam_df['year'] == (i+j)])
+                else:
+                    events_per_year.append(pd.DataFrame({'pay': [0], 'damage': [0]}))
+            simulated_ncf_rel, metrics, rf_rates_list = init_bond(events_per_year, premium, rf, nominal)
     
             metrics_sim['tot_payout'].append(metrics['tot_payout'])
             metrics_sim['tot_damage'].append(metrics['tot_damage'])
             metrics_sim['tot_pay'].append(metrics['tot_pay'])
 
             if want_ann_returns:
-                ann_return = np.mean(simulated_ncf_rel)
+                annual_returns.append(np.mean(simulated_ncf_rel))
             else:
                 ann_return = (1 + sum(simulated_ncf_rel)) ** (1/term) - 1
-            
-            annual_returns.append(ann_return)
+                annual_returns.append(ann_return)
+
             tot_returns.append(np.sum(simulated_ncf_rel))
             rf_annual.append(np.mean(rf_rates_list))
             rf_total.append(np.sum(rf_rates_list))
@@ -113,32 +136,19 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rate, event_probability, nomin
         metrics_sim_sum['tot_payout'] = np.sum(metrics_sim['tot_payout'])
         metrics_sim_sum['tot_damage'] = np.sum(metrics_sim['tot_damage'])
         metrics_sim_sum['tot_pay'] = np.nanmean(metrics_sim['tot_pay'])
-        VaR_01_ann = annual_returns.quantile(0.01)
-        VaR_01_tot = tot_returns.quantile(0.01)
-        VaR_05_ann = annual_returns.quantile(0.05)
-        VaR_05_tot = tot_returns.quantile(0.05)
-        ES_01_ann = annual_returns[annual_returns < VaR_01_ann].mean()
-        ES_01_tot = tot_returns[tot_returns < VaR_01_tot].mean()
-        ES_05_ann = annual_returns[annual_returns < VaR_05_ann].mean()
-        ES_05_tot = tot_returns[tot_returns < VaR_05_tot].mean()
         premium_float = np.float64(premium)
 
         sharpe_ratio_ann = init_sharpe_ratio(annual_returns, rf_annual)
         sharpe_ratio_tot = init_sharpe_ratio(tot_returns, rf_total)
-        cond_sharpe_ratio_01 = init_sharpe_ratio(annual_returns, rf_annual, ES_01_ann * -1)
-        cond_sharpe_ratio_05 = init_sharpe_ratio(annual_returns, rf_annual, ES_05_ann * -1)
 
-        metrics_per_premium.loc[i] = [premium_float, sharpe_ratio_ann, cond_sharpe_ratio_01, cond_sharpe_ratio_05, VaR_01_ann, ES_01_ann,
-                                      sharpe_ratio_tot, VaR_01_tot, ES_01_tot, 
+        metrics_per_premium.loc[z] = [premium_float, sharpe_ratio_ann, sharpe_ratio_tot,
                                       metrics_sim_sum['tot_payout']/metrics_sim_sum['tot_damage'], metrics_sim_sum['tot_payout']-metrics_sim_sum['tot_damage'], metrics_sim_sum['tot_pay']]  
         
-        returns_per_premium.loc[i] = [premium_float, annual_returns, tot_returns]
+        returns_per_premium.loc[z] = [premium_float, annual_returns, tot_returns]
 
     return metrics_per_premium, returns_per_premium
 
-def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, model_rf=False):
-    payouts = pay_dam_df['pay'].to_numpy()
-    damages = pay_dam_df['damage'].to_numpy()
+def init_bond(events_per_year, premium, risk_free_rates, nominal):
     simulated_ncf = []
     tot_payout = []
     tot_damage = []
@@ -146,32 +156,25 @@ def init_bond(pay_dam_df, premium, risk_free_rates, nominal, event_probability, 
     metrics = {}    
     cur_nominal = nominal
 
-    for i in range(term):
-        rf = check_rf(risk_free_rates, i)
+    for k in range(term):
+        rf = check_rf(risk_free_rates, k)
         rf_rates_list.append(rf)
-        net_cash_flow = 0
-        #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
-        num_events = np.random.poisson(lam=event_probability)
+        payouts = np.sum(events_per_year[k]['pay'].to_numpy()) 
+        damages = np.sum(events_per_year[k]['damage'].to_numpy())            
         #If there are events in the year, sample that many payouts and the associated damages
-        if num_events == 0:
-            net_cash_flow = cur_nominal * (premium + rf)
-            sum_damages = 0
+        sum_damages = damages
+        if payouts == 0:
             sum_payouts = 0
-        elif num_events > 0:
-            random_indices = np.random.randint(0, len(payouts), size=num_events)
-            sum_payouts = np.sum(payouts[random_indices])
-            sum_damages = np.sum(damages[random_indices])
-            if sum_payouts == 0:
-                net_cash_flow = cur_nominal * (premium + rf)
-            elif sum_payouts > 0:
-                net_cash_flow = 0 - sum_payouts
-                cur_nominal += net_cash_flow
-                if cur_nominal < 0:
-                    sum_payouts = sum_payouts + cur_nominal
-                    net_cash_flow = 0 - sum_payouts
-                    cur_nominal = 0
-                else:
-                    net_cash_flow = (cur_nominal * (premium + rf)) + net_cash_flow
+        elif payouts > 0:
+            sum_payouts = payouts
+            cur_nominal -= sum_payouts
+            if cur_nominal < 0:
+                sum_payouts += cur_nominal
+                cur_nominal = 0
+            else:
+                pass
+
+        net_cash_flow = (cur_nominal * (premium + rf)) - sum_payouts
             
 
         simulated_ncf.append(net_cash_flow)
@@ -195,7 +198,7 @@ def init_requ_premium(requ_sharpe_ratio, simulation_matrix, rf_rate, print_prem=
         return np.float64(sharpe_interp(x).item()) - requ_sharpe_ratio
     
     premiums = simulation_matrix['Premium']
-    sharpe_ratios = simulation_matrix['Sharpe_ratio_tot']
+    sharpe_ratios = simulation_matrix['Sharpe_ratio_ann']
     # Interpolate the Sharpe ratio curve
     sharpe_interp = interp1d(premiums, sharpe_ratios, kind='linear')
     # Use fsolve to find the intersection point(s), provide a guess
@@ -214,7 +217,7 @@ def display_premiums(requ_premiums, requ_sharpe_ratio, rf_rate, simulated_metric
     
     fig, ax1 = plt.subplots()
 
-    ax1.set_xlabel('Premium')
+    ax1.set_xlabel('Premium [share of nominal]')
     ax1.set_ylabel('Sharpe ratio')
     ax1.plot(simulated_metrics['Premium'], simulated_metrics['Sharpe_ratio_ann'])
 

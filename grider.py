@@ -14,7 +14,7 @@ buffer_size = 0.139  # Buffer size in degrees to expand the raster bounds (adjus
 grid_size = 0.3 # Size of each grid cell in degrees (adjust this value as needed)
 
 
-def init_grid(exp):
+def init_grid(exp, plot_rst=True):
     minx, miny, maxx, maxy = exp.gdf.total_bounds  # Get bounding box of the GeoDataFrame
 
     # Expand the bounds by the buffer size
@@ -84,13 +84,14 @@ def init_grid(exp):
     intersecting_cells['grid_letter'] = [chr(65 + i) for i in range(len(intersecting_cells))]
     intersecting_cells = intersecting_cells.drop(columns=['index_right'])
 
-    fig, ax = plt.subplots(figsize=(10, 10))
-    # Plot the original raster
-    islands_gdf.plot(ax=ax, color='blue', legend=True, label='Islands')
-    # Plot the intersecting grid cells
-    intersecting_cells.plot(ax=ax, edgecolor='red', facecolor = 'none', label='Grid cells')
-    plt.title("Grid Cells Over Islands")
-    plt.legend()
-    plt.show()
+    if plot_rst:
+        fig, ax = plt.subplots(figsize=(10, 10))
+        # Plot the original raster
+        islands_gdf.plot(ax=ax, color='blue', legend=True, label='Islands')
+        # Plot the intersecting grid cells
+        intersecting_cells.plot(ax=ax, edgecolor='red', facecolor = 'none', label='Grid cells')
+        plt.title("Grid Cells Over Islands")
+        plt.legend()
+        plt.show()
 
     return intersecting_cells

@@ -5,7 +5,7 @@ from climada.entity.impact_funcs import trop_cyclone
 from climada.engine import ImpactCalc
 
 
-def init_imp(exp, haz, grid):
+def init_imp(exp, haz, grid, plot_frequ=True):
     #import regional calibrated impact function for TC
     # prepare impact calcuation - after Samuel Eberenz
     # The iso3n codes need to be consistent with the column “region_id” in the 
@@ -30,7 +30,8 @@ def init_imp(exp, haz, grid):
 
     #compute exceedance frequency curve
     frequ_curve = imp.calc_freq_curve()
-    frequ_curve.plot()
+    if plot_frequ:
+        frequ_curve.plot()
     #save impact per exposure point
     imp_per_exp = imp.imp_mat
 
@@ -52,7 +53,7 @@ def init_imp(exp, haz, grid):
 
     #sum all impacts per grid cell
     for i in imp_grid_csr:
-        imp_grid_evt[i] = imp_grid_csr[i].sum(axis=1) #calculate sum of impacts per frid cell
+        imp_grid_evt[i] = imp_grid_csr[i].sum(axis=1) #calculate sum of impacts per grid cell
         imp_grid_evt[i] = [matrix.item() for matrix in imp_grid_evt[i]] #single values per event are stored in 1:1 matrix -> only save value
 
     #transform matrix to data frame

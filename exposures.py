@@ -44,7 +44,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, load_fls=False):
+def init_TC_exp(country, load_fls=False, plot_exp=True):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -68,8 +68,9 @@ def init_TC_exp(country, load_fls=False):
         print("----------------------Initiating Exposure----------------------")
         exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
         exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
-        
-    exp.plot_raster()
+    
+    if plot_exp:
+        exp.plot_raster()
 
     """initiate TC hazard from tracks and exposure"""
     # initiate new instance of TropCyclone(Hazard) class:
@@ -86,7 +87,8 @@ def init_TC_exp(country, load_fls=False):
         lat = exp.gdf['latitude'].values
         lon = exp.gdf['longitude'].values
         centrs = Centroids.from_lat_lon(lat, lon)
-        centrs.plot()
+        if plot_exp:
+            centrs.plot()
 
         track_dic = init_STORM_tracks(applicable_basin)
 
