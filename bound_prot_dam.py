@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 r = 10000 #number of simulated years in tc dataset
 
@@ -36,14 +37,41 @@ def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, p
         rp_dam_grid.loc[number] = [i, calc_rp(df,lower_rp)] #calculate damage of certain return periods, set max damage to nominal
 
     if plt_dam_rp_grid is not None:
-        #Create a plot
-        plt.figure(figsize=(12, 6))
 
-        #Plot a line connecting the points
-        plt.plot(dam_rp_per_grid[plt_dam_rp_grid]['RP'], dam_rp_per_grid[plt_dam_rp_grid]['Damage'], color='red', linestyle='-', linewidth=2)
-        plt.xlabel('Retrun Period [Years]')
-        plt.ylabel('Damage [USD]')
-        plt.title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid}')
+        mask = dam_rp_per_grid[plt_dam_rp_grid]['RP'] < 500
+        return_period_flt = dam_rp_per_grid[plt_dam_rp_grid]['RP'][mask]
+        impact_flt = dam_rp_per_grid[plt_dam_rp_grid]['Damage'][mask]
+
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(23, 6), gridspec_kw={'width_ratios': [10, 5, 5]})
+
+        ax1.plot(return_period_flt, impact_flt, label='Filtered Data', linestyle='-', color='red')
+
+        # Add labels and title
+        ax1.set_title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid}')
+        ax1.set_xlabel("Return Period [Years]")
+        ax1.set_ylabel("Impact [USD]")
+
+        # Create an inset plot (overview of total data)
+        inset_ax1 = inset_axes(ax1, width="30%", height="30%", loc='upper left', borderpad=3.0)  # adjust size and position
+        inset_ax1.plot(dam_rp_per_grid[plt_dam_rp_grid]['RP'], dam_rp_per_grid[plt_dam_rp_grid]['Damage'], label='Overview Data', linestyle='-', color='red')
+        inset_ax1.set_xlabel("Return Period [Years]", fontsize=8)
+        inset_ax1.set_ylabel("Impact [USD]", fontsize=8)
+
+        ax2.plot(dam_rp_per_grid[plt_dam_rp_grid]['RP'], dam_rp_per_grid[plt_dam_rp_grid]['Damage'], linestyle='-', color='red')
+        ax2.set_xscale('log')
+        ax2.set_xlabel('Return Period [Years]')
+        ax2.set_ylabel('Impact [USD]')
+        ax2.set_title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid} - Log')
+
+        ax3.plot(dam_rp_per_grid[plt_dam_rp_grid]['RP'], dam_rp_per_grid[plt_dam_rp_grid]['Damage'], linestyle='-', color='red')
+        ax3.set_xscale('log')
+        ax3.set_yscale('log')
+        ax3.set_xlabel('Return Period [Years]')
+        ax3.set_ylabel('Impact [USD]')
+        ax3.set_title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid} - LogLog')
+
+        # Show both plots
+        plt.tight_layout()
         plt.show()
 
     imp_grid_evt_flt = adj_imp_grid_evt(imp_grid_evt, rp_dam_grid, adj_max=False, nominal=None)
@@ -90,34 +118,30 @@ def calc_rp(df, return_period, damage=True):
     """
 
     if damage == True:
-        #Create a DataFrame to sort the values and assign ranks
-        df = df.sort_values(by='Damage', ascending=False)
-        #Assign unique ranks
-        df['Rank'] = range(1, len(df) + 1)
-        #Map the ranks back to the original DataFrame
-        #Sort the original DataFrame to match the original order
-        df['RP'] = (r + 1)/df['Rank']
-        df = df.sort_values(by='RP')
-        #Extract sorted return periods and impacts
-        sorted_rp = df['RP'].values
-        sorted_damage = df['Damage'].values
+        calc_rp_for = 'Damage'
+    else:
+        calc_rp_for = 'pay'
+    #Create a DataFrame to sort the values and assign ranks
+    df = df.sort_values(by=calc_rp_for, ascending=False)
+    #Assign unique ranks
+    df['Rank'] = range(1, len(df) + 1)
+    #Map the ranks back to the original DataFrame
+    #Sort the original DataFrame to match the original order
+    df['RP'] = (r + 1)/df['Rank']
+    df = df.sort_values(by='RP')
+    #Extract sorted return periods and impacts
+    sorted_rp = df['RP'].values
+    sorted_damage = df[calc_rp_for].values
+    #Interpolate impacts for the given return periods
+    calc_value = np.interp(return_period, sorted_rp, sorted_damage)
 
-        #Interpolate impacts for the given return periods
-        calc_value = np.interp(return_period, sorted_rp, sorted_damage)
-    else: 
-        #Create a DataFrame to sort the values and assign ranks
-        df = df.sort_values(by='pay', ascending=False)
-        #Assign unique ranks
-        df['Rank'] = range(1, len(df) + 1)
-        #Map the ranks back to the original DataFrame
-        #Sort the original DataFrame to match the original order
-        df['RP'] = (r + 1)/df['Rank']
-        df = df.sort_values(by='RP')
-        #Extract sorted return periods and impacts
-        sorted_rp = df['RP'].values
-        sorted_pay = df['pay'].values
-
-        #Interpolate impacts for the given return periods
-        calc_value = np.interp(return_period, sorted_rp, sorted_pay)
 
     return calc_value
+
+def init_imp_flt(imp_per_event, lower_rp):
+    imp_per_event_df = pd.DataFrame({'Damage': imp_per_event})
+    imp_lower_rp = calc_rp(imp_per_event_df, lower_rp, damage=True)
+    imp_per_event_flt=np.array(imp_per_event_df)
+    imp_per_event_flt[imp_per_event_flt < imp_lower_rp] = 0
+
+    return imp_per_event_flt

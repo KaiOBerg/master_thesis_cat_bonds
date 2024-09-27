@@ -9,7 +9,7 @@ import functions as fct
 
 
 term = 3
-simulated_years = 10000
+simulated_years = 10001
 
 def init_bond_exp_loss(events_per_year, nominal):
     losses = []
@@ -35,7 +35,7 @@ def init_bond_exp_loss(events_per_year, nominal):
         losses.append(sum_payouts)
     att_prob = payout_count / term
     tot_loss = np.sum(losses) /nominal
-    rel_losses = losses / nominal
+    rel_losses = np.array(losses) / nominal
     return rel_losses, att_prob, tot_loss
 
 
@@ -44,13 +44,13 @@ def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=True):
     att_prob_list = []
     annual_losses = []
     total_losses = []
-    for i in range(simulated_years-3):
+    for i in range(simulated_years-term):
         events_per_year = []
         for j in range(term):
-                if 'year' in pay_dam_df.columns:
-                    events_per_year.append(pay_dam_df[pay_dam_df['year'] == (i+j)])
-                else:
-                    events_per_year.append(pd.DataFrame({'pay': [0], 'damage': [0]}))
+            if 'year' in pay_dam_df.columns:
+                events_per_year.append(pay_dam_df[pay_dam_df['year'] == (i+j)])
+            else:
+                events_per_year.append(pd.DataFrame({'pay': [0], 'damage': [0]}))
         losses, att_prob, tot_loss = init_bond_exp_loss(events_per_year, nominal)
 
         att_prob_list.append(att_prob)
@@ -99,7 +99,7 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rate, nominal, want_ann_return
         rf_annual = []
         rf_total = []
         metrics_sim = {key: [] for key in metric_names}
-        for i in range(simulated_years-3):
+        for i in range(simulated_years-term):
             #model interest rates if wanted
             if model_rf:
                 rf = init_model_rf(rf_rate)
@@ -119,7 +119,7 @@ def init_bond_simulation(pay_dam_df, premiums, rf_rate, nominal, want_ann_return
             metrics_sim['tot_pay'].append(metrics['tot_pay'])
 
             if want_ann_returns:
-                annual_returns.append(np.mean(simulated_ncf_rel))
+                annual_returns.extend(simulated_ncf_rel)
             else:
                 ann_return = (1 + sum(simulated_ncf_rel)) ** (1/term) - 1
                 annual_returns.append(ann_return)
@@ -180,7 +180,7 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal):
         simulated_ncf.append(net_cash_flow)
         tot_payout.append(sum_payouts)
         tot_damage.append(sum_damages)
-    simulated_ncf_rel = simulated_ncf / nominal
+    simulated_ncf_rel = np.array(simulated_ncf) / nominal
     metrics['tot_payout'] = np.sum(tot_payout)
     metrics['tot_damage'] = np.sum(tot_damage)
     if np.sum(tot_payout) == 0:
