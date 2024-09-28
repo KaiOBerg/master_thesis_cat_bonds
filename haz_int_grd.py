@@ -6,7 +6,7 @@ from shapely.geometry import Point
 
 
 
-def init_haz_int(grid, tc_storms=None, tc_tracks=None, stat=100):
+def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100):
     """
     Calculates a specified statistic (mean, max, or median) for each events sustained wind speeds
     from tc_storms for each grid cell.
@@ -23,8 +23,8 @@ def init_haz_int(grid, tc_storms=None, tc_tracks=None, stat=100):
 
     if tc_storms:
         #group each exposure point according to grid cell letter
-        centrs_to_grid = tc_storms.centroids.gdf.sjoin(grid, how='left', predicate="within")
-        agg_exp = centrs_to_grid.groupby('grid_letter').apply(lambda x: x.index.tolist())
+        centrs_to_grid = tc_storms.centroids.gdf.sjoin(admin, how='left', predicate="within")
+        agg_exp = centrs_to_grid.groupby('admin_letter').apply(lambda x: x.index.tolist())
 
         #Initialize a dictionary to hold the calculated statistics
         int_grid = {letter: [None] * len(tc_storms.event_id) for letter in agg_exp.keys()}
@@ -48,6 +48,9 @@ def init_haz_int(grid, tc_storms=None, tc_tracks=None, stat=100):
                 else:
                     raise ValueError("Invalid statistic choice. Choose number for percentile or 'mean'")        
         int_grid = pd.DataFrame.from_dict(int_grid)
+        int_grid = int_grid.where(int_grid >= 33, 0)
+        int_grid['count_grids'] = (int_grid > 0).sum(axis=1)
+        int_grid.loc[int_grid['count_grids'] > 0, 'count_grids'] -= 1
 
     elif tc_tracks:
         grid_crs = grid.crs
@@ -70,8 +73,13 @@ def init_haz_int(grid, tc_storms=None, tc_tracks=None, stat=100):
                 if max_pressure_per_grid.get(letter):
                     int_grid[letter][i] = max_pressure_per_grid.get(letter)
                 else:
-                    int_grid[letter][i] = np.nan
+                    int_grid[letter][i] = 0
         int_grid = pd.DataFrame.from_dict(int_grid)
+        #int_grid = int_grid.where(int_grid < 979, 0)
+        int_grid['count_grids'] = (int_grid > 0).sum(axis=1)
+        int_grid.loc[int_grid['count_grids'] > 0, 'count_grids'] -= 1
+
+
 
     else: 
         print("Error: Input missing")

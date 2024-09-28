@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import random
 from scipy.interpolate import interp1d
-from scipy.optimize import fsolve
+from scipy.optimize import fsolve, minimize
 import matplotlib.pyplot as plt
 
 import functions as fct
@@ -78,7 +78,7 @@ def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=True):
         print(f'Expected Loss = {exp_loss_ann}')
         print(f'Attachment Probability = {att_prob}')
 
-    return exp_loss_ann, att_prob, es_metrics
+    return exp_loss_ann, att_prob, annual_losses, es_metrics
 
 def init_bond_simulation(pay_dam_df, premiums, rf_rate, nominal, want_ann_returns=True, model_rf=False):
 
@@ -276,3 +276,19 @@ def check_rf(risk_free_rates, iterator):
         rf = risk_free_rates
 
     return rf
+
+
+def find_sharpe(premium, payout, sigma, rf, target_sharpe):
+    expected_return = (premium + rf) - payout
+    return (((expected_return - rf) / sigma - target_sharpe)**2)**0.5
+
+def init_prem_sharpe_ratio(ann_losses, rf, target_sharpe):
+    # Example inputs
+    avg_losses = np.mean(ann_losses)
+    sigma = np.std(ann_losses)
+
+    result = minimize(lambda p: find_sharpe(p, avg_losses, sigma, rf, target_sharpe), 
+                      x0=[0.05])
+    optimal_premium = result.x[0]
+
+    return optimal_premium

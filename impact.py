@@ -9,7 +9,7 @@ from climada.entity.impact_funcs import trop_cyclone
 from climada.engine import ImpactCalc
 
 
-def init_imp(exp, haz, imp_admin=None, plot_frequ=True):
+def init_imp(exp, haz, admin_gdf=None, plot_frequ=True):
     #import regional calibrated impact function for TC
     # prepare impact calcuation - after Samuel Eberenz
     # The iso3n codes need to be consistent with the column “region_id” in the 
@@ -74,12 +74,12 @@ def init_imp(exp, haz, imp_admin=None, plot_frequ=True):
     #save impact per exposure point
     imp_per_event = imp.at_event
 
-    if imp_admin:
+    if admin_gdf is not None:
         #save impact per exposure point
         imp_per_exp = imp.imp_mat
 
         #Perform a spatial join to associate each exposure point with calculated impact with a grid cell
-        exp_to_admin = exp.gdf.sjoin(imp_admin, how='left', predicate="within")
+        exp_to_admin = exp.gdf.sjoin(admin_gdf, how='left', predicate="within")
 
         #group each exposure point according to grid cell letter
         agg_exp = exp_to_admin.groupby('admin_letter').apply(lambda x: x.index.tolist())
@@ -102,5 +102,7 @@ def init_imp(exp, haz, imp_admin=None, plot_frequ=True):
         #transform matrix to data frame
         imp_admin_evt = pd.DataFrame.from_dict(imp_admin_evt)
 
-    return imp, imp_per_event
+        return imp, imp_per_event, imp_admin_evt
+    else:
+        return imp, imp_per_event, None
 
