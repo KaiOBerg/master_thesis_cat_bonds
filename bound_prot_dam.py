@@ -138,10 +138,13 @@ def calc_rp(df, return_period, damage=True):
 
     return calc_value
 
-def init_imp_flt(imp_per_event, lower_rp):
+def init_imp_flt(imp_per_event, imp_admin_evt, lower_rp):
     imp_per_event_df = pd.DataFrame({'Damage': imp_per_event})
     imp_lower_rp = calc_rp(imp_per_event_df, lower_rp, damage=True)
     imp_per_event_flt=np.array(imp_per_event_df)
     imp_per_event_flt[imp_per_event_flt < imp_lower_rp] = 0
+    imp_admin_evt_flt = imp_admin_evt.copy()
+    imp_admin_evt_flt.loc[imp_admin_evt_flt.sum(axis=1) < imp_lower_rp, :] = 0
 
-    return imp_per_event_flt
+
+    return imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp

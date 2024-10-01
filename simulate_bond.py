@@ -278,16 +278,25 @@ def check_rf(risk_free_rates, iterator):
     return rf
 
 
-def find_sharpe(premium, payout, sigma, rf, target_sharpe):
-    expected_return = (premium + rf) - payout
-    return (((expected_return - rf) / sigma - target_sharpe)**2)**0.5
+def find_sharpe(premium, ann_losses, rf, target_sharpe):
+    ncf = []
+    cur_nominal = 1
+    for i in range(len(ann_losses)):
 
-def init_prem_sharpe_ratio(ann_losses, rf, target_sharpe):
-    # Example inputs
-    avg_losses = np.mean(ann_losses)
-    sigma = np.std(ann_losses)
+        if ann_losses[i] == 0:
+            ncf.append(cur_nominal * (premium + rf) - ann_losses[i])
+        elif ann_losses[i] > 0:
+            cur_nominal -= ann_losses[i]
+            ncf.append(cur_nominal * (premium + rf) - ann_losses[i])
+        if (i + 1) % term == 0:
+            cur_nominal = 1
+    avg_ret = np.mean(ncf)
+    sigma = np.std(ncf)
+    return (((avg_ret - rf) / sigma - target_sharpe)**2)**0.5
 
-    result = minimize(lambda p: find_sharpe(p, avg_losses, sigma, rf, target_sharpe), 
+def init_prem_sharpe_ratio(ann_losses, rf, target_sharpe):        
+
+    result = minimize(lambda p: find_sharpe(p, ann_losses, rf, target_sharpe), 
                       x0=[0.05])
     optimal_premium = result.x[0]
 

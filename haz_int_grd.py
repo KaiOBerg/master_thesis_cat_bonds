@@ -48,7 +48,7 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
                 else:
                     raise ValueError("Invalid statistic choice. Choose number for percentile or 'mean'")        
         int_grid = pd.DataFrame.from_dict(int_grid)
-        int_grid = int_grid.where(int_grid >= 33, 0)
+        #int_grid = int_grid.where(int_grid >= 33, 0)
         int_grid['count_grids'] = (int_grid > 0).sum(axis=1)
         int_grid.loc[int_grid['count_grids'] > 0, 'count_grids'] -= 1
 

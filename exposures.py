@@ -2,6 +2,7 @@ import numpy as np
 from pathlib import Path
 import geopandas as gpd
 from shapely.geometry import Point
+import matplotlib.pyplot as plt
 
 
 #import CLIMADA modules:
@@ -89,6 +90,19 @@ def init_TC_exp(country, load_fls=False, plot_exp=True, plot_centrs=True, plt_gr
     admin_gdf = gpd.read_file(ADMIN_DIR.joinpath(admin_str))
     admin_gdf = admin_gdf.to_crs(grid_gdf_csr)
     admin_gdf['admin_letter'] = [chr(65 + i) for i in range(len(admin_gdf))]
+    if plt_grd:
+        outer_boundary_grd = grid_gdf.dissolve()
+        fig, ax = plt.subplots(figsize=(10, 10))
+        islands_gdf.plot(ax=ax, color="green", label="Islands")
+        admin_gdf.plot(ax=ax, facecolor="none", edgecolor="red", label="Admin")
+        outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", edgecolor="black", label="TC Track Boundary")
+        handles = [
+            plt.Line2D([0], [0], color="green", lw=4, label="Islands"),           
+            plt.Line2D([0], [0], color="red", lw=2, label="Admin"),  
+            plt.Line2D([0], [0], color="black", lw=2, label="TC Track Boundary")           
+        ]
+        ax.legend(handles=handles, loc="upper right")
+        plt.show()
 
     """initiate TC hazard from tracks and exposure"""
     # initiate new instance of TropCyclone(Hazard) class:
@@ -105,7 +119,7 @@ def init_TC_exp(country, load_fls=False, plot_exp=True, plot_centrs=True, plt_gr
         lat = exp.gdf['latitude'].values
         lon = exp.gdf['longitude'].values
         centrs = Centroids.from_lat_lon(lat, lon)
-        if plot_exp:
+        if plot_centrs:
             centrs.plot()
 
         """Import TC Tracks"""
