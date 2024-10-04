@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
+import set_nominal as snom
+
 r = 10000 #number of simulated years in tc dataset
 
 def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, plt_dam_rp_grid=None):
@@ -138,13 +140,17 @@ def calc_rp(df, return_period, damage=True):
 
     return calc_value
 
-def init_imp_flt(imp_per_event, imp_admin_evt, lower_rp):
+def init_imp_flt(imp_per_event, imp_admin_evt, lower_rp=None, prot_share=None, exposure=None):
     imp_per_event_df = pd.DataFrame({'Damage': imp_per_event})
-    imp_lower_rp = calc_rp(imp_per_event_df, lower_rp, damage=True)
     imp_per_event_flt=np.array(imp_per_event_df)
-    imp_per_event_flt[imp_per_event_flt < imp_lower_rp] = 0
+    if lower_rp is not None:
+        to_protect = calc_rp(imp_per_event_df, lower_rp, damage=True)
+    else: 
+        to_protect = snom.init_nominal(exposure=exposure, prot_share=prot_share, print_nom=False)
+
+    imp_per_event_flt[imp_per_event_flt < to_protect] = 0
     imp_admin_evt_flt = imp_admin_evt.copy()
-    imp_admin_evt_flt.loc[imp_admin_evt_flt.sum(axis=1) < imp_lower_rp, :] = 0
+    imp_admin_evt_flt.loc[imp_admin_evt_flt.sum(axis=1) < to_protect, :] = 0
 
 
-    return imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp
+    return imp_per_event_flt, imp_admin_evt_flt, to_protect

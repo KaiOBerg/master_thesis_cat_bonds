@@ -85,16 +85,19 @@ def init_TC_exp(country, load_fls=False, plot_exp=True, plot_centrs=True, plt_gr
 
     """Divide Exposure set into admin/grid cells"""
     islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
-    grid_gdf_csr = grid_gdf.crs
-    admin_str = f"{country}/{country}_adm_1.shp"
-    admin_gdf = gpd.read_file(ADMIN_DIR.joinpath(admin_str))
-    admin_gdf = admin_gdf.to_crs(grid_gdf_csr)
-    admin_gdf['admin_letter'] = [chr(65 + i) for i in range(len(admin_gdf))]
+    #grid_gdf_csr = grid_gdf.crs
+    #admin_str = f"{country}/{country}_adm_1.shp"
+    #admin_gdf = gpd.read_file(ADMIN_DIR.joinpath(admin_str))
+    #admin_gdf = admin_gdf.to_crs(grid_gdf_csr)
+    #admin_gdf['admin_letter'] = [chr(65 + i) for i in range(len(admin_gdf))]
+    islands_split_gdf = grd.init_equ_pol(exp)
+    islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
+
     if plt_grd:
         outer_boundary_grd = grid_gdf.dissolve()
         fig, ax = plt.subplots(figsize=(10, 10))
         islands_gdf.plot(ax=ax, color="green", label="Islands")
-        admin_gdf.plot(ax=ax, facecolor="none", edgecolor="red", label="Admin")
+        islands_split_gdf.plot(ax=ax, facecolor="none", edgecolor="red", label="Admin")
         outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", edgecolor="black", label="TC Track Boundary")
         handles = [
             plt.Line2D([0], [0], color="green", lw=4, label="Islands"),           
@@ -143,7 +146,7 @@ def init_TC_exp(country, load_fls=False, plot_exp=True, plot_centrs=True, plt_gr
 
     print(f"Number of tracks in {applicable_basin} basin:",storm_basin_sub.size) 
 
-    return exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms
+    return exp, applicable_basin, grid_gdf, islands_split_gdf, storm_basin_sub, tc_storms
 
 
 

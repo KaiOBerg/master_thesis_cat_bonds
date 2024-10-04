@@ -558,3 +558,56 @@ def init_sng_cty_bond(country, prot_share, int_ws=True, incl_plots=False):
         es_metrics_ps[ps_str] = es_metrics
 
     return premium_simulation_ps, returns_ps, premium_dic, nom_arr, pay_dam_df_ps, es_metrics_ps, int_grid, imp_per_event_flt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
+from scipy.optimize import minimize
+
+minimum_payout = 0.3
+#Define bounds for minimum and maximum wind speeds
+initial_guess_ws = [30, 60]  # Wind speed initial guess
+initial_guess_cp = [980, 915]  # Central pressure initial guess
+
+def init_alt_payout(min_trig, max_trig, haz_int, nominal, int_haz_cp):
+    payouts = []
+    min_pay_abs = minimum_payout * nominal
+    diff_pay = nominal - min_pay_abs
+    if int_haz_cp:
+        for i in range(len(haz_int)):
+            act_int = haz_int.iloc[i, 0]
+            if min_trig >= act_int >= max_trig:
+                payout = ((haz_int.iloc[i, 0] - min_trig) / (max_trig - min_trig)) * diff_pay + min_pay_abs
+            elif act_int == 0 or act_int > min_trig:
+                payout = 0
+            else:
+                payout = nominal
+            payouts.append(payout)
+    else:
+        for i in range(len(haz_int)):
+            act_int = haz_int.iloc[i, 0]
+            if min_trig <= act_int <= max_trig:
+                payout = ((haz_int.iloc[i, 0] - min_trig) / (max_trig - min_trig)) * diff_pay + min_pay_abs
+            elif act_int > max_trig:
+                payout = nominal
+            else:
+                payout = 0
+            payouts.append(payout)
+
+    return payouts
+

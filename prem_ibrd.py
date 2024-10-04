@@ -15,7 +15,7 @@ def init_prem_ibrd(want_plot=True):
     params_prem_ibrd, cv = curve_fit(monoExp, ibrd_bonds['Expected Loss'], ibrd_bonds['Risk Multiple'])
 
     a, k, b = params_prem_ibrd
-    x_fit = np.linspace(0.5, ibrd_bonds['Expected Loss'].max(), 100)
+    x_fit = np.linspace(0.0, ibrd_bonds['Expected Loss'].max(), 100)
     y_fitted = monoExp(x_fit, a, k, b)
 
     squaredDiffs = np.square(ibrd_bonds['Risk Multiple'] - monoExp(ibrd_bonds['Expected Loss'], a, k, b))

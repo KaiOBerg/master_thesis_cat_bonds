@@ -11,31 +11,33 @@ term = 3
 simulated_years = 10001
 
 
-def init_bond_exp_loss(events_per_year, nominal, nominal_lst_cty=None):
+def init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty=None):
     ann_loss = []
     cur_nominal = nominal
-    if nominal_lst_cty is not None:
-        cur_nom_cty = nominal_lst_cty
+    if nominal_dic_cty is not None:
+        cur_nom_cty = nominal_dic_cty.copy()
     else:
-        cur_nom_cty = [1,1]
+        cur_nom_cty = {int(country): 1
+        for country in countries
+    }
 
     payout_count = 0
-    cty_losses = {k: [] for k in range(len(events_per_year))}
+    cty_losses = {country: [] for country in countries}
 
     for k in range(term):
         losses = []
-        for q in range(len(events_per_year)):
-            payouts = np.sum(events_per_year[q][k]['pay'].to_numpy())
+        for cty in countries:
+            payouts = np.sum(events_per_year[cty][k]['pay'].to_numpy())
             #If there are events in the year, sample that many payouts and the associated damages
-            if payouts == 0 or cur_nominal == 0 or cur_nom_cty[q] == 0:
+            if payouts == 0 or cur_nominal == 0 or cur_nom_cty[int(cty)] == 0:
                 sum_payouts = 0
             elif payouts > 0:
                 sum_payouts = payouts 
-                if nominal_lst_cty is not None:
-                    cur_nom_cty[q] -= sum_payouts
-                    if cur_nom_cty[q] < 0:
-                        sum_payouts += cur_nom_cty[q]
-                        cur_nom_cty[q] = 0
+                if nominal_dic_cty is not None:
+                    cur_nom_cty[int(cty)] -= sum_payouts
+                    if cur_nom_cty[int(cty)] < 0:
+                        sum_payouts += cur_nom_cty[int(cty)]
+                        cur_nom_cty[int(cty)] = 0
                 cur_nominal -= sum_payouts
                 if cur_nominal < 0:
                     sum_payouts += cur_nominal
@@ -44,7 +46,7 @@ def init_bond_exp_loss(events_per_year, nominal, nominal_lst_cty=None):
                     pass
             
             losses.append(sum_payouts)
-            cty_losses[q].append(sum_payouts)
+            cty_losses[cty].append(sum_payouts)
         ann_pay = np.sum(losses)
         if ann_pay > 0:
             payout_count += 1
@@ -53,29 +55,28 @@ def init_bond_exp_loss(events_per_year, nominal, nominal_lst_cty=None):
     att_prob = payout_count / term
     rel_tot_loss = np.sum(ann_loss) / nominal
     rel_losses = list(np.array(ann_loss) / nominal)
-    for key in cty_losses:
+    for key in cty_losses.keys():
         cty_losses[key] = [cty_abs_loss / nominal for cty_abs_loss in cty_losses[key]]
 
     return rel_losses, att_prob, rel_tot_loss, cty_losses
 
 
 
-def init_exp_loss_att_prob_simulation(pay_dam_df_dic, nominal, nominal_lst_cty=None, print_prob=True):
+def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nominal_dic_cty=None, print_prob=True):
     att_prob_list = []
     annual_losses = []
     total_losses = []
-    ann_cty_losses = {u: [] for u in range(len(pay_dam_df_dic))}
+    ann_cty_losses = {country: [] for country in countries}
 
     for i in range(simulated_years-3):
-        events_per_year = {u: [] for u in range(len(pay_dam_df_dic))}
+        events_per_year = {country: [] for country in countries}
         for j in range(term):
-            keys = list(pay_dam_df_dic.keys())
-            for r in range(len(pay_dam_df_dic)):
-                if 'year' in pay_dam_df_dic[keys[r]].columns:
-                    events_per_year[r].append(pay_dam_df_dic[keys[r]][pay_dam_df_dic[keys[r]]['year'] == (i+j)])
+            for cty in countries:
+                if 'year' in pay_dam_df_dic[int(cty)].columns:
+                    events_per_year[cty].append(pay_dam_df_dic[int(cty)][pay_dam_df_dic[int(cty)]['year'] == (i+j)])
                 else:
-                    events_per_year[r].append(pd.DataFrame({'pay': [0], 'damage': [0]}))
-        losses, att_prob, rel_tot_loss, cty_losses = init_bond_exp_loss(events_per_year, nominal, nominal_lst_cty)
+                    events_per_year[cty].append(pd.DataFrame({'pay': [0], 'damage': [0]}))
+        losses, att_prob, rel_tot_loss, cty_losses = init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty)
 
         att_prob_list.append(att_prob)
         annual_losses.extend(losses)
@@ -114,7 +115,7 @@ def init_exp_loss_att_prob_simulation(pay_dam_df_dic, nominal, nominal_lst_cty=N
 
     return exp_loss_ann, att_prob, annual_losses, total_losses, es_metrics, MES_cty
 
-def init_bond_simulation(pay_dam_df_dic, premiums, rf_rate, nominal, countries, want_ann_returns=True, model_rf=False):
+def init_bond_simulation(pay_dam_df_dic, premiums, rf_rate, nominal, countries, nominal_dic_cty=None, want_ann_returns=True, model_rf=False):
 
     metric_names = ['tot_payout', 'tot_damage', 'tot_pay']
 
@@ -145,15 +146,15 @@ def init_bond_simulation(pay_dam_df_dic, premiums, rf_rate, nominal, countries, 
                 rf = init_model_rf(rf_rate)
             else:
                 rf = rf_rate
-            events_per_year = {u: [] for u in range(len(pay_dam_df_dic))}
+            events_per_year = {country: [] for country in countries}
             for j in range(term):
                 keys = list(pay_dam_df_dic.keys())
-                for r in range(len(pay_dam_df_dic)):
-                    if 'year' in pay_dam_df_dic[keys[r]].columns:
-                        events_per_year[r].append(pay_dam_df_dic[keys[r]][pay_dam_df_dic[keys[r]]['year'] == (i+j)])
+                for cty in countries:
+                    if 'year' in pay_dam_df_dic[int(cty)].columns:
+                        events_per_year[cty].append(pay_dam_df_dic[int(cty)][pay_dam_df_dic[int(cty)]['year'] == (i+j)])
                     else:
-                        events_per_year[r].append(pd.DataFrame({'pay': [0], 'damage': [0]}))
-            simulated_ncf_rel, metrics, rf_rates_list, coverage_cty = init_bond(events_per_year, premium, rf, nominal, countries)
+                        events_per_year[cty].append(pd.DataFrame({'pay': [0], 'damage': [0]}))
+            simulated_ncf_rel, metrics, rf_rates_list, coverage_cty = init_bond(events_per_year, premium, rf, nominal, countries, nominal_dic_cty)
     
             metrics_sim['tot_payout'].append(metrics['tot_payout'])
             metrics_sim['tot_damage'].append(metrics['tot_damage'])
@@ -202,7 +203,7 @@ def init_bond_simulation(pay_dam_df_dic, premiums, rf_rate, nominal, countries, 
             
     return metrics_per_premium, returns_per_premium, tot_coverage_prem_cty
 
-def init_bond(events_per_year, premium, risk_free_rates, nominal, countries):   
+def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nominal_dic_cty=None):   
     simulated_ncf = []
     tot_payout = []
     tot_damage = []
@@ -212,6 +213,12 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries):
     rf_rates_list = []
     metrics = {}    
     cur_nominal = nominal
+    if nominal_dic_cty is not None:
+        cur_nom_cty = nominal_dic_cty.copy()
+    else:
+        cur_nom_cty = {int(country): 1
+                       for country in countries}
+        
     country_payouts = {code: [] for code in countries}
     country_damages = {code: [] for code in countries}
 
@@ -221,16 +228,21 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries):
         net_cash_flow = 0
         country_tot_payouts = []
         country_tot_damages = []
-        for q in range(len(events_per_year)):
+        for cty in countries:
             #randomly generate number of events in one year using poisson distribution and calculated yearly event probability
-            payouts = np.sum(events_per_year[q][k]['pay'].to_numpy()) 
-            damages = np.sum(events_per_year[q][k]['damage'].to_numpy())  
+            payouts = np.sum(events_per_year[cty][k]['pay'].to_numpy()) 
+            damages = np.sum(events_per_year[cty][k]['damage'].to_numpy())  
             #If there are events in the year, sample that many payouts and the associated damages
             sum_damages = damages
-            if payouts == 0:
+            if payouts == 0 or cur_nominal == 0 or cur_nom_cty[int(cty)] == 0:
                 sum_payouts = 0
             elif payouts > 0:
                 sum_payouts = payouts
+                if nominal_dic_cty is not None:
+                    cur_nom_cty[int(cty)] -= sum_payouts
+                    if cur_nom_cty[int(cty)] < 0:
+                        sum_payouts += cur_nom_cty[int(cty)]
+                        cur_nom_cty[int(cty)] = 0
                 cur_nominal -= sum_payouts
                 if cur_nominal < 0:
                     sum_payouts += cur_nominal
@@ -238,8 +250,8 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries):
                 else:
                     pass
             
-            country_payouts[countries[q]].append(sum_payouts)
-            country_damages[countries[q]].append(sum_damages)
+            country_payouts[cty].append(sum_payouts)
+            country_damages[cty].append(sum_damages)
             country_tot_payouts.append(sum_payouts)
             country_tot_damages.append(sum_damages)
 
