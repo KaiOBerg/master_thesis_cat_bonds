@@ -22,7 +22,7 @@ ADMIN_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/countries_admi
 
 #define countries per tropical cyclone basin according to STORM dataset
 NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
-SI = [174,480,690,626]
+SI = [174,480,690,626, 450]
 SP = [184,242,296,520,570,598,882,90,626,798,548]
 WP = [296,584,583,520,585]
 EP = [296]
@@ -44,9 +44,9 @@ year = 2020 #reference year for exposure
 res = 30 #resolution in arcsec for exposure
 #define variables for grid and centroids
 res_centrs = 150 #resolution in arcsec for centroids
-buffer_distance_km = 20 
+buffer_distance_km = 40 
 grid_cell_size_km = 30 
-min_overlap_percent = 20 
+min_overlap_percent = 10 
 #define variables for TC class
 r = 10000 #number of simulated years in tc dataset
 freq_corr_STORM = 1 / r
@@ -55,13 +55,13 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
         if country in countries:
             applicable_basin = basin
-            print('STORM basin of country: ', applicable_basin)
+            #print('STORM basin of country: ', applicable_basin)
     if 'applicable_basin' not in locals():
         print('Error: Applicable basin not found - Do not proceed.')
         return 0, 0, 0, 0
@@ -72,30 +72,23 @@ def init_TC_exp(country, load_fls=False, plot_exp=True, plot_centrs=True, plt_gr
     exp_str = f"Exp_{country}_{fin}_{year}_{res}.hdf5"
     if load_fls and Path.is_file(EXPOSURE_DIR.joinpath(exp_str)):
         """Loading Exposure"""
-        print("----------------------Loading Exposure----------------------")
         exp = LitPop.from_hdf5(EXPOSURE_DIR.joinpath(exp_str))
     else:
         """Initiating Exposure"""
-        print("----------------------Initiating Exposure----------------------")
         exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
         exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
     
     if plot_exp:
-        exp.plot_raster()
+        exp.plot_raster(label= 'Exposure [log(tUSD)]', figsize=(10,5))
 
     """Divide Exposure set into admin/grid cells"""
     islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
-    #grid_gdf_csr = grid_gdf.crs
-    #admin_str = f"{country}/{country}_adm_1.shp"
-    #admin_gdf = gpd.read_file(ADMIN_DIR.joinpath(admin_str))
-    #admin_gdf = admin_gdf.to_crs(grid_gdf_csr)
-    #admin_gdf['admin_letter'] = [chr(65 + i) for i in range(len(admin_gdf))]
-    islands_split_gdf = grd.init_equ_pol(exp)
+    islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_size)
     islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
 
     if plt_grd:
         outer_boundary_grd = grid_gdf.dissolve()
-        fig, ax = plt.subplots(figsize=(10, 10))
+        fig, ax = plt.subplots(figsize=(10, 5))
         islands_gdf.plot(ax=ax, color="green", label="Islands")
         islands_split_gdf.plot(ax=ax, facecolor="none", edgecolor="red", label="Admin")
         outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", edgecolor="black", label="TC Track Boundary")
@@ -112,12 +105,10 @@ def init_TC_exp(country, load_fls=False, plot_exp=True, plot_centrs=True, plt_gr
     haz_str = f"TC_sub_{applicable_basin}_{country}_{res}_STORM.hdf5"
     track_str = f"Track_sub_{applicable_basin}_{country}_{res}_STORM.hdf5"
     if load_fls and Path.is_file(HAZARD_DIR.joinpath(haz_str)):
-        print("----------------------Loading Hazard----------------------")
         tc_storms = TropCyclone.from_hdf5(HAZARD_DIR.joinpath(haz_str))
         storm_basin_sub = TCTracks.from_hdf5(HAZARD_DIR.joinpath(track_str))
 
     else:
-        print("----------------------Generate Hazard----------------------")
         """Generating Centroids"""
         lat = exp.gdf['latitude'].values
         lon = exp.gdf['longitude'].values

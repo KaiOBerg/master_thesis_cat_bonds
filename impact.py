@@ -35,41 +35,47 @@ def init_imp(exp, haz, admin_gdf=None, plot_frequ=True):
     #compute exceedance frequency curve
     frequ_curve = imp.calc_freq_curve()
     if plot_frequ:
-        mask = frequ_curve.return_per < 500
+        mask = frequ_curve.return_per < 100
         return_period_flt = frequ_curve.return_per[mask]
         impact_flt = frequ_curve.impact[mask]
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(23, 6), gridspec_kw={'width_ratios': [10, 5, 5]})
-
+    
+        # Plot on ax1
         ax1.plot(return_period_flt, impact_flt, label='Filtered Data')
-
-        # Add labels and title
-        ax1.set_title("Impact Frequency Curve")
-        ax1.set_xlabel("Return Period [Years]")
-        ax1.set_ylabel("Impact [USD]")
-
+    
+        # Add labels and title with increased font size
+        ax1.set_title("Impact Frequency Curve", fontsize=16)
+        ax1.set_xlabel("Return Period [Years]", fontsize=14)
+        ax1.set_ylabel("Impact [USD]", fontsize=14)
+    
         # Create an inset plot (overview of total data)
-        inset_ax1 = inset_axes(ax1, width="30%", height="30%", loc='upper left', borderpad=3.0)  # adjust size and position
+        inset_ax1 = inset_axes(ax1, width="30%", height="30%", loc='lower right', borderpad=3.0)  # adjust size and position
         inset_ax1.plot(frequ_curve.return_per, frequ_curve.impact, label='Overview Data')
-        inset_ax1.set_xlabel("Return Period [Years]", fontsize=8)
-        inset_ax1.set_ylabel("Impact [USD]", fontsize=8)
-
+        inset_ax1.set_xlabel("Return Period [Years]", fontsize=10)
+        inset_ax1.set_ylabel("Impact [USD]", fontsize=10)
+    
+        # Plot on ax2 (log x-axis)
         ax2.plot(frequ_curve.return_per, frequ_curve.impact)
         ax2.set_xscale('log')
-        ax2.set_xlabel('Return Period [Years]')
-        ax2.set_ylabel('Impact [USD]')
-        ax2.set_title('Impact Frequency Curve - Log')
-
+        ax2.set_xlabel('Return Period [Years]', fontsize=14)
+        ax2.set_ylabel('Impact [USD]', fontsize=14)
+        ax2.set_title('Impact Frequency Curve - Log', fontsize=16)
+    
+        # Plot on ax3 (log-log scale)
         ax3.plot(frequ_curve.return_per, frequ_curve.impact)
         ax3.set_xscale('log')
         ax3.set_yscale('log')
-        ax3.set_xlabel('Return Period [Years]')
-        ax3.set_ylabel('Impact [USD]')
-        ax3.set_title('Impact Frequency Curve - LogLog')
-
-        # Show both plots
+        ax3.set_xlabel('Return Period [Years]', fontsize=14)
+        ax3.set_ylabel('Impact [USD]', fontsize=14)
+        ax3.set_title('Impact Frequency Curve - LogLog', fontsize=16)
+        
+        # Adjust layout
         plt.tight_layout()
+    
+        # Show both plots
         plt.show()
+
 
     #save impact per exposure point
     imp_per_event = imp.at_event

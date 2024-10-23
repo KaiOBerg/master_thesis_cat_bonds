@@ -96,10 +96,22 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
     VaR_99_tot = total_losses.quantile(0.99)
     VaR_95_ann = annual_losses.quantile(0.95)
     VaR_95_tot = total_losses.quantile(0.95)
-    ES_99_ann = annual_losses[annual_losses > VaR_99_ann].mean()
-    ES_99_tot = total_losses[total_losses > VaR_99_tot].mean()
-    ES_95_ann = annual_losses[annual_losses > VaR_95_ann].mean()
-    ES_95_tot = total_losses[total_losses > VaR_95_tot].mean()
+    if VaR_99_ann == 1:
+        ES_99_ann = 1
+    else:
+        ES_99_ann = annual_losses[annual_losses > VaR_99_ann].mean()
+    if VaR_99_tot == 1:
+        ES_99_tot = 1
+    else:
+        ES_99_tot = total_losses[total_losses > VaR_99_tot].mean()
+    if VaR_95_ann == 1:
+        ES_95_ann = 1
+    else:
+        ES_95_ann = annual_losses[annual_losses > VaR_95_ann].mean()
+    if VaR_95_tot == 1:
+        ES_95_tot = 1
+    else:
+        ES_95_tot = total_losses[total_losses > VaR_95_tot].mean()
     MES_cty = {country: {'95': None, '99': None} for country in ann_cty_losses.keys()}
     for country, ann_cty_losses_iter in ann_cty_losses.items():
         ann_cty_losses_iter = pd.Series(ann_cty_losses_iter)

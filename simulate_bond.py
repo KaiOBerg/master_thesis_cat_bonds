@@ -67,10 +67,22 @@ def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=True):
     VaR_99_tot = total_losses.quantile(0.99)
     VaR_95_ann = annual_losses.quantile(0.95)
     VaR_95_tot = total_losses.quantile(0.95)
-    ES_99_ann = annual_losses[annual_losses > VaR_99_ann].mean()
-    ES_99_tot = total_losses[total_losses > VaR_99_tot].mean()
-    ES_95_ann = annual_losses[annual_losses > VaR_95_ann].mean()
-    ES_95_tot = total_losses[total_losses > VaR_95_tot].mean()
+    if VaR_99_ann == 1:
+        ES_99_ann = 1
+    else:
+        ES_99_ann = annual_losses[annual_losses > VaR_99_ann].mean()
+    if VaR_99_tot == 1:
+        ES_99_tot = 1
+    else:
+        ES_99_tot = total_losses[total_losses > VaR_99_tot].mean()
+    if VaR_95_ann == 1:
+        ES_95_ann = 1
+    else:
+        ES_95_ann = annual_losses[annual_losses > VaR_95_ann].mean()
+    if VaR_95_tot == 1:
+        ES_95_tot = 1
+    else:
+        ES_95_tot = total_losses[total_losses > VaR_95_tot].mean()
     es_metrics = {'VaR_99_ann': VaR_99_ann, 'VaR_99_tot': VaR_99_tot, 'VaR_95_ann': VaR_95_ann, 'VaR_95_tot': VaR_95_tot,
                   'ES_99_ann': ES_99_ann, 'ES_99_tot': ES_99_tot, 'ES_95_ann': ES_95_ann, 'ES_95_tot': ES_95_tot}
 
@@ -284,7 +296,7 @@ def find_sharpe(premium, ann_losses, rf, target_sharpe):
     for i in range(len(ann_losses)):
 
         if ann_losses[i] == 0:
-            ncf.append(cur_nominal * (premium + rf) - ann_losses[i])
+            ncf.append(cur_nominal * (premium + rf))
         elif ann_losses[i] > 0:
             cur_nominal -= ann_losses[i]
             ncf.append(cur_nominal * (premium + rf) - ann_losses[i])
@@ -292,7 +304,7 @@ def find_sharpe(premium, ann_losses, rf, target_sharpe):
             cur_nominal = 1
     avg_ret = np.mean(ncf)
     sigma = np.std(ncf)
-    return (((avg_ret - rf) / sigma - target_sharpe)**2)**0.5
+    return ((avg_ret - rf) / sigma - target_sharpe)**2
 
 def init_prem_sharpe_ratio(ann_losses, rf, target_sharpe):        
 
