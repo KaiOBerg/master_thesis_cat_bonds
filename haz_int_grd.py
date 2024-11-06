@@ -3,6 +3,9 @@ import numpy as np
 import geopandas as gpd
 import re
 from shapely.geometry import Point
+import math
+from scipy.stats import spearmanr
+import matplotlib.pyplot as plt
 
 
 
@@ -29,11 +32,15 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
         #Initialize a dictionary to hold the calculated statistics
         int_grid = {letter: [None] * len(tc_storms.event_id) for letter in agg_exp.keys()}
         int_grid['year'] = [None] * len(tc_storms.event_id)
+        int_grid['month'] = [None] * len(tc_storms.event_id)
+
 
         #Iterate over each event
         for i in range(len(tc_storms.event_id)):
             year_string = tc_storms.event_name[i]
+            month_string = tc_storms.get_event_date()[i]
             int_grid['year'][i] = extract_year(year_string)
+            int_grid['month'][i] = int(month_string.split('-')[1])
             #For each grid cell, calculate the desired statistic
             for letter, line_numbers in agg_exp.items():
                 selected_values = tc_storms.intensity[i, line_numbers]
@@ -50,7 +57,7 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
         int_grid = pd.DataFrame.from_dict(int_grid)
         #int_grid = int_grid.where(int_grid >= 33, 0)
         int_grid['count_grids'] = (int_grid > 0).sum(axis=1)
-        int_grid.loc[int_grid['count_grids'] > 0, 'count_grids'] -= 1
+        int_grid.loc[int_grid['count_grids'] > 0, 'count_grids'] -= 2
 
     elif tc_tracks:
         grid_crs = grid.crs
@@ -58,6 +65,7 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
         #Initialize a dictionary to hold the calculated statistics
         int_grid = {letter: [None] * len(tc_tracks.data) for letter in grid['grid_letter']}
         int_grid['year'] = [None] * len(tc_tracks.data)
+        int_grid['month'] = [None] * len(tc_tracks.data)
         for i in range(len(tc_tracks.data)):
             latitudes = tc_tracks.data[i]['lat'].values
             longitudes = tc_tracks.data[i]['lon'].values
@@ -67,7 +75,9 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
             points_in_grid = gpd.sjoin(points_gdf, grid)
 
             year_string = tc_tracks.data[i].attrs['sid']
+            month_string = tc_tracks.data[i].coords['time'][0]
             int_grid['year'][i] = extract_year(year_string)
+            int_grid['month'][i] = month_string.dt.month.item()
             max_pressure_per_grid = points_in_grid.groupby('grid_letter')['Central Pressure (mb)'].min()
             for letter in grid['grid_letter']:
                 if max_pressure_per_grid.get(letter):
@@ -99,3 +109,36 @@ def extract_year(string):
         after_txt = int(match.group(2))
         year = before_txt * 1000 + after_txt
     return year
+
+
+def plt_int_dam(imp_admin_evt, int_grid):
+
+    num_grids = len(imp_admin_evt.columns)
+    n_cols = 2  # Choose the number of columns (for a wide layout)
+    n_rows = math.ceil(num_grids / n_cols) 
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(30, 8 * n_rows))
+
+    if n_rows > 1:
+        axes = axes.flatten()
+
+    for i, (columnName, columnData) in enumerate(imp_admin_evt.items()):
+        corr, pval = spearmanr(columnData, int_grid[columnName])
+        ax = axes[i]
+
+        ax.scatter(columnData, int_grid[columnName], marker='o', edgecolor='blue', facecolor='none', label='Events')
+        # Add labels and title
+        ax.set_title(f"Damage vs. Wind Speed - Island {columnName}", fontsize=18)
+        ax.set_xlabel("Damage [USD]", fontsize=16)
+        ax.set_ylabel("Wind Speed [m/s]", fontsize=16)
+        ax.text(0, 68, f'Spearman.: {round(corr, 2)}', fontsize = 16)
+        ax.set_ylim(0,80)
+        ax.legend(loc='lower right')
+
+    # Remove any extra axes that are not used
+    for j in range(i + 1, len(axes)):
+        fig.delaxes(axes[j])
+
+    # Show both plots
+    plt.tight_layout()
+    plt.show()

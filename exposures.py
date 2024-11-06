@@ -1,14 +1,17 @@
 import numpy as np
 from pathlib import Path
 import geopandas as gpd
-from shapely.geometry import Point
+from shapely.geometry import Point, LineString, MultiLineString
 import matplotlib.pyplot as plt
+import shapely
 
 
 #import CLIMADA modules:
 from climada.hazard import Centroids, TropCyclone
 from climada.hazard.tc_tracks import TCTracks
 from climada.entity import LitPop
+import climada.util.coordinates as u_coord
+from climada.util.constants import EARTH_RADIUS_KM, SYSTEM_DIR, DEF_CRS
 
 import grider as grd
 
@@ -23,7 +26,7 @@ ADMIN_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/countries_admi
 #define countries per tropical cyclone basin according to STORM dataset
 NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
 SI = [174,480,690,626, 450]
-SP = [184,242,296,520,570,598,882,90,626,798,548]
+SP = [184,242,296,520,570,598,882,90,798,548]
 WP = [296,584,583,520,585]
 EP = [296]
 NI = [462]
@@ -64,7 +67,7 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=
             #print('STORM basin of country: ', applicable_basin)
     if 'applicable_basin' not in locals():
         print('Error: Applicable basin not found - Do not proceed.')
-        return 0, 0, 0, 0
+        return 0, 0, 0, 0, 0, 0
     else:
         pass
         
@@ -79,7 +82,7 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=
         exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
     
     if plot_exp:
-        exp.plot_raster(label= 'Exposure [log(tUSD)]', figsize=(10,5))
+        exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
 
     """Divide Exposure set into admin/grid cells"""
     islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
@@ -120,9 +123,8 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=
         track_dic = init_STORM_tracks(applicable_basin)
 
         """Filter TC Tracks"""
-        tc_tracks_lines = track_dic[applicable_basin].to_geodataframe()
+        tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
         intersected_tracks = gpd.sjoin(tc_tracks_lines, grid_gdf, how='inner', predicate='intersects')
-
         select_tracks = tc_tracks_lines.index.isin(intersected_tracks.index)
         tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]
         storm_basin_sub = TCTracks(tracks_in_exp) 
@@ -185,3 +187,34 @@ def init_centrs(grid_gdf, resolution_arcsec):
     points_gdf = gpd.GeoDataFrame(geometry=points, crs=grid_gdf.crs)
 
     return points_gdf
+
+def to_geodataframe(self):
+    gdf = gpd.GeoDataFrame([dict(track.attrs) for track in self.data])
+
+    # Normalize longitudes to the [-180, 180] range
+    t_lons = [u_coord.lon_normalize(t.lon.values.copy()) for t in self.data]
+    t_lats = [t.lat.values for t in self.data]
+    # Create geometries
+    gdf.geometry = gpd.GeoSeries([
+                    LineString(np.c_[lons, lats]) if lons.size > 1
+                    else Point(lons, lats)
+                    for lons, lats in zip(t_lons, t_lats)
+                ])
+
+    gdf.crs = DEF_CRS
+
+    # for splitting, restrict to tracks that come close to the antimeridian
+    t_split_mask = np.asarray([
+        (lon > 170).any() and (lon < -170).any() and lon.size > 1
+        for lon in t_lons])
+
+    antimeridian = LineString([(180, -90), (180, 90)]).buffer(1e-9)  # Tiny buffer to avoid exact overlap
+    gdf.loc[t_split_mask, "geometry"] = gdf.geometry[t_split_mask] \
+        .to_crs({"proj": "longlat", "lon_wrap": 180}) \
+        .apply(lambda line: MultiLineString([
+            LineString([(x - 360, y) for x, y in segment.coords])
+            if any(x > 180 for x, y in segment.coords) else segment
+            for segment in shapely.ops.split(line, antimeridian).geoms
+        ]))
+    
+    return gdf

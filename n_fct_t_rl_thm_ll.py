@@ -18,7 +18,7 @@ ann_ret = True
 params_ibrd = prib.init_prem_ibrd(want_plot=False)
 a, k, b = params_ibrd
 
-def init_sng_cty_bond(country, prot_share, rf_rate, target_sharpe, grid_size=600, buffer_size=1, low_to_prot=None, to_prot_share=None, int_ws=True, incl_plots=False):    
+def init_sng_cty_bond_principal(country, prot_share, rf_rate, target_sharpe, grid_size=600, buffer_size=1, low_to_prot=None, to_prot_share=None, int_ws=True, incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposure
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex.init_TC_exp(country=country, grid_size=grid_size, buffer_size=buffer_size, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
     #calculate impact and aggregate impact per grid
@@ -79,7 +79,7 @@ def init_sng_cty_bond(country, prot_share, rf_rate, target_sharpe, grid_size=600
 
 
 
-def init_mlt_cty_bond(countries, pay_dam_df_dic_ps, prot_share, nominals_dic_ps, rf_rate, target_sharpe, int_grid_dic=None, damages_grid_flt_dic=None, damages_evt_flt_dic=None, incl_plots=False):  
+def init_mlt_cty_bond_principal(countries, pay_dam_df_dic_ps, prot_share, nominals_dic_ps, rf_rate, target_sharpe, int_grid_dic=None, damages_grid_flt_dic=None, damages_evt_flt_dic=None, incl_plots=False):  
     #set principal
     premium_dic = {}
     for ps_share in prot_share:
@@ -92,6 +92,7 @@ def init_mlt_cty_bond(countries, pay_dam_df_dic_ps, prot_share, nominals_dic_ps,
     es_metrics_ps = {}
     MES_cty_ps = {}
     requ_nom_arr = []
+    ann_loss_ps = {}
 
     l = len(prot_share)
 
@@ -149,11 +150,11 @@ def init_mlt_cty_bond(countries, pay_dam_df_dic_ps, prot_share, nominals_dic_ps,
         es_metrics_ps[ps_str] = es_metrics
         MES_cty_ps[ps_str] = MES_cty
         requ_nom_arr.append(requ_nom)
-
+        ann_loss_ps[ps_str] = ann_losses
         fct.print_progress_bar(i + 1, l)
 
 
-    return premium_simulation_ps, returns_ps, tot_coverage_prem_cty_ps, premium_dic, requ_nom_arr, es_metrics_ps, MES_cty_ps
+    return premium_simulation_ps, returns_ps, tot_coverage_prem_cty_ps, premium_dic, requ_nom_arr, es_metrics_ps, MES_cty_ps, ann_loss_ps
 
 
 def sng_cty_bond(country, prot_share, rf_rate, target_sharpe, grid_size=600, buffer_size=1, low_to_prot=None, to_prot_share=None, incl_plots=False):    
@@ -188,44 +189,38 @@ def sng_cty_bond(country, prot_share, rf_rate, target_sharpe, grid_size=600, buf
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     premium_dic['ibrd'] = ibrd_prem
-    #simulate cat bond
-    premium_simulation, returns = sb.init_bond_simulation(pay_dam_df, ibrd_prem, rf_rate, nominal, ann_ret) 
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
+    #simulate cat bond
+    bond_metrics, bond_returns = sb.init_bond_simulation(pay_dam_df, ibrd_prem, rf_rate, nominal, ann_ret) 
 
-    return premium_simulation, returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt
+    return bond_metrics, bond_returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt
 
 
 
-def mlt_cty_bond(countries, pay_dam_df_dic_ps, nominals_dic_ps, rf_rate, target_sharpe, opt_cap=True, incl_plots=False):  
+def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate, target_sharpe, opt_cap=True, incl_plots=False):  
     #set principal
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
 
     nom_cty = []
-    for cty in nominals_dic_ps.keys():
-        nom_cty.append(nominals_dic_ps[cty])
+    for cty in nominals_dic.keys():
+        nom_cty.append(nominals_dic[cty])
     nominal = (np.sum(nom_cty))
 
 
-    nominal_dic_cty = {}
-    for cty in nominals_dic_ps.keys():
-        nominal_dic_cty[cty] = nominals_dic_ps[cty]
-    pay_dam_df_dic = {}
-    for key, pay_dam_df in pay_dam_df_dic_ps.items():
-        pay_dam_df_dic[key] = pay_dam_df
     if opt_cap:
-        exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nominal_dic_cty, print_prob=False)
+        exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nominals_dic, print_prob=False)
         requ_nom = total_losses.max() * nominal
     else:
         requ_nom = nominal
-    exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominal_dic_cty, print_prob=False)
+    exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominals_dic, print_prob=False)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
     premium_dic['ibrd'] = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     #simulate cat bond
-    premium_simulation, returns, tot_coverage_prem_cty = smcb.init_bond_simulation(pay_dam_df_dic, requ_prem, rf_rate, requ_nom, countries, nominal_dic_cty, ann_ret) 
+    premium_simulation, returns, tot_coverage_prem_cty = smcb.init_bond_simulation(pay_dam_df_dic, requ_prem, rf_rate, requ_nom, countries, nominals_dic, ann_ret) 
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
 

@@ -5,34 +5,34 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 from scipy.optimize import minimize
 
-minimum_payout = 0.3
 #Define bounds for minimum and maximum wind speeds
 initial_guess_ws = [30, 40]  # Wind speed initial guess
 initial_guess_cp = [990, 920]  # Central pressure initial guess
 
-def init_alt_payout(min_trig, max_trig, haz_int, max_pay, int_haz_cp):
+def init_alt_payout(min_trig, max_trig, haz_int, max_pay, minimum_payout, int_haz_cp):
+    rel_min_pay = minimum_payout/max_pay
     intensities = np.array(haz_int.iloc[:, 0])
     payouts = np.zeros_like(intensities)
     if int_haz_cp:
         payouts[intensities <= max_trig] = max_pay
         mask = (intensities <= min_trig) & (intensities > max_trig)
-        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * ((1 - minimum_payout) * max_pay) + (minimum_payout * max_pay)
+        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * ((1 - rel_min_pay) * max_pay) + (rel_min_pay * max_pay)
 
     else:
         payouts[intensities >= max_trig] = max_pay
         mask = (intensities >= min_trig) & (intensities < max_trig)
-        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * ((1 - minimum_payout) * max_pay) + (minimum_payout * max_pay)
+        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * ((1 - rel_min_pay) * max_pay) + (rel_min_pay * max_pay)
 
     return payouts
 
-def init_alt_objective_function(params, haz_int, damages, nominal, int_haz_cp):
+def init_alt_objective_function(params, haz_int, damages, nominal, min_pay, int_haz_cp):
     min_trig, max_trig = params
     max_dam = np.max(damages)
     if max_dam < nominal:
         max_pay = max_dam
     else: 
         max_pay = nominal
-    payouts = init_alt_payout(min_trig, max_trig, haz_int, max_pay, int_haz_cp)
+    payouts = init_alt_payout(min_trig, max_trig, haz_int, max_pay, min_pay, int_haz_cp)
     if int_haz_cp:
         damage_per_grid = [float(damage) / integer if integer > 0 else 0
                            for damage, integer in zip(damages, np.array(haz_int['count_grids']))]
@@ -44,9 +44,10 @@ def init_alt_objective_function(params, haz_int, damages, nominal, int_haz_cp):
 
 def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None, print_params=True):
     # Define bounds and initial guesses for each grid cell
-    grid_cells = range(len(haz_int.columns)-2)  
+    grid_cells = range(len(haz_int.columns)-3)  
     grid_specific_results = {}
-    
+    min_pay = damages_evt[damages_evt > 0].min()
+   
     if (haz_int.iloc[:, 0] > 900).any():
         initial_guess = initial_guess_cp
         int_haz_cp = True
@@ -63,7 +64,7 @@ def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None,
         # Perform optimization for each grid cell
         result = minimize(init_alt_objective_function, 
                           initial_guess, 
-                          args=(haz_int.iloc[:,[cell, -1]], damages, nominal, int_haz_cp), 
+                          args=(haz_int.iloc[:,[cell, -1]], damages, nominal, min_pay, int_haz_cp), 
                           method='COBYLA',
                           #constraints=cons,
                           options={'maxiter': 100000})
@@ -111,8 +112,9 @@ def init_cons(int_haz_cp):
 
 def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, damages_grid=None, damages=None):
     b = len(damages_flt)
+    minimum_payout = damages_flt[damages_flt > 0].min()
     payout_evt_grd = pd.DataFrame({letter: [None] * b for letter in haz_int.columns[:-2]})
-    pay_dam_df = pd.DataFrame({'pay': [0.0] * b, 'damage': [0.0] * b, 'year': [0] * b})
+    pay_dam_df = pd.DataFrame({'pay': [0.0] * b, 'damage': [0.0] * b, 'year': [0] * b, 'month': [0] * b})
 
     if (haz_int.iloc[:, 0] > 900).any():
         int_haz_cp = True
@@ -124,7 +126,8 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
         tot_dam = damages_flt[i]
         pay_dam_df.loc[i,"damage"] = tot_dam
         pay_dam_df.loc[i,"year"] = int(haz_int['year'][i])
-        for j in range(len(haz_int.columns)-2):
+        pay_dam_df.loc[i,"month"] = int(haz_int['month'][i])
+        for j in range(len(haz_int.columns)-3):
             grid_hazint = haz_int.iloc[:,[j, -1]]
             if int_haz_cp:
                 None
@@ -134,12 +137,12 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
                 max_pay = max_dam
             else: 
                 max_pay = nominal
-            payouts = init_alt_payout(optimized_1[j], optimized_2[j], grid_hazint, max_pay, int_haz_cp)
+            payouts = init_alt_payout(optimized_1[j], optimized_2[j], grid_hazint, max_pay, minimum_payout, int_haz_cp)
             payout_evt_grd.iloc[:,j] = payouts
         tot_pay = np.sum(payout_evt_grd.iloc[i, :])
         if tot_pay > nominal:
             tot_pay = nominal
-        elif tot_pay < (minimum_payout * nominal):
+        elif tot_pay < minimum_payout:
             tot_pay = 0
         else: 
             pass
