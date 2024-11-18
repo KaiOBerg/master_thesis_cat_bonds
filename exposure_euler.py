@@ -55,7 +55,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, grid_size=600, buffer_size=1, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, grid_size=600, buffer_size=1):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -73,7 +73,7 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, plot_exp=True, plot_centr
     exp.write_hdf5(OUTPUT_DIR / f"Exp_{country}_{fin}_{year}_{res}.hdf5")
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
+    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, False)
     islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_size)
     islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
 
