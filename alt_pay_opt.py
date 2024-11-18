@@ -9,30 +9,29 @@ from scipy.optimize import minimize
 initial_guess_ws = [30, 40]  # Wind speed initial guess
 initial_guess_cp = [990, 920]  # Central pressure initial guess
 
-def init_alt_payout(min_trig, max_trig, haz_int, max_pay, minimum_payout, int_haz_cp):
-    rel_min_pay = minimum_payout/max_pay
+def init_alt_payout(min_trig, max_trig, haz_int, max_pay, int_haz_cp):
     intensities = np.array(haz_int.iloc[:, 0])
     payouts = np.zeros_like(intensities)
     if int_haz_cp:
         payouts[intensities <= max_trig] = max_pay
         mask = (intensities <= min_trig) & (intensities > max_trig)
-        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * ((1 - rel_min_pay) * max_pay) + (rel_min_pay * max_pay)
+        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * max_pay
 
     else:
         payouts[intensities >= max_trig] = max_pay
         mask = (intensities >= min_trig) & (intensities < max_trig)
-        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * ((1 - rel_min_pay) * max_pay) + (rel_min_pay * max_pay)
+        payouts[mask] = (intensities[mask] - min_trig) / (max_trig - min_trig) * max_pay
 
     return payouts
 
-def init_alt_objective_function(params, haz_int, damages, nominal, min_pay, int_haz_cp):
+def init_alt_objective_function(params, haz_int, damages, nominal, int_haz_cp):
     min_trig, max_trig = params
     max_dam = np.max(damages)
     if max_dam < nominal:
         max_pay = max_dam
     else: 
         max_pay = nominal
-    payouts = init_alt_payout(min_trig, max_trig, haz_int, max_pay, min_pay, int_haz_cp)
+    payouts = init_alt_payout(min_trig, max_trig, haz_int, max_pay, int_haz_cp)
     if int_haz_cp:
         damage_per_grid = [float(damage) / integer if integer > 0 else 0
                            for damage, integer in zip(damages, np.array(haz_int['count_grids']))]
@@ -46,7 +45,6 @@ def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None,
     # Define bounds and initial guesses for each grid cell
     grid_cells = range(len(haz_int.columns)-3)  
     grid_specific_results = {}
-    min_pay = damages_evt[damages_evt > 0].min()
    
     if (haz_int.iloc[:, 0] > 900).any():
         initial_guess = initial_guess_cp
@@ -64,7 +62,7 @@ def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None,
         # Perform optimization for each grid cell
         result = minimize(init_alt_objective_function, 
                           initial_guess, 
-                          args=(haz_int.iloc[:,[cell, -1]], damages, nominal, min_pay, int_haz_cp), 
+                          args=(haz_int.iloc[:,[cell, -1]], damages, nominal, int_haz_cp), 
                           method='COBYLA',
                           #constraints=cons,
                           options={'maxiter': 100000})
@@ -137,7 +135,7 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
                 max_pay = max_dam
             else: 
                 max_pay = nominal
-            payouts = init_alt_payout(optimized_1[j], optimized_2[j], grid_hazint, max_pay, minimum_payout, int_haz_cp)
+            payouts = init_alt_payout(optimized_1[j], optimized_2[j], grid_hazint, max_pay, int_haz_cp)
             payout_evt_grd.iloc[:,j] = payouts
         tot_pay = np.sum(payout_evt_grd.iloc[i, :])
         if tot_pay > nominal:

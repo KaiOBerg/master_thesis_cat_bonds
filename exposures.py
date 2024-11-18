@@ -27,8 +27,8 @@ ADMIN_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/countries_admi
 NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
 SI = [174,480,690,626, 450]
 SP = [184,242,296,520,570,598,882,90,798,548]
-WP = [296,584,583,520,585]
-EP = [296]
+WP = [584,583,520,585]
+EP = []
 NI = [462]
 
 #create dictionaries for countries per STORM basin
