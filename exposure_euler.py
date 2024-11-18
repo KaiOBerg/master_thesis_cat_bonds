@@ -97,6 +97,7 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, plot_exp=True, plot_centr
     tc_storms.frequency = np.ones(tc_storms.event_id.size) * freq_corr_STORM
     tc_storms.check()
     tc_storms.write_hdf5(OUTPUT_DIR / f"TC_sub_{applicable_basin}_{country}_{res}_STORM.hdf5")
+    print('Job done')
 
     return exp, applicable_basin, grid_gdf, islands_split_gdf, storm_basin_sub, tc_storms
 
