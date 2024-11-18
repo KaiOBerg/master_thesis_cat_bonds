@@ -15,43 +15,40 @@ from climada.util.constants import EARTH_RADIUS_KM, SYSTEM_DIR, DEF_CRS
 
 import grider as grd
 
+#define directories
+OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
+STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
+#define countries per tropical cyclone basin according to STORM dataset
+NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
+SI = [174,480,690,626, 450]
+SP = [184,242,296,520,570,598,882,90,798,548]
+WP = [584,583,520,585]
+EP = []
+NI = [462]
+#create dictionaries for countries per STORM basin
+basins_countries = {
+    'NA': NA,
+    'SI': SI,
+    'SP': SP,
+    'WP': WP,
+    'EP': EP,
+    'NI': NI
+}
+#define variables for exposure
+fin = 'gdp' #fin mode for exposure
+year = 2020 #reference year for exposure
+res = 30 #resolution in arcsec for exposure
+#define variables for grid and centroids
+res_centrs = 150 #resolution in arcsec for centroids
+buffer_distance_km = 40 
+grid_cell_size_km = 30 
+min_overlap_percent = 10 
+#define variables for TC class
+r = 10000 #number of simulated years in tc dataset
+freq_corr_STORM = 1 / r
+
 
 def init_TC_exp(country, grid_size=600, buffer_size=1):
-    #define directories
-    OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
-    STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
-
-
-    #define countries per tropical cyclone basin according to STORM dataset
-    NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
-    SI = [174,480,690,626, 450]
-    SP = [184,242,296,520,570,598,882,90,798,548]
-    WP = [584,583,520,585]
-    EP = []
-    NI = [462]
-
-    #create dictionaries for countries per STORM basin
-    basins_countries = {
-        'NA': NA,
-        'SI': SI,
-        'SP': SP,
-        'WP': WP,
-        'EP': EP,
-        'NI': NI
-    }
-
-    #define variables for exposure
-    fin = 'gdp' #fin mode for exposure
-    year = 2020 #reference year for exposure
-    res = 30 #resolution in arcsec for exposure
-    #define variables for grid and centroids
-    res_centrs = 150 #resolution in arcsec for centroids
-    buffer_distance_km = 40 
-    grid_cell_size_km = 30 
-    min_overlap_percent = 10 
-    #define variables for TC class
-    r = 10000 #number of simulated years in tc dataset
-    freq_corr_STORM = 1 / r
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -102,7 +99,6 @@ def init_TC_exp(country, grid_size=600, buffer_size=1):
 
 #Load all STORM tracks for the basin of interest.
 def init_STORM_tracks(basin, load_fls=False):
-    STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
     """Import TC Tracks"""
     all_tracks = []
     storms_basin = {}
