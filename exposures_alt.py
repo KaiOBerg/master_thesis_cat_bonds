@@ -47,7 +47,6 @@ year = 2020 #reference year for exposure
 res = 30 #resolution in arcsec for exposure
 #define variables for grid and centroids
 res_centrs = 150 #resolution in arcsec for centroids
-buffer_distance_km = 40 
 grid_cell_size_km = 30 
 min_overlap_percent = 10 
 #define variables for TC class
@@ -58,7 +57,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, grid_specs, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, grid_specs, file_path, storm_path, buffer_distance_km, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -73,13 +72,13 @@ def init_TC_exp(country, grid_specs, load_fls=False, plot_exp=True, plot_centrs=
         
     """Define Exposure"""
     exp_str = f"Exp_{country}_{fin}_{year}_{res}.hdf5"
-    if load_fls and Path.is_file(EXPOSURE_DIR.joinpath(exp_str)):
+    if load_fls and Path.is_file(file_path.joinpath(exp_str)):
         """Loading Exposure"""
-        exp = LitPop.from_hdf5(EXPOSURE_DIR.joinpath(exp_str))
+        exp = LitPop.from_hdf5(file_path.joinpath(exp_str))
     else:
         """Initiating Exposure"""
         exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
-        exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
+        exp.write_hdf5(file_path.joinpath(exp_str))
     
     if plot_exp:
         exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
@@ -111,9 +110,9 @@ def init_TC_exp(country, grid_specs, load_fls=False, plot_exp=True, plot_centrs=
     # initiate new instance of TropCyclone(Hazard) class:
     haz_str = f"TC_sub_{applicable_basin}_{country}_{res}_STORM.hdf5"
     track_str = f"Track_sub_{applicable_basin}_{country}_{res}_STORM.hdf5"
-    if load_fls and Path.is_file(HAZARD_DIR.joinpath(haz_str)):
-        tc_storms = TropCyclone.from_hdf5(HAZARD_DIR.joinpath(haz_str))
-        storm_basin_sub = TCTracks.from_hdf5(HAZARD_DIR.joinpath(track_str))
+    if load_fls and Path.is_file(file_path.joinpath(haz_str)):
+        tc_storms = TropCyclone.from_hdf5(file_path.joinpath(haz_str))
+        storm_basin_sub = TCTracks.from_hdf5(file_path.joinpath(track_str))
 
     else:
         """Generating Centroids"""
@@ -124,7 +123,7 @@ def init_TC_exp(country, grid_specs, load_fls=False, plot_exp=True, plot_centrs=
             centrs.plot()
 
         """Import TC Tracks"""
-        track_dic = init_STORM_tracks(applicable_basin)
+        track_dic = init_STORM_tracks(applicable_basin, storm_path)
 
         """Filter TC Tracks"""
         tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
@@ -133,13 +132,13 @@ def init_TC_exp(country, grid_specs, load_fls=False, plot_exp=True, plot_centrs=
         tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]
         storm_basin_sub = TCTracks(tracks_in_exp) 
         storm_basin_sub.equal_timestep(time_step_h=1)
-        storm_basin_sub.write_hdf5(HAZARD_DIR.joinpath(track_str)) 
+        storm_basin_sub.write_hdf5(file_path.joinpath(track_str)) 
 
         #generate TropCyclone class from previously loaded TC tracks for one storm data set
         tc_storms = TropCyclone.from_tracks(storm_basin_sub, centroids=centrs)
         tc_storms.frequency = np.ones(tc_storms.event_id.size) * freq_corr_STORM
         tc_storms.check()
-        tc_storms.write_hdf5(HAZARD_DIR.joinpath(haz_str))   
+        tc_storms.write_hdf5(file_path.joinpath(haz_str))   
 
     print(f"Number of tracks in {applicable_basin} basin:",storm_basin_sub.size) 
 
@@ -148,14 +147,14 @@ def init_TC_exp(country, grid_specs, load_fls=False, plot_exp=True, plot_centrs=
 
 
 #Load all STORM tracks for the basin of interest.
-def init_STORM_tracks(basin, load_fls=False):
+def init_STORM_tracks(basin, file_path, load_fls=False):
     """Import TC Tracks"""
     all_tracks = []
     storms_basin = {}
     print("----------------------Initiating TC Tracks----------------------")
     fname = lambda i: f"STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
     for i in range(10):
-        tracks_STORM = TCTracks.from_simulations_storm(STORM_DIR.joinpath(fname(i)))
+        tracks_STORM = TCTracks.from_simulations_storm(file_path.joinpath(fname(i)))
         all_tracks.extend(tracks_STORM.data)
     tracks_STORM.data = all_tracks
             
