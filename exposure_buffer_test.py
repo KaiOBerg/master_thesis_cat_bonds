@@ -15,8 +15,6 @@ from climada.util.constants import EARTH_RADIUS_KM, SYSTEM_DIR, DEF_CRS
 
 import grider as grd
 
-#define directories
-STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 #define countries per tropical cyclone basin according to STORM dataset
 NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
 SI = [174,480,690,626, 450]
@@ -46,7 +44,7 @@ r = 10000 #number of simulated years in tc dataset
 freq_corr_STORM = 1 / r
 
 
-def init_TC_exp(country, buffer_distance_km, grid_size=600, buffer_size=1):
+def init_TC_exp(country, buffer_distance_km, file_path, grid_size=600, buffer_size=1):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -73,7 +71,7 @@ def init_TC_exp(country, buffer_distance_km, grid_size=600, buffer_size=1):
     lon = exp.gdf['longitude'].values
     centrs = Centroids.from_lat_lon(lat, lon)
     """Import TC Tracks"""
-    track_dic = init_STORM_tracks(applicable_basin)
+    track_dic = init_STORM_tracks(applicable_basin, file_path)
     """Filter TC Tracks"""
     tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
     intersected_tracks = gpd.sjoin(tc_tracks_lines, grid_gdf, how='inner', predicate='intersects')
@@ -93,14 +91,14 @@ def init_TC_exp(country, buffer_distance_km, grid_size=600, buffer_size=1):
 
 
 #Load all STORM tracks for the basin of interest.
-def init_STORM_tracks(basin, load_fls=False):
+def init_STORM_tracks(basin, file_path, load_fls=False):
     """Import TC Tracks"""
     all_tracks = []
     storms_basin = {}
     print("----------------------Initiating TC Tracks----------------------")
     fname = lambda i: f"STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
     for i in range(10):
-        tracks_STORM = TCTracks.from_simulations_storm(STORM_DIR.joinpath(fname(i)))
+        tracks_STORM = TCTracks.from_simulations_storm(file_path.joinpath(fname(i)))
         all_tracks.extend(tracks_STORM.data)
     tracks_STORM.data = all_tracks
             
