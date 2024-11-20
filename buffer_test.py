@@ -7,7 +7,7 @@ from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor
 
 OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
-lower_share = 0.042
+lower_share = 0.045
 country = 882
 buffer_distance_arr = np.arange(5, 151, 5)  # Buffer distances
 file_loc = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
