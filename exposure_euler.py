@@ -37,7 +37,7 @@ year = 2020 #reference year for exposure
 res = 30 #resolution in arcsec for exposure
 #define variables for grid and centroids
 res_centrs = 150 #resolution in arcsec for centroids
-buffer_distance_km = 150 
+buffer_distance_km = 105 
 grid_cell_size_km = 30 
 min_overlap_percent = 10 
 #define variables for TC class
