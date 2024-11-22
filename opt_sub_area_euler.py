@@ -20,14 +20,14 @@ lower_share = 0.045
 int_stat = np.arange(10, 101, 10)
 selected_buffer = 105
 
-def sng_cty_bond(country, grid_specs, int_stat, prot_share, file_path, storm_path, buffer_distance, to_prot_share=None, incl_plots=False):    
+def sng_cty_bond(country, grid_specs, int_stat, prot_rp, file_path, storm_path, buffer_distance, to_prot_share, incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposured
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = aexp.init_TC_exp(country=country, grid_specs=grid_specs, file_path=file_path, storm_path=storm_path,
                                                                                               buffer_distance_km=buffer_distance, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, prot_share=to_prot_share, exposure=exp)
     
-    nominal = snom.init_nominal(impact=imp, exposure=exp, prot_share=prot_share, print_nom=False)
+    nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=prot_rp, print_nom=False)
 
     basis_risk_dic = {}
     for i in int_stat:
