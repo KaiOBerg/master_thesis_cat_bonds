@@ -34,7 +34,7 @@ basins_countries = {
 #define variables for exposure
 fin = 'gdp' #fin mode for exposure
 year = 2020 #reference year for exposure
-res = 30 #resolution in arcsec for exposure
+res = 150 #resolution in arcsec for exposure
 #define variables for grid and centroids
 res_centrs = 150 #resolution in arcsec for centroids
 buffer_distance_km = 105 
