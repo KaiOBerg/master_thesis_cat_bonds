@@ -9,6 +9,16 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
+OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
+STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
+
+#choose country
+country = 882
+#define bond charactersitcs
+prot_rp = 250
+lower_share = 0.045
+int_stat = np.arange(10, 101, 10)
+selected_buffer = 105
 
 def sng_cty_bond(country, grid_specs, int_stat, prot_share, file_path, storm_path, buffer_distance, to_prot_share=None, incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposured
@@ -34,17 +44,6 @@ def sng_cty_bond(country, grid_specs, int_stat, prot_share, file_path, storm_pat
     basis_risk_df = pd.DataFrame([basis_risk_dic])
 
     return basis_risk_df, len(optimized_1), exp
-
-OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
-STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
-
-#choose country
-country = 308
-#define bond charactersitcs
-prot_rp = 250
-lower_share = 0.045
-int_stat = np.arange(10, 101, 10)
-selected_buffer = 105
 
 all_dfs = []
 
