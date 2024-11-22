@@ -31,7 +31,7 @@ def sng_cty_bond(country, grid_specs, int_stat, prot_rp, file_path, storm_path, 
 
     basis_risk_dic = {}
     for i in int_stat:
-        int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=i)
+        int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=float(i))
         result, optimized_1, optimized_2 = apo.init_alt_optimization(int_grid, nominal, damages_grid=imp_admin_evt_flt, damages_evt=imp_per_event_flt, print_params=incl_plots)
         pay_dam_df = apo.alt_pay_vs_damage(imp_per_event_flt, optimized_1, optimized_2, int_grid, nominal, imp_admin_evt)
         basis_risk_dic[i] = np.sum(pay_dam_df['damage']) - np.sum(pay_dam_df['pay'])
