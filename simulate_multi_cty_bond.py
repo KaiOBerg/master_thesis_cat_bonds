@@ -150,10 +150,10 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
 
 def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, nominal_dic_cty=None, want_ann_returns=True, model_rf=False):
 
-    metric_names = ['tot_payout', 'tot_damage', 'tot_pay']
+    metric_names = ['tot_payout', 'tot_damage', 'tot_premium', 'tot_pay']
 
     bond_metrics = pd.DataFrame(columns=["Premium", "Sharpe_ratio_ann", "Sharpe_ratio_tot",
-                                                                              "Coverage", "Basis_risk", "Average Payments", "Summed Payments"])
+                                         "Coverage", "Basis_risk", "Average Payments", "Summed Payments", 'Total Premiums'])
 
     bond_returns = pd.DataFrame(columns=["Premium","Annual", "Total"])
 
@@ -186,6 +186,7 @@ def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, n
 
         metrics_sim['tot_payout'].append(metrics['tot_payout'])
         metrics_sim['tot_damage'].append(metrics['tot_damage'])
+        metrics_sim['tot_premium'].append(metrics['tot_premium'])
         metrics_sim['tot_pay'].append(metrics['tot_pay'])
         for key in coverage_cty.keys():
             tot_coverage_cty[key]['payout'].append(coverage_cty[key]['payout'])
@@ -207,6 +208,7 @@ def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, n
     metrics_sim_sum = {}
     metrics_sim_sum['tot_payout'] = np.sum(metrics_sim['tot_payout'])
     metrics_sim_sum['tot_damage'] = np.sum(metrics_sim['tot_damage'])
+    metrics_sim_sum['tot_premium'] = np.sum(metrics_sim['tot_premium'])
     metrics_sim_sum['tot_pay'] = np.nanmean(metrics_sim['tot_pay'])
     for key in tot_coverage_cty.keys():
         tot_coverage_cty[key]['coverage'] = (sum(tot_coverage_cty[key]['payout']) / sum(tot_coverage_cty[key]['damage']))
@@ -219,7 +221,8 @@ def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, n
     bond_metrics.loc[len(bond_metrics)] = [premium_float, sharpe_ratio_ann, sharpe_ratio_tot,
                                            metrics_sim_sum['tot_payout']/metrics_sim_sum['tot_damage'], 
                                            metrics_sim_sum['tot_payout']-metrics_sim_sum['tot_damage'], 
-                                           metrics_sim_sum['tot_pay'], metrics_sim_sum['tot_payout']]  
+                                           metrics_sim_sum['tot_pay'], metrics_sim_sum['tot_payout'],
+                                           metrics_sim_sum['tot_premium']]  
     
     bond_returns.loc[len(bond_returns)] = [premium_float, annual_returns, tot_returns]
 
@@ -228,6 +231,7 @@ def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, n
 
 def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nominal_dic_cty=None):   
     simulated_ncf = []
+    simulated_premium = []
     tot_payout = []
     tot_damage = []
     coverage_cty = {}
@@ -243,12 +247,14 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
         rf = check_rf(risk_free_rates, k)
         rf_rates_list.append(rf)
         if events_per_year[k].empty:
+            premium_ann = (cur_nominal * (premium))
             net_cash_flow_ann = (cur_nominal * (premium + rf))
             sum_payouts_ann = [0]
             sum_damages_ann = [0]
         else:
             events_per_year[k] = events_per_year[k].sort_values(by='month')
             net_cash_flow_ann = []
+            premium_ann = []
             sum_payouts_ann = []
             sum_damages_ann = []
             months = events_per_year[k]['month'].tolist()
@@ -257,6 +263,7 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
             dam = events_per_year[k]['damage'].tolist()
             ncf_pre_event = (cur_nominal * (premium + rf)) / 12 * (months[0])
             net_cash_flow_ann.append(ncf_pre_event)
+            premium_ann.append((cur_nominal * (premium)) / 12 * (months[0]))
             cty_payouts_event = {country: [] for country in countries}
             cty_damages_event = {country: [] for country in countries}
             for o in range(len(events_per_year[k])):
@@ -283,11 +290,14 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
 
                 if o + 1 < len(events_per_year[k]):
                     nex_month = events_per_year[k].loc[events_per_year[k].index[o + 1], 'month'] 
+                    premium_post_event = ((cur_nominal * (premium)) / 12 * (nex_month - month))
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (nex_month - month)) - event_payout
                 else:
+                    premium_post_event = ((cur_nominal * (premium)) / 12 * (nex_month - month))
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month)) - event_payout
 
                 net_cash_flow_ann.append(ncf_post_event)
+                premium_ann.append(premium_post_event)
                 sum_payouts_ann.append(event_payout)
                 sum_damages_ann.append(damage)
                 cty_payouts_event[cty].append(event_payout)
@@ -300,10 +310,12 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
         tot_payout.append(np.sum(sum_payouts_ann))
         tot_damage.append(np.sum(sum_damages_ann))
         simulated_ncf.append(np.sum(net_cash_flow_ann))
+        simulated_premium.append(np.sum(premium_ann))
 
     simulated_ncf_rel = list(np.array(simulated_ncf) / nominal)
     metrics['tot_payout'] = np.sum(tot_payout)
     metrics['tot_damage'] = np.sum(tot_damage)
+    metrics['tot_premium'] = np.sum(simulated_premium)
     if np.sum(tot_payout) == 0:
         tot_pay = np.nan
     else:

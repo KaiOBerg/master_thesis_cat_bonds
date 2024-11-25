@@ -113,12 +113,12 @@ def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=True):
 
 def init_bond_simulation(pay_dam_df, premium, rf_rate, nominal, want_ann_returns=True, model_rf=False):
 
-    metric_names = ['tot_payout', 'tot_damage', 'tot_pay']
+    metric_names = ['tot_payout', 'tot_damage', 'tot_premium', 'tot_pay']
 
     #Check if premiums/rf_rates are single values
 
     bond_metrics = pd.DataFrame(columns=["Premium", "Sharpe_ratio_ann", "Sharpe_ratio_tot",
-                                         "Coverage", "Basis_risk", "Average Payments"])
+                                         "Coverage", "Basis_risk", "Average Payments", "Summed Payments", 'Total Premiums'])
 
     bond_returns = pd.DataFrame(columns=["Premium","Annual", "Total"])
 
@@ -144,6 +144,7 @@ def init_bond_simulation(pay_dam_df, premium, rf_rate, nominal, want_ann_returns
 
         metrics_sim['tot_payout'].append(metrics['tot_payout'])
         metrics_sim['tot_damage'].append(metrics['tot_damage'])
+        metrics_sim['tot_premium'].append(metrics['tot_premium'])
         metrics_sim['tot_pay'].append(metrics['tot_pay'])
         if want_ann_returns:
             annual_returns.extend(simulated_ncf_rel)
@@ -160,6 +161,7 @@ def init_bond_simulation(pay_dam_df, premium, rf_rate, nominal, want_ann_returns
     metrics_sim_sum = {}
     metrics_sim_sum['tot_payout'] = np.sum(metrics_sim['tot_payout'])
     metrics_sim_sum['tot_damage'] = np.sum(metrics_sim['tot_damage'])
+    metrics_sim_sum['tot_premium'] = np.sum(metrics_sim['tot_premium'])
     metrics_sim_sum['tot_pay'] = np.nanmean(metrics_sim['tot_pay'])
     premium_float = np.float64(premium)
     sharpe_ratio_ann = init_sharpe_ratio(annual_returns, rf_annual)
@@ -167,7 +169,8 @@ def init_bond_simulation(pay_dam_df, premium, rf_rate, nominal, want_ann_returns
     bond_metrics.loc[len(bond_metrics)] = [premium_float, sharpe_ratio_ann, sharpe_ratio_tot,
                                            metrics_sim_sum['tot_payout']/metrics_sim_sum['tot_damage'], 
                                            metrics_sim_sum['tot_payout']-metrics_sim_sum['tot_damage'], 
-                                           metrics_sim_sum['tot_pay']]
+                                           metrics_sim_sum['tot_pay'], metrics_sim_sum['tot_payout'],
+                                           metrics_sim_sum['tot_premium']]
     
     bond_returns.loc[len(bond_returns)] = [premium_float, annual_returns, tot_returns]
 
@@ -175,6 +178,7 @@ def init_bond_simulation(pay_dam_df, premium, rf_rate, nominal, want_ann_returns
 
 def init_bond(events_per_year, premium, risk_free_rates, nominal):
     simulated_ncf = []
+    simulated_premiums = []
     tot_payout = []
     tot_damage = []
     rf_rates_list = []
@@ -184,17 +188,20 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal):
         rf = check_rf(risk_free_rates, k)
         rf_rates_list.append(rf)
         if events_per_year[k].empty:
+            premium_ann = (cur_nominal * (premium))
             net_cash_flow_ann = (cur_nominal * (premium + rf))
             sum_payouts_ann = 0
             sum_damages_ann = 0
         else:
             events_per_year[k] = events_per_year[k].sort_values(by='month')
             net_cash_flow_ann = []
+            premium_ann = []
             sum_payouts_ann = []
             sum_damages_ann = []
             month = events_per_year[k].loc[events_per_year[k].index[0], 'month'] 
             ncf_pre_event = (cur_nominal * (premium + rf)) / 12 * (month)
             net_cash_flow_ann.append(ncf_pre_event)
+            premium_ann.append((cur_nominal * (premium)) / 12 * (month))
             for o in range(len(events_per_year[k])):
                 payouts = events_per_year[k].loc[events_per_year[k].index[o], 'pay']
                 damages = events_per_year[k].loc[events_per_year[k].index[o], 'damage']
@@ -212,20 +219,25 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal):
                         pass
                 if o + 1 < len(events_per_year[k]):
                     nex_month = events_per_year[k].loc[events_per_year[k].index[o + 1], 'month'] 
+                    premium_post_event = ((cur_nominal * (premium)) / 12 * (nex_month - month))
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (nex_month - month)) - sum_payouts
                 else:
+                    premium_post_event = ((cur_nominal * (premium)) / 12 * (12- month))
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month)) - sum_payouts
 
                 net_cash_flow_ann.append(ncf_post_event)
+                premium_ann.append(premium_post_event)
                 sum_payouts_ann.append(sum_payouts)
                 sum_damages_ann.append(damages)
 
         simulated_ncf.append(np.sum(net_cash_flow_ann))
+        simulated_premiums.append(np.sum(premium_ann))
         tot_payout.append(np.sum(sum_payouts_ann))
         tot_damage.append(np.sum(sum_damages_ann))
     simulated_ncf_rel = np.array(simulated_ncf) / nominal
     metrics['tot_payout'] = np.sum(tot_payout)
     metrics['tot_damage'] = np.sum(tot_damage)
+    metrics['tot_premium'] = np.sum(simulated_premiums)
     if np.sum(tot_payout) == 0:
         tot_pay = np.nan
     else:
