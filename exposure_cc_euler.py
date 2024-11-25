@@ -142,12 +142,21 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
 
 
 #Load all STORM tracks for the basin of interest.
-def init_STORM_tracks(basin, STORM_path, load_fls=False):
+def init_STORM_tracks(basin, STORM_path, cc_model, load_fls=False):
     """Import TC Tracks"""
     all_tracks = []
     storms_basin = {}
     print("----------------------Initiating TC Tracks----------------------")
-    fname = lambda i: f"STORM_DATA_CMCC-CM2-VHR4_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    if cc_model == 'CMCC':
+        fname = lambda i: f"STORM_DATA_CMCC-CM2-VHR4_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    elif cc_model == 'CNRM':
+        fname = lambda i: f"STORM_DATA_CNRM-CM6-1-HR_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    elif cc_model == 'ECEARTH':
+        fname = lambda i: f"STORM_DATA_EC-Earth3P-HR_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    elif cc_model == 'HADGEM':
+        fname = lambda i: f"STORM_DATA_HadGEM3-GC31-HM_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    else:
+        print('ERROR: No valid climate change model')
     for i in range(10):
         tracks_STORM = TCTracks.from_simulations_storm(STORM_path.joinpath(fname(i)))
         all_tracks.extend(tracks_STORM.data)
