@@ -117,7 +117,7 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
             centrs.plot()
 
         """Import TC Tracks"""
-        track_dic = init_STORM_tracks(applicable_basin, STORM_DIR)
+        track_dic = init_STORM_tracks(applicable_basin, STORM_DIR, cc_model)
 
         """Filter TC Tracks"""
         tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
