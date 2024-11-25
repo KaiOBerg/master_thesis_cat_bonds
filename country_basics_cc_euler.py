@@ -15,6 +15,6 @@ if __name__ == "__main__":
         sys.exit(1)
     
     country = int(sys.argv[1])
-    cc_model = int(sys.argv[2])
+    cc_model = sys.argv[2]
     process_country(country, cc_model)
     print(f"Finished processing country: {country} with model {cc_model}")
