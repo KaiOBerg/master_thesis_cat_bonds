@@ -16,7 +16,7 @@ from climada.util.constants import EARTH_RADIUS_KM, SYSTEM_DIR, DEF_CRS
 import grider as grd
 
 #define directories
-OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
+OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller")
 
 
 #define countries per tropical cyclone basin according to STORM dataset
