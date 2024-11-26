@@ -1,5 +1,6 @@
 import numpy as np
 
+import exposures_cc as ex_cc
 import exposures as ex
 import functions as fct
 import impact as cimp
@@ -157,9 +158,9 @@ def init_mlt_cty_bond_principal(countries, pay_dam_df_dic_ps, prot_share, nomina
     return premium_simulation_ps, returns_ps, tot_coverage_prem_cty_ps, premium_dic, requ_nom_arr, es_metrics_ps, MES_cty_ps, ann_loss_ps
 
 
-def sng_cty_bond(country, prot_share, rf_rate, target_sharpe, grid_size=600, buffer_size=1, low_to_prot=None, to_prot_share=None, incl_plots=False):    
+def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposure
-    exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex.init_TC_exp(country=country, grid_size=grid_size, buffer_size=buffer_size, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
+    exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex.init_TC_exp(country=country, buffer_distance_km=buffer_distance_km, res_exp=res_exp, grid_size=grid_size, buffer_grid_size=buffer_grid_size, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 
@@ -172,7 +173,51 @@ def sng_cty_bond(country, prot_share, rf_rate, target_sharpe, grid_size=600, buf
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
 
 
-    nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=prot_share)
+    if prot_share is not None:
+        nominal = snom.init_nominal(impact=imp, exposure=exp, prot_share=prot_share)
+    else:
+        nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=prot_rp)
+    if nominal < imp_lower_rp:
+        print(Back.RED + "Warning: Given Budget to small to cover specified minimal damage")
+        print("The specified damage which should be covered is: ",round(imp_lower_rp, 3), " [USD]")
+        print(Style.RESET_ALL)
+    #optimize minimum and maximum triggering wind speed per grid cell
+    result, optimized_1, optimized_2 = apo.init_alt_optimization(int_grid, nominal, damages_grid=imp_admin_evt_flt, damages_evt=imp_per_event_flt, print_params=incl_plots)
+    #create data frame containing payment vs damage per event
+    pay_dam_df = apo.alt_pay_vs_damage(imp_per_event_flt, optimized_1, optimized_2, int_grid, nominal, imp_admin_evt)
+    #calculate expected loss and attachment probability
+    exp_loss_ann, att_prob, ann_losses, es_metrics = sb.init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=False)
+    #calculate premiums using different approaches
+    requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
+    ibrd_prem = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
+    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
+    premium_dic['required'] = requ_prem
+    premium_dic['ibrd'] = ibrd_prem
+    premium_dic['exp_loss'] = exp_loss_ann
+    premium_dic['att_prob'] = att_prob
+    #simulate cat bond
+    bond_metrics, bond_returns = sb.init_bond_simulation(pay_dam_df, ibrd_prem, rf_rate, nominal, ann_ret) 
+
+    return bond_metrics, bond_returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt
+
+def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, incl_plots=False):    
+    #load tc_tracks, create hazard class and calculate exposure
+    exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex_cc.init_TC_exp(country=country, cc_model=cc_model, file_path=output_dir, storm_path=storm_dir, buffer_distance_km=buffer_distance_km, res_exp=res_exp, grid_size=grid_size, buffer_grid_size=buffer_grid_size, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
+    #calculate impact and aggregate impact per grid
+    imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
+    if low_to_prot is not None: 
+            imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, lower_rp=low_to_prot)
+    else:
+        imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, prot_share=to_prot_share, exposure=exp)
+    #set up hazard intensity matrix per grid and event
+    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=90, cc_model=cc_model)
+
+    premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
+
+    if prot_share is not None:
+        nominal = snom.init_nominal(impact=imp, exposure=exp, prot_share=prot_share)
+    else:
+        nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=prot_rp)
     if nominal < imp_lower_rp:
         print(Back.RED + "Warning: Given Budget to small to cover specified minimal damage")
         print("The specified damage which should be covered is: ",round(imp_lower_rp, 3), " [USD]")

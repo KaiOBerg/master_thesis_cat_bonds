@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 
-def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100):
+def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100, cc_model=None):
     """
     Calculates a specified statistic (mean, max, or median) for each events sustained wind speeds
     from tc_storms for each grid cell.
@@ -39,7 +39,7 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
         for i in range(len(tc_storms.event_id)):
             year_string = tc_storms.event_name[i]
             month_string = tc_storms.get_event_date()[i]
-            int_grid['year'][i] = extract_year(year_string)
+            int_grid['year'][i] = extract_year(year_string, cc_model)
             int_grid['month'][i] = int(month_string.split('-')[1])
             #For each grid cell, calculate the desired statistic
             for letter, line_numbers in agg_exp.items():
@@ -76,7 +76,7 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
 
             year_string = tc_tracks.data[i].attrs['sid']
             month_string = tc_tracks.data[i].coords['time'][0]
-            int_grid['year'][i] = extract_year(year_string)
+            int_grid['year'][i] = extract_year(year_string, cc_model)
             int_grid['month'][i] = month_string.dt.month.item()
             max_pressure_per_grid = points_in_grid.groupby('grid_letter')['Central Pressure (mb)'].min()
             for letter in grid['grid_letter']:
@@ -100,10 +100,14 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
 #determine year for every event and add it to dataframe
 #Regular expression to capture the number before .txt and the one after .txt-
 pattern = r'(\d+)\.txt-(\d+)'
+pattern_cc = r'(\d+)_IBTRACSDELTA\.txt-(\d+)'
 
 # Function to extract the numbers
-def extract_year(string):
-    match = re.search(pattern, string)
+def extract_year(string, cc_model):
+    if cc_model is not None:
+        match = re.search(pattern_cc, string)
+    else:
+        match = re.search(pattern, string)
     if match:
         before_txt = int(match.group(1))
         after_txt = int(match.group(2))
