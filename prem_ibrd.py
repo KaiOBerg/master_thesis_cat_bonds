@@ -1,18 +1,18 @@
 from scipy.optimize import curve_fit
 import pandas as pd
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-ibrd_bonds = pd.read_excel(r"C:\Users\kaibe\Documents\ETH_Zurich\Thesis\Data\IBRD_bonds.xlsx")
 
 #define exponential fuction to fit risk multiple
 def monoExp(x, a, k, b):
     return a * np.exp(-k * x) + b
 
-def init_prem_ibrd(peril=None, year=None,want_plot=True):
-
+def init_prem_ibrd(file_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), peril=None, year=None,want_plot=True):
+    ibrd_bonds = pd.read_excel(file_path.joinpath('IBRD_bonds.xlsx'))
     if peril is not None: 
         flt_ibrd_bonds = ibrd_bonds[ibrd_bonds['Peril'] == peril]
         flt_ibrd_bonds = flt_ibrd_bonds.reset_index(drop=True)

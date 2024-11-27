@@ -48,6 +48,7 @@ def get_bond_metrics(pool):
             rf_rate=rf_rate,
             target_sharpe=target_sharpe,
             opt_cap=True,
+            ibrd_path=OUTPUT_DIR,
         )
         bond_cache[pool_key] = {
             "ibrd": premium_dic["ibrd"] * nominal,
@@ -66,7 +67,8 @@ def create_sng_binds(countries_30, countries_150):
                                                                                                                                                         to_prot_share=lower_share,
                                                                                                                                                         buffer_distance_km=105,
                                                                                                                                                         res_exp=30,
-                                                                                                                                                        grid_size=6000)
+                                                                                                                                                        grid_size=6000,
+                                                                                                                                                        ibrd_path=OUTPUT_DIR)
             bond_metrics_dic[cty] = bond_metrics
             returns_dic[cty] = returns
             premium_dic_dic[cty] = premium_dic
@@ -92,7 +94,8 @@ def create_sng_binds(countries_30, countries_150):
                                                                                                                                                         to_prot_share=lower_share,
                                                                                                                                                         buffer_distance_km=105,
                                                                                                                                                         res_exp=150,
-                                                                                                                                                        grid_size=6000)
+                                                                                                                                                        grid_size=6000,
+                                                                                                                                                        ibrd_path=OUTPUT_DIR)
 
 
 
@@ -126,7 +129,7 @@ if __name__ == "__main__":
         pay_dam_pool_it[countries[i]] = pay_dam_df_dic[countries[i]]
         nominal_pool_it[countries[i]] = nominal_dic[countries[i]]
 
-    bond_metrics_pool, returns_pool, tot_coverage_cty_pool, premium_dic_pool, nominal_pool, es_metrics_pool, MES_cty_pool = bond_fct.mlt_cty_bond(countries=countries, pay_dam_df_dic=pay_dam_pool_it, nominals_dic=nominal_pool_it, rf_rate=rf_rate, target_sharpe=target_sharpe, opt_cap=False)
+    bond_metrics_pool, returns_pool, tot_coverage_cty_pool, premium_dic_pool, nominal_pool, es_metrics_pool, MES_cty_pool = bond_fct.mlt_cty_bond(countries=countries, pay_dam_df_dic=pay_dam_pool_it, nominals_dic=nominal_pool_it, rf_rate=rf_rate, target_sharpe=target_sharpe, opt_cap=False, ibrd_path=OUTPUT_DIR)
     tmp_abs_prem = abs_prem = premium_dic_pool['ibrd'] * nominal_pool
     tmp_abs_prem_regr = premium_dic_pool['regression'] * nominal_pool
     pool_comb.loc[len(pool_comb)] = [countries, tmp_abs_prem, tmp_abs_prem_regr]

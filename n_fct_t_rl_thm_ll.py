@@ -1,5 +1,5 @@
 import numpy as np
-
+from pathlib import Path
 import exposures_cc as ex_cc
 import exposures as ex
 import functions as fct
@@ -16,8 +16,6 @@ from colorama import Fore, Style, Back
 
 artemis_multiplier = 4.11
 ann_ret = True
-params_ibrd = prib.init_prem_ibrd(want_plot=False)
-a, k, b = params_ibrd
 
 def init_sng_cty_bond_principal(country, prot_share, rf_rate, target_sharpe, grid_size=600, buffer_size=1, low_to_prot=None, to_prot_share=None, int_ws=True, incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposure
@@ -62,6 +60,8 @@ def init_sng_cty_bond_principal(country, prot_share, rf_rate, target_sharpe, gri
         exp_loss_ann, att_prob, ann_losses[ps_str], es_metrics = sb.init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=False)
         #calculate premiums using different approaches
         requ_prem = sb.init_prem_sharpe_ratio(ann_losses[ps_str], rf_rate, target_sharpe)
+        params_ibrd = prib.init_prem_ibrd(want_plot=False)
+        a, k, b = params_ibrd
         premium_dic[ps_str]['ibrd'] = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
         premium_dic[ps_str]['artemis'] = exp_loss_ann * artemis_multiplier
         premium_dic[ps_str]['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
@@ -137,6 +137,8 @@ def init_mlt_cty_bond_principal(countries, pay_dam_df_dic_ps, prot_share, nomina
         exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominal_dic_cty, print_prob=False)
         #calculate premiums using different approaches
         requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
+        params_ibrd = prib.init_prem_ibrd(want_plot=False)
+        a, k, b = params_ibrd
         premium_dic[ps_str]['ibrd'] = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
         premium_dic[ps_str]['artemis'] = exp_loss_ann * artemis_multiplier
         premium_dic[ps_str]['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
@@ -158,7 +160,7 @@ def init_mlt_cty_bond_principal(countries, pay_dam_df_dic_ps, prot_share, nomina
     return premium_simulation_ps, returns_ps, tot_coverage_prem_cty_ps, premium_dic, requ_nom_arr, es_metrics_ps, MES_cty_ps, ann_loss_ps
 
 
-def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, incl_plots=False):    
+def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposure
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex.init_TC_exp(country=country, buffer_distance_km=buffer_distance_km, res_exp=res_exp, grid_size=grid_size, buffer_grid_size=buffer_grid_size, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
     #calculate impact and aggregate impact per grid
@@ -189,6 +191,8 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     exp_loss_ann, att_prob, ann_losses, es_metrics = sb.init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=False)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
+    params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path,want_plot=False)
+    a, k, b = params_ibrd
     ibrd_prem = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
@@ -200,7 +204,7 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
 
     return bond_metrics, bond_returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt
 
-def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, incl_plots=False):    
+def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposure
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex_cc.init_TC_exp(country=country, cc_model=cc_model, file_path=output_dir, storm_path=storm_dir, buffer_distance_km=buffer_distance_km, res_exp=res_exp, grid_size=grid_size, buffer_grid_size=buffer_grid_size, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
     #calculate impact and aggregate impact per grid
@@ -230,6 +234,8 @@ def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, targe
     exp_loss_ann, att_prob, ann_losses, es_metrics = sb.init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=False)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
+    params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
+    a, k, b = params_ibrd
     ibrd_prem = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
@@ -243,7 +249,7 @@ def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, targe
 
 
 
-def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate, target_sharpe, opt_cap=True, incl_plots=False):  
+def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate, target_sharpe, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), opt_cap=True, incl_plots=False):  
     #set principal
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
 
@@ -261,6 +267,8 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate, target_sharpe
     exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominals_dic, print_prob=False)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
+    params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
+    a, k, b = params_ibrd
     premium_dic['ibrd'] = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
