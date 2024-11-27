@@ -55,9 +55,9 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, buffer_grid_size=1, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, cc_model, file_path, storm_path, buffer_distance_km=105, res_exp=30, grid_size=600, buffer_grid_size=1, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
 
-    STORM_DIR = Path(f"C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks/climate_change/{cc_model}")
+    STORM_DIR = storm_path.joinpath(cc_model)
 
 
     """Define STORM Basin"""
@@ -73,13 +73,13 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
         
     """Define Exposure"""
     exp_str = f"Exp_{country}_{fin}_{year}_{res_exp}.hdf5"
-    if load_fls and Path.is_file(EXPOSURE_DIR.joinpath(exp_str)):
+    if load_fls and Path.is_file(file_path.joinpath(exp_str)):
         """Loading Exposure"""
-        exp = LitPop.from_hdf5(EXPOSURE_DIR.joinpath(exp_str))
+        exp = LitPop.from_hdf5(file_path.joinpath(exp_str))
     else:
         """Initiating Exposure"""
         exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res_exp)
-        exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
+        exp.write_hdf5(file_path.joinpath(exp_str))
     
     if plot_exp:
         exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
@@ -107,9 +107,9 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
     # initiate new instance of TropCyclone(Hazard) class:
     haz_str = f"TC_sub_{applicable_basin}_{country}_{res_exp}_STORM_cc_{cc_model}.hdf5"
     track_str = f"Track_sub_{applicable_basin}_{country}_{res_exp}_STORMcc_{cc_model}.hdf5"
-    if load_fls and Path.is_file(HAZARD_DIR.joinpath(haz_str)):
-        tc_storms = TropCyclone.from_hdf5(HAZARD_DIR.joinpath(haz_str))
-        storm_basin_sub = TCTracks.from_hdf5(HAZARD_DIR.joinpath(track_str))
+    if load_fls and Path.is_file(file_path.joinpath(haz_str)):
+        tc_storms = TropCyclone.from_hdf5(file_path.joinpath(haz_str))
+        storm_basin_sub = TCTracks.from_hdf5(file_path.joinpath(track_str))
 
     else:
         """Generating Centroids"""
@@ -120,7 +120,7 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
             centrs.plot()
 
         """Import TC Tracks"""
-        track_dic = init_STORM_tracks(applicable_basin, STORM_DIR)
+        track_dic = init_STORM_tracks(applicable_basin, STORM_DIR, cc_model)
 
         """Filter TC Tracks"""
         tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
@@ -129,13 +129,13 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
         tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]
         storm_basin_sub = TCTracks(tracks_in_exp) 
         storm_basin_sub.equal_timestep(time_step_h=1)
-        storm_basin_sub.write_hdf5(HAZARD_DIR.joinpath(track_str)) 
+        storm_basin_sub.write_hdf5(file_path.joinpath(track_str)) 
 
         #generate TropCyclone class from previously loaded TC tracks for one storm data set
         tc_storms = TropCyclone.from_tracks(storm_basin_sub, centroids=centrs)
         tc_storms.frequency = np.ones(tc_storms.event_id.size) * freq_corr_STORM
         tc_storms.check()
-        tc_storms.write_hdf5(HAZARD_DIR.joinpath(haz_str))   
+        tc_storms.write_hdf5(file_path.joinpath(haz_str))   
 
     print(f"Number of tracks in {applicable_basin} basin:",storm_basin_sub.size) 
 
@@ -145,12 +145,21 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
 
 
 #Load all STORM tracks for the basin of interest.
-def init_STORM_tracks(basin, STORM_path, load_fls=False):
+def init_STORM_tracks(basin, STORM_path, cc_model, load_fls=False):
     """Import TC Tracks"""
     all_tracks = []
     storms_basin = {}
     print("----------------------Initiating TC Tracks----------------------")
-    fname = lambda i: f"STORM_DATA_CMCC-CM2-VHR4_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    if cc_model == 'CMCC':
+        fname = lambda i: f"STORM_DATA_CMCC-CM2-VHR4_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    elif cc_model == 'CNRM':
+        fname = lambda i: f"STORM_DATA_CNRM-CM6-1-HR_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    elif cc_model == 'ECEARTH':
+        fname = lambda i: f"STORM_DATA_EC-Earth3P-HR_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    elif cc_model == 'HADGEM':
+        fname = lambda i: f"STORM_DATA_HadGEM3-GC31-HM_{basin}_1000_YEARS_{i}_IBTRACSDELTA.txt"
+    else:
+        print('ERROR: No valid climate change model')
     for i in range(10):
         tracks_STORM = TCTracks.from_simulations_storm(STORM_path.joinpath(fname(i)))
         all_tracks.extend(tracks_STORM.data)

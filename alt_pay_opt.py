@@ -110,7 +110,11 @@ def init_cons(int_haz_cp):
 
 def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, damages_grid=None, damages=None):
     b = len(damages_flt)
-    minimum_payout = damages_flt[damages_flt > 0].min()
+    max_damage = damages_flt.max()
+    if max_damage < 1:
+        minimum_payout = 0
+    else:
+        minimum_payout = damages_flt[damages_flt > 0].min()
     payout_evt_grd = pd.DataFrame({letter: [None] * b for letter in haz_int.columns[:-2]})
     pay_dam_df = pd.DataFrame({'pay': [0.0] * b, 'damage': [0.0] * b, 'year': [0] * b, 'month': [0] * b})
 

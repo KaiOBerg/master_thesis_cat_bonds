@@ -26,7 +26,7 @@ ADMIN_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/countries_admi
 #define countries per tropical cyclone basin according to STORM dataset
 NA = [28,44,52,84,132,192,212,214,308,624,328,332,388,659,662,670,740,780]
 SI = [174,480,690,626, 450]
-SP = [184,242,296,520,570,598,882,90,798,548]
+SP = [184,242,296,520,570,598,882,90,798,548,776]
 WP = [584,583,520,585]
 EP = []
 NI = [462]
@@ -44,10 +44,8 @@ basins_countries = {
 #define variables for exposure
 fin = 'gdp' #fin mode for exposure
 year = 2020 #reference year for exposure
-res = 30 #resolution in arcsec for exposure
 #define variables for grid and centroids
 res_centrs = 150 #resolution in arcsec for centroids
-buffer_distance_km = 40 
 grid_cell_size_km = 30 
 min_overlap_percent = 10 
 #define variables for TC class
@@ -58,7 +56,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, buffer_distance_km, res_exp, grid_size=600, buffer_grid_size=1, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -72,13 +70,13 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=
         pass
         
     """Define Exposure"""
-    exp_str = f"Exp_{country}_{fin}_{year}_{res}.hdf5"
+    exp_str = f"Exp_{country}_{fin}_{year}_{res_exp}.hdf5"
     if load_fls and Path.is_file(EXPOSURE_DIR.joinpath(exp_str)):
         """Loading Exposure"""
         exp = LitPop.from_hdf5(EXPOSURE_DIR.joinpath(exp_str))
     else:
         """Initiating Exposure"""
-        exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
+        exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res_exp)
         exp.write_hdf5(EXPOSURE_DIR.joinpath(exp_str))
     
     if plot_exp:
@@ -86,7 +84,7 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=
 
     """Divide Exposure set into admin/grid cells"""
     islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
-    islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_size)
+    islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_grid_size)
     islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
 
     if plt_grd:
@@ -105,8 +103,8 @@ def init_TC_exp(country, grid_size=600, buffer_size=1, load_fls=False, plot_exp=
 
     """initiate TC hazard from tracks and exposure"""
     # initiate new instance of TropCyclone(Hazard) class:
-    haz_str = f"TC_sub_{applicable_basin}_{country}_{res}_STORM.hdf5"
-    track_str = f"Track_sub_{applicable_basin}_{country}_{res}_STORM.hdf5"
+    haz_str = f"TC_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
+    track_str = f"Track_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
     if load_fls and Path.is_file(HAZARD_DIR.joinpath(haz_str)):
         tc_storms = TropCyclone.from_hdf5(HAZARD_DIR.joinpath(haz_str))
         storm_basin_sub = TCTracks.from_hdf5(HAZARD_DIR.joinpath(track_str))
