@@ -293,7 +293,7 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
                     premium_post_event = ((cur_nominal * (premium)) / 12 * (nex_month - month))
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (nex_month - month)) - event_payout
                 else:
-                    premium_post_event = ((cur_nominal * (premium)) / 12 * (nex_month - month))
+                    premium_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month))
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month)) - event_payout
 
                 net_cash_flow_ann.append(ncf_post_event)
