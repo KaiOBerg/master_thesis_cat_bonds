@@ -8,7 +8,7 @@ import pandas as pd
 
 countries_30 = [585, 583, 584, 882, 776, 798, 570, 184, 480, 690, 174, 462, 780, 670, 662, 659, 52, 308, 28, 212, 132]
 countries_150 = [548, 626, 44, 388, 332, 214] #90
-countries = []
+
 
 #define minimum return period to be covered
 lower_rp = 0.05
@@ -35,7 +35,7 @@ int_grid_dic = {}
 imp_per_event_flt_dic = {}
 imp_admin_evt_flt_dic = {}
 
-def get_bond_metrics(pool):
+def get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it):
     pool_key = tuple(sorted(pool))  # Create a unique key for the pool
     if pool_key not in bond_cache:
         # If result isn't cached, compute and store it
@@ -52,12 +52,13 @@ def get_bond_metrics(pool):
         )
         bond_cache[pool_key] = {
             "ibrd": premium_dic["ibrd"] * nominal,
-            "regression": premium_dic["regression"] * nominal
-        }
+            "regression": premium_dic["regression"] * nominal,
+            }
     return bond_cache[pool_key]
 
 
 def create_sng_binds(countries_30, countries_150):
+    countries = []
     for cty in countries_30:
         try:
             bond_metrics, returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt = bond_fct.sng_cty_bond(country=cty,
@@ -115,7 +116,7 @@ def create_sng_binds(countries_30, countries_150):
         except Exception as e:
             print(f"Error processing country {cty}: {e}")
 
-        return bond_metrics_dic, returns_dic, premium_dic_dic, nominal_dic, pay_dam_df_dic, es_metrics_dic, int_grid_dic, imp_per_event_flt_dic, imp_admin_evt_flt_dic, countries
+    return bond_metrics_dic, returns_dic, premium_dic_dic, nominal_dic, pay_dam_df_dic, es_metrics_dic, int_grid_dic, imp_per_event_flt_dic, imp_admin_evt_flt_dic, countries
 
 
 
@@ -144,12 +145,12 @@ if __name__ == "__main__":
         iteration += 1 
         print('Iteration: ',iteration)
         tmp_abs_prem = abs_prem
-        prem_placeholder = 1000000000000000000
+        prem_placeholder = np.inf
         for i in range(len(countries_main_pool)):
             cty = countries_main_pool[i]
             tmp_main_pool = countries_main_pool.copy()
             tmp_main_pool.pop(i)
-            main_pool_metrics = get_bond_metrics(tmp_main_pool)
+            main_pool_metrics = get_bond_metrics(tmp_main_pool, pay_dam_pool_it, nominal_pool_it)
             tmp_abs_prem_main = main_pool_metrics["ibrd"]
             tmp_abs_prem_main_regr = main_pool_metrics["regression"]
             if country_side_pools:
@@ -157,8 +158,8 @@ if __name__ == "__main__":
                     tmp_abs_prem_ls = []
                     tmp_side_pools = copy.deepcopy(country_side_pools)
                     tmp_side_pools[inner_pool].append(cty)
-                    tmp_abs_prem_ls = [get_bond_metrics(pool)["ibrd"] for pool in tmp_side_pools]
-                    tmp_abs_prem_ls_regr = [get_bond_metrics(pool)["regression"] for pool in tmp_side_pools]
+                    tmp_abs_prem_ls = [get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it)["ibrd"] for pool in tmp_side_pools]
+                    tmp_abs_prem_ls_regr = [get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it)["regression"] for pool in tmp_side_pools]
                     tot_prem_it = np.sum(tmp_abs_prem_ls) + tmp_abs_prem_main
                     tot_prem_it_regr = np.sum(tmp_abs_prem_ls_regr) + tmp_abs_prem_main_regr
                     print('Side Pools: ',tot_prem_it)
@@ -169,8 +170,8 @@ if __name__ == "__main__":
                         tmp_abs_prem_regr = tot_prem_it_regr
             tmp_side_pools = copy.deepcopy(country_side_pools)
             tmp_side_pools.append([cty])
-            tmp_abs_prem_ls = [get_bond_metrics(pool)["ibrd"] for pool in tmp_side_pools]
-            tmp_abs_prem_ls_regr = [get_bond_metrics(pool)["regression"] for pool in tmp_side_pools]
+            tmp_abs_prem_ls = [get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it)["ibrd"] for pool in tmp_side_pools]
+            tmp_abs_prem_ls_regr = [get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it)["regression"] for pool in tmp_side_pools]
             tot_prem_it = np.sum(tmp_abs_prem_ls) + tmp_abs_prem_main
             tot_prem_it_regr = np.sum(tmp_abs_prem_ls_regr) + tmp_abs_prem_main_regr
             print('Extra Side Pools: ',tot_prem_it)
