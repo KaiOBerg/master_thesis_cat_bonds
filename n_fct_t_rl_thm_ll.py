@@ -188,6 +188,8 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     result, optimized_1, optimized_2 = apo.init_alt_optimization(int_grid, nominal, damages_grid=imp_admin_evt_flt, damages_evt=imp_per_event_flt, print_params=incl_plots)
     #create data frame containing payment vs damage per event
     pay_dam_df = apo.alt_pay_vs_damage(imp_per_event_flt, optimized_1, optimized_2, int_grid, nominal, imp_admin_evt)
+    if np.sum(pay_dam_df['damage']) == 0 or np.sum(pay_dam_df['pay']) == 0:
+        raise Exception(f'no damage {country}')
     #calculate expected loss and attachment probability
     exp_loss_ann, att_prob, ann_losses, es_metrics = sb.init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=False)
     #calculate premiums using different approaches

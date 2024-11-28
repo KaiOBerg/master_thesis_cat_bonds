@@ -7,7 +7,7 @@ import copy
 import pandas as pd
 
 countries_30 = [585, 583, 584, 882, 776, 798, 570, 184, 480, 690, 174, 462, 780, 670, 662, 659, 52, 308, 28, 212, 132]
-countries_150 = [548, 626, 44, 388, 332, 214] #90
+countries_150 = [548, 626, 388, 332, 214] #90, 44
 
 
 #define minimum return period to be covered
@@ -151,7 +151,6 @@ if __name__ == "__main__":
     country_side_pools = []
     while tmp_abs_prem <= abs_prem and iteration < len(countries)-1:
         iteration += 1 
-        print('Iteration: ',iteration)
         tmp_abs_prem = abs_prem
         prem_placeholder = np.inf
         for i in range(len(countries_main_pool)):
@@ -170,7 +169,6 @@ if __name__ == "__main__":
                     tmp_abs_prem_ls_regr = [get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it)["regression"] for pool in tmp_side_pools]
                     tot_prem_it = np.sum(tmp_abs_prem_ls) + tmp_abs_prem_main
                     tot_prem_it_regr = np.sum(tmp_abs_prem_ls_regr) + tmp_abs_prem_main_regr
-                    print('Side Pools: ',tot_prem_it)
                     if tot_prem_it < prem_placeholder:
                         prem_placeholder = tot_prem_it
                         tmp_country_side_pools = tmp_side_pools
@@ -182,7 +180,6 @@ if __name__ == "__main__":
             tmp_abs_prem_ls_regr = [get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it)["regression"] for pool in tmp_side_pools]
             tot_prem_it = np.sum(tmp_abs_prem_ls) + tmp_abs_prem_main
             tot_prem_it_regr = np.sum(tmp_abs_prem_ls_regr) + tmp_abs_prem_main_regr
-            print('Extra Side Pools: ',tot_prem_it)
             if tot_prem_it < prem_placeholder:
                 prem_placeholder = tot_prem_it
                 tmp_country_side_pools = tmp_side_pools
@@ -191,7 +188,6 @@ if __name__ == "__main__":
         tmp_abs_prem = prem_placeholder
         country_side_pools = tmp_country_side_pools
         countries_main_pool = tmp_country_main_pool
-        print('Final Premium:', tmp_abs_prem)
         pool_comb.loc[len(pool_comb)] = [[countries_main_pool,country_side_pools], tmp_abs_prem, tmp_abs_prem_regr]
 
     output_file = OUTPUT_DIR / "opt_pool.xlsx"
