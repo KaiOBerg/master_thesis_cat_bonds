@@ -2,6 +2,7 @@ import numpy as np
 from pathlib import Path
 import exposures_cc as ex_cc
 import exposures as ex
+import exposure_euler
 import functions as fct
 import impact as cimp
 import bound_prot_dam as bpd
@@ -160,9 +161,9 @@ def init_mlt_cty_bond_principal(countries, pay_dam_df_dic_ps, prot_share, nomina
     return premium_simulation_ps, returns_ps, tot_coverage_prem_cty_ps, premium_dic, requ_nom_arr, es_metrics_ps, MES_cty_ps, ann_loss_ps
 
 
-def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False):    
+def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, storm_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), output_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposure
-    exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex.init_TC_exp(country=country, buffer_distance_km=buffer_distance_km, res_exp=res_exp, grid_size=grid_size, buffer_grid_size=buffer_grid_size, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
+    exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex.init_TC_exp(country=country, buffer_distance_km=buffer_distance_km, res_exp=res_exp, grid_size=grid_size, buffer_grid_size=buffer_grid_size, OUTPUT_DIR=output_dir, STORM_DIR=storm_dir, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 

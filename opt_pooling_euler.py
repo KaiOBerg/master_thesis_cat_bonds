@@ -23,6 +23,8 @@ target_sharpe = 0.5
 rf_rate = 0.00
 
 OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller")
+HAZARD_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
+STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 
 bond_cache = {}
 bond_metrics_dic = {}
@@ -61,6 +63,7 @@ def create_sng_binds(countries_30, countries_150):
     countries = []
     for cty in countries_30:
         try:
+            print('Creating cat bond for ',cty)
             bond_metrics, returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt = bond_fct.sng_cty_bond(country=cty,
                                                                                                                                                         prot_share=upper_share, 
                                                                                                                                                         rf_rate=rf_rate, 
@@ -69,6 +72,8 @@ def create_sng_binds(countries_30, countries_150):
                                                                                                                                                         buffer_distance_km=105,
                                                                                                                                                         res_exp=30,
                                                                                                                                                         grid_size=6000,
+                                                                                                                                                        output_dir=HAZARD_DIR,
+                                                                                                                                                        storm_dir=STORM_DIR,
                                                                                                                                                         ibrd_path=OUTPUT_DIR)
             bond_metrics_dic[cty] = bond_metrics
             returns_dic[cty] = returns
@@ -88,6 +93,7 @@ def create_sng_binds(countries_30, countries_150):
 
     for cty in countries_150:
         try:
+            print('Creating cat bond for ',cty)
             bond_metrics, returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt = bond_fct.sng_cty_bond(country=cty,
                                                                                                                                                         prot_share=upper_share, 
                                                                                                                                                         rf_rate=rf_rate, 
@@ -96,6 +102,8 @@ def create_sng_binds(countries_30, countries_150):
                                                                                                                                                         buffer_distance_km=105,
                                                                                                                                                         res_exp=150,
                                                                                                                                                         grid_size=6000,
+                                                                                                                                                        output_dir=HAZARD_DIR,
+                                                                                                                                                        storm_dir=STORM_DIR,
                                                                                                                                                         ibrd_path=OUTPUT_DIR)
 
 
