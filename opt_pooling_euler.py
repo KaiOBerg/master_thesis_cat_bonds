@@ -7,7 +7,7 @@ import copy
 import pandas as pd
 
 countries_30 = [585, 583, 584, 882, 776, 798, 570, 184, 480, 690, 174, 462, 780, 670, 662, 659, 52, 308, 28, 212, 132]
-countries_150 = [548, 626, 388, 332, 214] #90, 44
+countries_150 = [548, 626, 388, 332, 214, 192] #90, 44
 
 
 #define minimum return period to be covered
@@ -59,7 +59,7 @@ def get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it):
     return bond_cache[pool_key]
 
 
-def create_sng_binds(countries_30, countries_150):
+def create_sng_bonds(countries_30, countries_150):
     countries = []
     for cty in countries_30:
         try:
@@ -129,7 +129,7 @@ def create_sng_binds(countries_30, countries_150):
 
 
 if __name__ == "__main__":
-    bond_metrics_dic, returns_dic, premium_dic_dic, nominal_dic, pay_dam_df_dic, es_metrics_dic, int_grid_dic, imp_per_event_flt_dic, imp_admin_evt_flt_dic, countries = create_sng_binds(countries_30, countries_150)
+    bond_metrics_dic, returns_dic, premium_dic_dic, nominal_dic, pay_dam_df_dic, es_metrics_dic, int_grid_dic, imp_per_event_flt_dic, imp_admin_evt_flt_dic, countries = create_sng_bonds(countries_30, countries_150)
 
     pool_comb = pd.DataFrame(columns = ['Pool', 'Premium_ibrd', 'Premium_regr'])
     pay_dam_pool_it = {}
