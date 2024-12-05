@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 import exposure_euler as ex_eu
+import impact as cimp
+import set_nominal as snom
 
 # Directories
 OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
@@ -9,7 +11,10 @@ STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 def process_country(cty):
     """Wrapper function to process a single country."""
     print(f"Processing country: {cty}")
-    ex_eu.init_TC_exp(country=cty, OUTPUT_DIR=OUTPUT_DIR, STORM_DIR=STORM_DIR, grid_size=6000)
+    exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex_eu.init_TC_exp(country=cty, OUTPUT_DIR=OUTPUT_DIR, STORM_DIR=STORM_DIR, grid_size=6000)
+    imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=False) 
+    nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=250)
+    return nominal
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -17,5 +22,7 @@ if __name__ == "__main__":
         sys.exit(1)
     
     country = int(sys.argv[1])
-    process_country(country)
+    print(f"Processing country: {country}")
+    nominal = process_country(country)
+    print(country, nominal)
     print(f"Finished processing country: {country}")

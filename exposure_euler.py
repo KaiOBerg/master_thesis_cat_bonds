@@ -64,8 +64,6 @@ def init_TC_exp(country, OUTPUT_DIR, STORM_DIR, grid_size=600, buffer_size=1):
 
     """Divide Exposure set into admin/grid cells"""
     islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, False)
-    islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_size)
-    islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
 
     """initiate TC hazard from tracks and exposure"""
     """Generating Centroids"""
@@ -89,7 +87,7 @@ def init_TC_exp(country, OUTPUT_DIR, STORM_DIR, grid_size=600, buffer_size=1):
     tc_storms.write_hdf5(OUTPUT_DIR / f"TC_sub_{applicable_basin}_{country}_{res}_STORM.hdf5")
     print('Job done')
 
-    return exp, applicable_basin, grid_gdf, islands_split_gdf, storm_basin_sub, tc_storms
+    return exp, applicable_basin, grid_gdf, storm_basin_sub, tc_storms
 
 
 
