@@ -3,7 +3,8 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve, minimize
 import matplotlib.pyplot as plt
-
+from decimal import Decimal, getcontext
+getcontext().prec = 17  
 import functions as fct
 
 
@@ -83,7 +84,7 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
     list_loss_month = []
     ann_cty_losses = {country: [] for country in countries}
 
-    for i in range(simulated_years-3):
+    for i in range(simulated_years-term):
         events_per_year = []
         for j in range(term):
             events_per_cty = []  
@@ -166,7 +167,7 @@ def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, n
     rf_annual = []
     rf_total = []
     metrics_sim = {key: [] for key in metric_names}
-    for i in range(simulated_years-3):
+    for i in range(simulated_years-term):
         #model interest rates if wanted
         if model_rf:
             rf = init_model_rf(rf_rate)
@@ -247,10 +248,10 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
         rf = check_rf(risk_free_rates, k)
         rf_rates_list.append(rf)
         if events_per_year[k].empty:
-            premium_ann = (cur_nominal * (premium))
+            premium_ann = cur_nominal * premium
             net_cash_flow_ann = (cur_nominal * (premium + rf))
-            sum_payouts_ann = [0]
-            sum_damages_ann = [0]
+            sum_payouts_ann = 0
+            sum_damages_ann = 0
         else:
             events_per_year[k] = events_per_year[k].sort_values(by='month')
             net_cash_flow_ann = []
@@ -261,9 +262,9 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
             cties = events_per_year[k]['country_code'].tolist()
             pay = events_per_year[k]['pay'].tolist()
             dam = events_per_year[k]['damage'].tolist()
-            ncf_pre_event = (cur_nominal * (premium + rf)) / 12 * (months[0])
+            ncf_pre_event = (cur_nominal * (premium + rf)) / 12 * months[0]
             net_cash_flow_ann.append(ncf_pre_event)
-            premium_ann.append((cur_nominal * (premium)) / 12 * (months[0]))
+            premium_ann.append(cur_nominal * premium / 12 * (months[0]))
             cty_payouts_event = {country: [] for country in countries}
             cty_damages_event = {country: [] for country in countries}
             for o in range(len(events_per_year[k])):
@@ -287,13 +288,12 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
                         cur_nominal = 0
                     else:
                         pass
-
                 if o + 1 < len(events_per_year[k]):
-                    nex_month = events_per_year[k].loc[events_per_year[k].index[o + 1], 'month'] 
-                    premium_post_event = ((cur_nominal * (premium)) / 12 * (nex_month - month))
+                    nex_month = months[o+1] 
+                    premium_post_event = (cur_nominal * premium) / 12 * (nex_month - month)
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (nex_month - month)) - event_payout
                 else:
-                    premium_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month))
+                    premium_post_event = (cur_nominal * premium) / 12 * (12- month)
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month)) - event_payout
 
                 net_cash_flow_ann.append(ncf_post_event)
@@ -311,7 +311,6 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
         tot_damage.append(np.sum(sum_damages_ann))
         simulated_ncf.append(np.sum(net_cash_flow_ann))
         simulated_premium.append(np.sum(premium_ann))
-
     simulated_ncf_rel = list(np.array(simulated_ncf) / nominal)
     metrics['tot_payout'] = np.sum(tot_payout)
     metrics['tot_damage'] = np.sum(tot_damage)

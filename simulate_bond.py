@@ -4,6 +4,8 @@ import random
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve, minimize
 import matplotlib.pyplot as plt
+from decimal import Decimal, getcontext
+getcontext().prec = 17  
 
 import functions as fct
 
@@ -188,7 +190,7 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal):
         rf = check_rf(risk_free_rates, k)
         rf_rates_list.append(rf)
         if events_per_year[k].empty:
-            premium_ann = (cur_nominal * (premium))
+            premium_ann = cur_nominal * premium
             net_cash_flow_ann = (cur_nominal * (premium + rf))
             sum_payouts_ann = 0
             sum_damages_ann = 0
@@ -199,14 +201,13 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal):
             sum_payouts_ann = []
             sum_damages_ann = []
             month = events_per_year[k].loc[events_per_year[k].index[0], 'month'] 
-            ncf_pre_event = (cur_nominal * (premium + rf)) / 12 * (month)
+            ncf_pre_event = (cur_nominal * (premium + rf)) / 12 * month
             net_cash_flow_ann.append(ncf_pre_event)
-            premium_ann.append((cur_nominal * (premium)) / 12 * (month))
+            premium_ann.append((cur_nominal * premium) / 12 * month)
             for o in range(len(events_per_year[k])):
                 payouts = events_per_year[k].loc[events_per_year[k].index[o], 'pay']
                 damages = events_per_year[k].loc[events_per_year[k].index[o], 'damage']
                 month = events_per_year[k].loc[events_per_year[k].index[o], 'month']    
-                #If there are events in the year, sample that many payouts and the associated damages
                 if payouts == 0:
                     sum_payouts = 0
                 elif payouts > 0:
@@ -219,10 +220,10 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal):
                         pass
                 if o + 1 < len(events_per_year[k]):
                     nex_month = events_per_year[k].loc[events_per_year[k].index[o + 1], 'month'] 
-                    premium_post_event = ((cur_nominal * (premium)) / 12 * (nex_month - month))
+                    premium_post_event = (cur_nominal * premium) / 12 * (nex_month - month)
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (nex_month - month)) - sum_payouts
                 else:
-                    premium_post_event = ((cur_nominal * (premium)) / 12 * (12- month))
+                    premium_post_event = (cur_nominal * premium) / 12 * (12- month)
                     ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month)) - sum_payouts
 
                 net_cash_flow_ann.append(ncf_post_event)
