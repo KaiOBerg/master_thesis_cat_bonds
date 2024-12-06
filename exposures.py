@@ -53,7 +53,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, buffer_distance_km, res_exp, grid_size=600, buffer_grid_size=1, OUTPUT_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), STORM_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, buffer_distance_km, res_exp, grid_size=6000, buffer_grid_size=1, OUTPUT_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), STORM_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():

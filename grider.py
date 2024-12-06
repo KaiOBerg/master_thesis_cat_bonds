@@ -158,7 +158,7 @@ def divide_islands(islands, num_divisions):
         polygons = new_polygons
     return polygons
 
-def init_equ_pol(exposure, grid_size=600, buffer_size=1, crs="EPSG:3857"):
+def init_equ_pol(exposure, grid_size=6000, buffer_size=1, crs="EPSG:3857"):
     divided_islands = []
     exposure_crs = exposure.crs
     islands_gdf = create_islands(exposure)

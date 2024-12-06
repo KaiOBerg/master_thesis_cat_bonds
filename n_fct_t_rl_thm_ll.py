@@ -203,7 +203,7 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
     #simulate cat bond
-    bond_metrics, bond_returns = sb.init_bond_simulation(pay_dam_df, ibrd_prem, rf_rate, nominal, ann_ret) 
+    bond_metrics, bond_returns = sb.init_bond_simulation(pay_dam_df, premium_dic['regression'], rf_rate, nominal, ann_ret) 
 
     return bond_metrics, bond_returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt
 
@@ -252,7 +252,7 @@ def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, targe
 
 
 
-def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate, target_sharpe, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), opt_cap=True, incl_plots=False):  
+def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate=0.0, target_sharpe=0.5, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), opt_cap=True, incl_plots=False):  
     #set principal
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
 
@@ -276,7 +276,7 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate, target_sharpe
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     #simulate cat bond
-    premium_simulation, returns, tot_coverage_prem_cty = smcb.init_bond_simulation(pay_dam_df_dic, requ_prem, rf_rate, requ_nom, countries, nominals_dic, ann_ret) 
+    premium_simulation, returns, tot_coverage_prem_cty = smcb.init_bond_simulation(pay_dam_df_dic, premium_dic['regression'], rf_rate, requ_nom, countries, nominals_dic, ann_ret) 
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
 
