@@ -113,7 +113,6 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
 
     annual_losses = pd.Series(annual_losses)
     total_losses = pd.Series(total_losses)
-
     VaR_99_ann = annual_losses.quantile(0.99)
     VaR_99_tot = total_losses.quantile(0.99)
     VaR_95_ann = annual_losses.quantile(0.95)
@@ -134,11 +133,13 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
         ES_95_tot = 1
     else:
         ES_95_tot = total_losses[total_losses > VaR_95_tot].mean()
-    MES_cty = {country: {'95': None, '99': None} for country in ann_cty_losses.keys()}
+    MES_cty = {country: {'95': None, '99': None, 'EL': None} for country in ann_cty_losses.keys()}
     for country, ann_cty_losses_iter in ann_cty_losses.items():
         ann_cty_losses_iter = pd.Series(ann_cty_losses_iter)
         MES_cty[country]['95'] = ann_cty_losses_iter[annual_losses > VaR_95_ann].mean()
         MES_cty[country]['99'] = ann_cty_losses_iter[annual_losses > VaR_99_ann].mean()
+    for cty in countries: 
+        MES_cty[cty]['EL'] = np.mean(ann_cty_losses[cty])
 
     es_metrics = {'VaR_99_ann': VaR_99_ann, 'VaR_99_tot': VaR_99_tot, 'VaR_95_ann': VaR_95_ann, 'VaR_95_tot': VaR_95_tot,
                   'ES_99_ann': ES_99_ann, 'ES_99_tot': ES_99_tot, 'ES_95_ann': ES_95_ann, 'ES_95_tot': ES_95_tot}
@@ -149,7 +150,26 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
 
     return exp_loss_ann, att_prob, df_loss_month, total_losses, es_metrics, MES_cty
 
-def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, nominal_dic_cty=None, want_ann_returns=True, model_rf=False):
+def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, nominal_dic_cty=None, el_dic=None, want_ann_returns=True, model_rf=False):
+
+    nom_sng = []
+    el_sum = []
+    for cty in countries:
+        nom_sng.append(nominal_dic_cty[cty])
+        el_sum.append(el_dic[cty])
+    nom_sng = sum(nom_sng)
+    el_sum = sum(el_sum)
+    
+    share_nom = {}
+    share_prem_abs = {}
+    for cty in countries:
+        share_nom[cty] = nominal_dic_cty[cty]/nom_sng * nominal
+        share_prem_abs[cty] = (el_dic[cty]/el_sum) * (premium * nominal)
+
+    share_prem = {}
+    for cty in countries:
+        share_prem[cty] = share_prem_abs[cty]/share_nom[cty]
+
 
     metric_names = ['tot_payout', 'tot_damage', 'tot_premium', 'tot_pay']
 
