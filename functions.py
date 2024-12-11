@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+import calc_premium as cp
 
 def check_scalar(variable):
     if np.isscalar(variable):
@@ -55,3 +57,83 @@ def print_mlt_bnd_rel_metr(countries, returns, premium_dic, tot_coverage_cty, no
     print('Premium Target Sharpe Ratio',round(premium_dic['required']*100,1),'%; ',round(premium_dic['required']*nominal, 0),'USD')
     print('Standard Deviation Returns',np.std(returns['Annual'][0]))
 
+
+def calc_rp_bnd_lss(ann_losses, return_period):
+    """
+    Compute impacts/payouts for specific return periods using a DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.Series
+        A Series containing annual loss values.
+    return_periods : Object
+        The return period where we want to compute the exceedance impact/pay.
+    damage : Boolean
+        Indicating if function should return associated damage value or payout for given return period.
+
+    Returns
+    -------
+    A number.
+    """
+
+    annual_losses = ann_losses['losses'].apply(sum)
+    df = pd.DataFrame(annual_losses.sort_values(ascending=True))
+    df['Rank'] = df.rank(method='first', ascending=False)
+    df['RP'] = (len(df) + 1)/df['Rank']
+    df = df.sort_values(by='RP')
+    sorted_rp = df['RP'].values
+    sorted_losses = df['losses'].values
+    calc_value = np.interp(return_period, sorted_rp, sorted_losses)
+
+    return calc_value
+
+def create_tranches(rp_array, ann_losses):
+    rows = []
+    tranch_df = pd.DataFrame(columns=['RP', 'Loss'])
+    for i in rp_array:
+        loss = calc_rp_bnd_lss(ann_losses, i)
+        rows.append({'RP': i, 'Loss': (loss)})
+    rows.append({'RP': 'Max', 'Loss': (calc_rp_bnd_lss(ann_losses, 10000))})
+
+    # Combine the rows into a DataFrame
+    tranches = pd.concat([tranch_df, pd.DataFrame(rows)], ignore_index=True)
+    tranches['nominal'] = 0.0
+    tranches['nominal'] = tranches['Loss'].diff()
+    tranches.at[0, 'nominal'] = tranches.at[0, 'Loss']
+    el = 0
+    tranches['expected_loss'] = 0.0
+    tranches['expected_loss_own'] = 0.0
+    tranches['lower_bound'] = 0.0
+    tranches['upper_bound'] = 0.0
+    tranches['premium'] = 0.0
+
+    # Calculate lower and upper bounds, and expected loss
+    for i in tranches.index:
+        # Determine layer boundaries
+        tranches.at[i, 'lower_bound'] = 0 if i == 0 else tranches.at[i - 1, 'Loss']
+        tranches.at[i, 'upper_bound'] = tranches.at[i, 'Loss']
+
+        # Losses within the tranche layer
+        annual_losses = ann_losses['losses'].apply(sum)
+        tranche_losses = (
+            np.clip(annual_losses, tranches.at[i, 'lower_bound'], tranches.at[i, 'upper_bound']) 
+            - tranches.at[i, 'lower_bound']
+        )
+
+        # Expected loss for the tranche
+        tranche_el = np.mean(tranche_losses)
+        el += tranche_el
+        tranches.at[i, 'expected_loss'] = tranche_el
+
+        tranches_loss_own =  np.array(tranche_losses)/tranches.at[i, 'nominal']
+        tranches.at[i, 'expected_loss_own'] = np.mean(tranches_loss_own)
+        
+    # Calculate share of expected loss
+    tranches['share_expected_loss'] = tranches['expected_loss'] / el
+
+    tranches['nominal'] = tranches['Loss'].diff()
+    tranches.at[0, 'nominal'] = tranches.at[0, 'Loss']
+
+    tranches['premium'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100
+
+    return tranches
