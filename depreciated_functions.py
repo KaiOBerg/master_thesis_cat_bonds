@@ -8,6 +8,106 @@ from rasterio.transform import from_origin, from_bounds
 from shapely.geometry import box, shape
 
 
+
+
+
+
+
+def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nominal_dic_cty=None):   
+    simulated_ncf = []
+    simulated_premium = []
+    tot_payout = []
+    tot_damage = []
+    coverage_cty = {}
+    for code in countries:
+        coverage_cty[code] = {'payout': 0, 'damage': 0}
+    rf_rates_list = []
+    metrics = {}    
+    cur_nominal = nominal
+    cur_nom_cty = nominal_dic_cty.copy() if nominal_dic_cty is not None else {int(country): 1 for country in countries}
+
+        
+    for k in range(term):
+        rf = check_rf(risk_free_rates, k)
+        rf_rates_list.append(rf)
+        if events_per_year[k].empty:
+            premium_ann = cur_nominal * premium
+            net_cash_flow_ann = (cur_nominal * (premium + rf))
+            sum_payouts_ann = 0
+            sum_damages_ann = 0
+        else:
+            events_per_year[k] = events_per_year[k].sort_values(by='month')
+            net_cash_flow_ann = []
+            premium_ann = []
+            sum_payouts_ann = []
+            sum_damages_ann = []
+            months = events_per_year[k]['month'].tolist()
+            cties = events_per_year[k]['country_code'].tolist()
+            pay = events_per_year[k]['pay'].tolist()
+            dam = events_per_year[k]['damage'].tolist()
+            ncf_pre_event = (cur_nominal * (premium + rf)) / 12 * months[0]
+            net_cash_flow_ann.append(ncf_pre_event)
+            premium_ann.append(cur_nominal * premium / 12 * (months[0]))
+            cty_payouts_event = {country: [] for country in countries}
+            cty_damages_event = {country: [] for country in countries}
+            for o in range(len(events_per_year[k])):
+                payout = pay[o]
+                cty = cties[o]
+                damage = dam[o]
+                month = months[o]
+
+                if payout == 0 or cur_nominal == 0 or cur_nom_cty[int(cty)] == 0:
+                    event_payout = 0
+                elif payout > 0:
+                    event_payout = payout
+                    if nominal_dic_cty is not None:
+                        cur_nom_cty[int(cty)] -= event_payout
+                        if cur_nom_cty[int(cty)] < 0:
+                            event_payout += cur_nom_cty[int(cty)]
+                            cur_nom_cty[int(cty)] = 0
+                    cur_nominal -= event_payout
+                    if cur_nominal < 0:
+                        event_payout += cur_nominal
+                        cur_nominal = 0
+                    else:
+                        pass
+                if o + 1 < len(events_per_year[k]):
+                    nex_month = months[o+1] 
+                    premium_post_event = (cur_nominal * premium) / 12 * (nex_month - month)
+                    ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (nex_month - month)) - event_payout
+                else:
+                    premium_post_event = (cur_nominal * premium) / 12 * (12- month)
+                    ncf_post_event = ((cur_nominal * (premium + rf)) / 12 * (12- month)) - event_payout
+
+                net_cash_flow_ann.append(ncf_post_event)
+                premium_ann.append(premium_post_event)
+                sum_payouts_ann.append(event_payout)
+                sum_damages_ann.append(damage)
+                cty_payouts_event[cty].append(event_payout)
+                cty_damages_event[cty].append(damage)
+
+            for key in cty_payouts_event.keys():
+                coverage_cty[key]['payout'] += sum(cty_payouts_event[key])
+                coverage_cty[key]['damage'] += sum(cty_damages_event[key])
+
+        tot_payout.append(np.sum(sum_payouts_ann))
+        tot_damage.append(np.sum(sum_damages_ann))
+        simulated_ncf.append(np.sum(net_cash_flow_ann))
+        simulated_premium.append(np.sum(premium_ann))
+    simulated_ncf_rel = list(np.array(simulated_ncf) / nominal)
+    metrics['tot_payout'] = np.sum(tot_payout)
+    metrics['tot_damage'] = np.sum(tot_damage)
+    metrics['tot_premium'] = np.sum(simulated_premium)
+    if np.sum(tot_payout) == 0:
+        tot_pay = np.nan
+    else:
+        tot_pay = np.sum(tot_payout)
+    metrics['tot_pay'] = tot_pay
+
+    return simulated_ncf_rel, metrics, rf_rates_list, coverage_cty
+
+
+
 # Define raster properties
 pixel_size = 0.008333  # Size of each pixel in degrees (adjust this value as needed)
 buffer_size = 0.5  # Buffer size in degrees to expand the raster bounds (adjust this value as needed)
