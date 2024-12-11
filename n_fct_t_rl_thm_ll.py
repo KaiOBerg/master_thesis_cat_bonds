@@ -11,6 +11,7 @@ import set_nominal as snom
 import alt_pay_opt as apo
 import simulate_bond as sb
 import prem_ibrd as prib
+import requ_nominal_mlt_bnd as rnmb
 import simulate_multi_cty_bond as smcb
 import calc_premium as cp
 from colorama import Fore, Style, Back
@@ -252,7 +253,7 @@ def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, targe
 
 
 
-def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate=0.0, target_sharpe=0.5, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), opt_cap=True, incl_plots=False):  
+def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rate=0.0, target_sharpe=0.5, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), opt_cap=True, incl_plots=False):  
     #set principal
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
 
@@ -261,13 +262,12 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate=0.0, target_sh
         nom_cty.append(nominals_dic[cty])
     nominal = (np.sum(nom_cty))
 
-
     if opt_cap:
-        exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nominals_dic, print_prob=False)
-        requ_nom = total_losses.max() * nominal
+        requ_nom = smcb.requ_nom(countries, pay_dam_df_dic, nominals_dic)
     else:
         requ_nom = nominal
     exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominals_dic, print_prob=False)
+    tranches = fct.create_tranches(tranches_array, ann_losses)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
@@ -276,9 +276,8 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, rf_rate=0.0, target_sh
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     #simulate cat bond
-    premium_simulation, returns, tot_coverage_prem_cty = smcb.init_bond_simulation(pay_dam_df_dic, premium_dic['regression'], rf_rate, requ_nom, countries, nominals_dic, ann_ret) 
+    ncf, prem = smcb.simulate_ncf_prem(premium_dic['regression'], ann_losses, tranches, MES_cty) 
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
 
-
-    return premium_simulation, returns, tot_coverage_prem_cty, premium_dic, requ_nom, es_metrics, MES_cty
+    return ncf, prem, premium_dic, requ_nom, es_metrics, MES_cty, tranches
