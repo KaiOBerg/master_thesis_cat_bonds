@@ -280,4 +280,5 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rat
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
 
+    print(f"Reduction of Principal: {1-requ_nom/nominal*100}%")
     return ncf, prem, premium_dic, requ_nom, es_metrics, MES_cty, tranches
