@@ -17,13 +17,17 @@ def init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty=None
     loss_month_data = []
     cur_nominal = nominal
     cur_nom_cty = nominal_dic_cty.copy() if nominal_dic_cty is not None else {int(country): 1 for country in countries}
-
+    tot_damage = []
+    tot_payout = []
     payout_count = 0
     cty_losses = {country: np.zeros(term) for country in countries}  
+    coverage_cty = {}
+    for code in countries:
+        coverage_cty[code] = {'payout': 0, 'damage': 0}
 
     for k in range(term):
-        losses = np.zeros(1)  
         cty_losses_event = {country: [] for country in countries}
+        cty_damages_event = {country: [] for country in countries}
         sum_payouts = np.zeros(len(events_per_year[k]))
 
         if not events_per_year[k].empty:
@@ -31,12 +35,14 @@ def init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty=None
             months = events['month'].to_numpy()
             cties = events['country_code'].to_numpy()
             pay = events['pay'].to_numpy()
+            dam = events['damage'].to_numpy()
 
             sum_payouts = np.zeros(len(events))  
-            
+            sum_damages = np.zeros(len(events)) 
             for o in range(len(events)):
                 payout = pay[o]
                 cty = cties[o]
+                damage = dam[o]
                 
                 if payout == 0 or cur_nominal == 0 or cur_nom_cty[int(cty)] == 0:
                     event_payout = 0
@@ -53,18 +59,24 @@ def init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty=None
                         cur_nominal = 0
 
                 sum_payouts[o] = event_payout
+                sum_damages[o] = damage
                 cty_losses_event[cty].append(event_payout)
-
-            losses[0] = np.sum(sum_payouts)
+                cty_damages_event[cty].append(damage)
+            losses = np.sum(sum_payouts)
+            damages = np.sum(sum_damages)
             for cty, cty_loss in cty_losses_event.items():
                 cty_losses[cty][k] = np.sum(cty_loss)
+                coverage_cty[cty]['payout'] += sum(cty_losses_event[cty])
+                coverage_cty[cty]['damage'] += sum(cty_damages_event[cty])
         else:
-            losses[0] = 0
+            losses = 0
+            damages = 0
             months = []
         
-        ann_loss[k] = losses[0]
+        ann_loss[k] = losses
+        tot_damage.append(damages)
         loss_month_data.append((sum_payouts, months))
-        if losses[0] > 0:
+        if losses > 0:
             payout_count += 1
 
     loss_month = pd.DataFrame(loss_month_data, columns=['losses', 'months'])
@@ -75,7 +87,8 @@ def init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty=None
     for key in cty_losses.keys():
         cty_losses[key] = cty_losses[key] / nominal 
     loss_month['losses'] = loss_month['losses'].values / nominal
-    return rel_losses, att_prob, rel_tot_loss, cty_losses, loss_month
+    coverage_tot = {'payout': np.sum(ann_loss), 'damage': np.sum(tot_damage)}
+    return rel_losses, att_prob, rel_tot_loss, cty_losses, loss_month, coverage_tot, coverage_cty
 
 
 
@@ -85,6 +98,10 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
     total_losses = []
     list_loss_month = []
     ann_cty_losses = {country: [] for country in countries}
+    coverage = {'payout': 0, 'damage': 0}
+    tot_coverage_cty = {}
+    for cty in countries:
+        tot_coverage_cty[cty] = {'payout': [], 'damage': [], 'coverage': [], 'EL': 0, 'share_EL': 0}
 
     for i in range(simulated_years-term):
         events_per_year = []
@@ -98,12 +115,18 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
             year_events_df = pd.concat(events_per_cty, ignore_index=True) if events_per_cty else pd.DataFrame()
             events_per_year.append(year_events_df)
 
-        losses, att_prob, rel_tot_loss, cty_losses, loss_month = init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty)
+        losses, att_prob, rel_tot_loss, cty_losses, loss_month, coverage_tot, coverage_cty = init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty)
 
         list_loss_month.append(loss_month)
         att_prob_list.append(att_prob)
         annual_losses.extend(losses)
         total_losses.append(rel_tot_loss)
+        coverage['payout'] += coverage_tot['payout']
+        coverage['damage'] += coverage_tot['damage']
+
+        for key in coverage_cty.keys():
+            tot_coverage_cty[key]['payout'].append(coverage_cty[key]['payout'])
+            tot_coverage_cty[key]['damage'].append(coverage_cty[key]['damage'])
 
         for key in cty_losses:
             ann_cty_losses[key].extend(cty_losses[key])
@@ -125,17 +148,31 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
     #    ann_cty_losses_iter = pd.Series(ann_cty_losses_iter)
     #    MES_cty[country]['95'] = ann_cty_losses_iter[annual_losses > VaR_95_ann].mean()
     #    MES_cty[country]['99'] = ann_cty_losses_iter[annual_losses > VaR_99_ann].mean()
-    MES_cty = {country: {'EL': np.mean(ann_cty_losses[country])} for country in ann_cty_losses}
-    for cty in MES_cty:
-        MES_cty[cty]['share_EL'] = MES_cty[cty]['EL'] / exp_loss_ann
+    #MES_cty = {country: {'EL': np.mean(ann_cty_losses[country])} for country in ann_cty_losses}
+    #for cty in MES_cty:
+    #    MES_cty[cty]['share_EL'] = MES_cty[cty]['EL'] / exp_loss_ann
 
-    es_metrics = {'VaR_99_ann': risk_metrics_annual[0.99]['VaR'], 'VaR_99_tot': risk_metrics_total[0.99]['VaR'], 'VaR_95_ann': risk_metrics_annual[0.95]['VaR'], 'VaR_95_tot': risk_metrics_total[0.95]['VaR'],
-                  'ES_99_ann': risk_metrics_annual[0.99]['ES'], 'ES_99_tot': risk_metrics_total[0.99]['ES'], 'ES_95_ann': risk_metrics_annual[0.95]['ES'], 'ES_95_tot': risk_metrics_total[0.95]['ES']}
+    for key in tot_coverage_cty.keys():
+        tot_coverage_cty[key]['payout'] = sum(tot_coverage_cty[key]['payout'])
+        tot_coverage_cty[key]['damage'] = sum(tot_coverage_cty[key]['damage'])
+        tot_coverage_cty[key]['coverage'] = tot_coverage_cty[key]['payout'] / tot_coverage_cty[key]['damage']
+        tot_coverage_cty[key]['EL'] = np.mean(ann_cty_losses[key])
+
+    for key in tot_coverage_cty:
+        tot_coverage_cty[key]['share_EL'] = tot_coverage_cty[key]['EL'] / exp_loss_ann
+    print(tot_coverage_cty)
+        
+
+    es_metrics = {'Payout': coverage['payout'], 'Damage': coverage['damage'], 
+                  'VaR_99_ann': risk_metrics_annual[0.99]['VaR'], 'VaR_99_tot': risk_metrics_total[0.99]['VaR'],
+                  'VaR_95_ann': risk_metrics_annual[0.95]['VaR'], 'VaR_95_tot': risk_metrics_total[0.95]['VaR'],
+                  'ES_99_ann': risk_metrics_annual[0.99]['ES'], 'ES_99_tot': risk_metrics_total[0.99]['ES'], 
+                  'ES_95_ann': risk_metrics_annual[0.95]['ES'], 'ES_95_tot': risk_metrics_total[0.95]['ES']}
     
     if print_prob:
         print(f'Expected Loss = {exp_loss_ann}')
         print(f'Attachment Probability = {att_prob}')
-    return exp_loss_ann, att_prob, df_loss_month, total_losses, es_metrics, MES_cty
+    return exp_loss_ann, att_prob, df_loss_month, total_losses, es_metrics, tot_coverage_cty
 
 def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, nominal_dic_cty=None, el_dic=None, want_ann_returns=True, model_rf=False):
 
