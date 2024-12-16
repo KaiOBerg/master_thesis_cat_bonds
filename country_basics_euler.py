@@ -11,7 +11,7 @@ STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 def process_country(cty):
     """Wrapper function to process a single country."""
     print(f"Processing country: {cty}")
-    exp, applicable_basin, grid_gdf, storm_basin_sub, tc_storms = ex_eu.init_TC_exp(country=cty, OUTPUT_DIR=OUTPUT_DIR, STORM_DIR=STORM_DIR, grid_size=6000)
+    exp, applicable_basin, grid_gdf, storm_basin_sub, tc_storms = ex_eu.init_TC_exp(country=cty, OUTPUT_DIR=OUTPUT_DIR, STORM_DIR=STORM_DIR, crs="EPSG:3832")
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, plot_frequ=False) 
     nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=250)
     return nominal

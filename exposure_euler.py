@@ -45,7 +45,7 @@ r = 10000 #number of simulated years in tc dataset
 freq_corr_STORM = 1 / r
 
 
-def init_TC_exp(country, OUTPUT_DIR, STORM_DIR, grid_size=600, buffer_size=1):
+def init_TC_exp(country, OUTPUT_DIR, STORM_DIR, crs="EPSG:3857"):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -63,7 +63,7 @@ def init_TC_exp(country, OUTPUT_DIR, STORM_DIR, grid_size=600, buffer_size=1):
     exp.write_hdf5(OUTPUT_DIR / f"Exp_{country}_{fin}_{year}_{res}.hdf5")
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, False)
+    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs, False)
 
     """initiate TC hazard from tracks and exposure"""
     """Generating Centroids"""
@@ -74,6 +74,8 @@ def init_TC_exp(country, OUTPUT_DIR, STORM_DIR, grid_size=600, buffer_size=1):
     track_dic = init_STORM_tracks(applicable_basin, STORM_DIR)
     """Filter TC Tracks"""
     tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
+    if crs != "EPSG:3857":
+            tc_tracks_lines = tc_tracks_lines.to_crs(crs)
     intersected_tracks = gpd.sjoin(tc_tracks_lines, grid_gdf, how='inner', predicate='intersects')
     select_tracks = tc_tracks_lines.index.isin(intersected_tracks.index)
     tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]

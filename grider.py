@@ -5,12 +5,11 @@ import rasterio
 from rasterio.io import MemoryFile
 from rasterio.features import shapes, rasterize
 from rasterio.transform import from_bounds, from_origin, from_bounds
-from shapely.geometry import box, shape, LineString, GeometryCollection, Polygon
+from shapely.geometry import box, shape, LineString, GeometryCollection, Polygon, MultiPolygon
 from shapely.ops import unary_union, split
-import shapely
+from shapely.affinity import translate
 
 resolution = 1000
-
 
 def create_islands(exp, crs="EPSG:3857"):
     exp_crs = exp.gdf.to_crs(crs)
@@ -33,28 +32,9 @@ def create_islands(exp, crs="EPSG:3857"):
         fill=0,  # Fill value for areas with no geometry
         dtype='float32' # Data type of raster
     )
-
-    # Write the raster to a GeoTIFF file using rasterio
-    with MemoryFile() as memfile:
-        with memfile.open(
-            driver='GTiff',
-            height=height,
-            width=width,
-            count=1,  # Number of bands
-            dtype='float32',  # Data type for the raster values
-            crs=crs,  # Coordinate reference system
-            transform=transform,
-        ) as dataset:
-            dataset.write(raster, 1)  # Write raster data to the first band
-            
-            # Read back the raster data from the in-memory file
-            raster_data = dataset.read(1)
-            transform = dataset.transform
-
-    mask = raster_data > 0  # Create a mask for non-zero values
+    mask = raster > 0  # Create a mask for non-zero values
     # Convert raster mask to polygons (islands)
-    cap_style='round'
-    shapes_gen = list(shapes(raster_data, mask=mask, transform=transform))
+    shapes_gen = list(shapes(raster, mask=mask, transform=transform))
     polygons = [shape(geom) for geom, value in shapes_gen if value > 0]
     # Return as GeoDataFrame
     gdf_islands = gpd.GeoDataFrame(geometry=polygons, crs=crs)
@@ -103,15 +83,16 @@ def divide_into_grid(buffered_gdf, grid_cell_size_km, min_overlap_percent, crs="
     # Return as GeoDataFrame
     return grid_gdf
 
-def process_islands(exposure, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_true=True):
-    exposure_crs = exposure.crs
-    islands_gdf = create_islands(exposure)
-    buffered_islands = buffer_islands(islands_gdf, buffer_distance_km)
-    grid_gdf = divide_into_grid(buffered_islands, grid_cell_size_km, min_overlap_percent)
+def process_islands(exposure, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs="EPSG:3857", plt_true=True):
+    islands_gdf = create_islands(exposure, crs)
+    buffered_islands = buffer_islands(islands_gdf, buffer_distance_km, crs)
+    grid_gdf = divide_into_grid(buffered_islands, grid_cell_size_km, min_overlap_percent, crs)
 
-    islands_gdf = islands_gdf.to_crs(exposure_crs)
-    buffered_islands = buffered_islands.to_crs(exposure_crs)
-    grid_gdf = grid_gdf.to_crs(exposure_crs)
+    if crs == "EPSG:3857":
+        exposure_crs = exposure.crs
+        islands_gdf = islands_gdf.to_crs(exposure_crs)
+        buffered_islands = buffered_islands.to_crs(exposure_crs)
+        grid_gdf = grid_gdf.to_crs(exposure_crs)
 
 
     #if plt_true:
@@ -161,7 +142,7 @@ def divide_islands(islands, num_divisions):
 def init_equ_pol(exposure, grid_size=6000, buffer_size=1, crs="EPSG:3857"):
     divided_islands = []
     exposure_crs = exposure.crs
-    islands_gdf = create_islands(exposure)
+    islands_gdf = create_islands(exposure, crs)
     islands_sng = islands_gdf.explode(index_parts=False)
     buffered_geometries = islands_sng.geometry.buffer(buffer_size * 1000)
     united_polygons = unary_union(buffered_geometries)
@@ -180,7 +161,7 @@ def init_equ_pol(exposure, grid_size=6000, buffer_size=1, crs="EPSG:3857"):
     
     islands_split_gdf = gpd.GeoDataFrame(geometry=divided_islands, crs=crs)
 
-    islands_split_gdf = islands_split_gdf.to_crs(exposure_crs)
+    #islands_split_gdf = islands_split_gdf.to_crs(exposure_crs)
     return islands_split_gdf
 
 

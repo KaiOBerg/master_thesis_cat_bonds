@@ -53,7 +53,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, buffer_distance_km, res_exp, grid_size=6000, buffer_grid_size=1, OUTPUT_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), STORM_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, buffer_distance_km, res_exp, grid_size=6000, buffer_grid_size=1, crs="EPSG:3857", OUTPUT_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), STORM_DIR=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
@@ -80,8 +80,8 @@ def init_TC_exp(country, buffer_distance_km, res_exp, grid_size=6000, buffer_gri
         exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
-    islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_grid_size)
+    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs, plt_grd)
+    islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_grid_size, crs)
     islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
 
     if plt_grd:
@@ -118,7 +118,9 @@ def init_TC_exp(country, buffer_distance_km, res_exp, grid_size=6000, buffer_gri
         track_dic = init_STORM_tracks(applicable_basin, STORM_DIR)
 
         """Filter TC Tracks"""
-        tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
+        tc_tracks_lines = to_geodataframe(track_dic[applicable_basin]) 
+        if crs != "EPSG:3857":
+            tc_tracks_lines = tc_tracks_lines.to_crs(crs)
         intersected_tracks = gpd.sjoin(tc_tracks_lines, grid_gdf, how='inner', predicate='intersects')
         select_tracks = tc_tracks_lines.index.isin(intersected_tracks.index)
         tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]
