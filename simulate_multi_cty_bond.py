@@ -160,7 +160,6 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
 
     for key in tot_coverage_cty:
         tot_coverage_cty[key]['share_EL'] = tot_coverage_cty[key]['EL'] / exp_loss_ann
-    print(tot_coverage_cty)
         
 
     es_metrics = {'Payout': coverage['payout'], 'Damage': coverage['damage'], 
