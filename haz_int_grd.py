@@ -18,7 +18,7 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
         tc_storms: A hazard object containing wind speed data per centroid.
         agg_exp (dict): A dictionary where keys are the labels of grid cells and values are lists of 
                         line numbers corresponding to indices in tc_storms.intensity.
-        stat (str): The statistic to calculate. Can either be a numer to calculate percentile or the
+        stat (str or float): The statistic to calculate. Can either be a numer to calculate percentile or the
                     string 'mean' to calculate the average.
     Returns:
         pd.DataFrame: A DataFrame containing the calculated statistics with labels as columns.
@@ -26,7 +26,9 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
 
     if tc_storms:
         #group each exposure point according to grid cell letter
-        centrs_to_grid = tc_storms.centroids.gdf.sjoin(admin, how='left', predicate="within")
+        hazard = tc_storms.centroids.gdf
+        hazard = hazard.to_crs(admin.crs)
+        centrs_to_grid = hazard.sjoin(admin, how='left', predicate="within")
         agg_exp = centrs_to_grid.groupby('admin_letter').apply(lambda x: x.index.tolist())
 
         #Initialize a dictionary to hold the calculated statistics

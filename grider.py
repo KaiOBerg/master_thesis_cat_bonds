@@ -161,7 +161,8 @@ def init_equ_pol(exposure, grid_size=6000, buffer_size=1, crs="EPSG:3857"):
     
     islands_split_gdf = gpd.GeoDataFrame(geometry=divided_islands, crs=crs)
 
-    #islands_split_gdf = islands_split_gdf.to_crs(exposure_crs)
+    if crs == "EPSG:3857":
+        islands_split_gdf = islands_split_gdf.to_crs(exposure_crs)
     return islands_split_gdf
 
 

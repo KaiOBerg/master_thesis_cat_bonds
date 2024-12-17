@@ -1,20 +1,20 @@
 import sys
 from pathlib import Path
-import exposure_euler as ex_eu
+import exposures_alt as exa
 import impact as cimp
+import n_fct_t_rl_thm_ll as bnd_fct
 import set_nominal as snom
 
 # Directories
 OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
 STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
+IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 
 def process_country(cty):
     """Wrapper function to process a single country."""
     print(f"Processing country: {cty}")
-    exp, applicable_basin, grid_gdf, storm_basin_sub, tc_storms = ex_eu.init_TC_exp(country=cty, OUTPUT_DIR=OUTPUT_DIR, STORM_DIR=STORM_DIR, crs="EPSG:3832")
-    imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, plot_frequ=False) 
-    nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=250)
-    return nominal
+    bnd_all = bnd_fct.sng_cty_bond(cty, res_exp=150, grid_size=10000, grid_specs=[4,4], buffer_grid_size=5, prot_rp=250, to_prot_share=0.045, storm_dir=STORM_DIR, output_dir=OUTPUT_DIR, ibrd_path=IBRD_DIR, incl_plots=True, plt_save=True)
+    return bnd_all
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -23,6 +23,6 @@ if __name__ == "__main__":
     
     country = int(sys.argv[1])
     print(f"Processing country: {country}")
-    nominal = process_country(country)
-    print(country, nominal)
+    bnd_all = process_country(country)
+    print(country, bnd_all)
     print(f"Finished processing country: {country}")

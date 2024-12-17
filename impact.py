@@ -83,9 +83,10 @@ def init_imp(exp, haz, admin_gdf=None, plot_frequ=True):
     if admin_gdf is not None:
         #save impact per exposure point
         imp_per_exp = imp.imp_mat
-
+        exp_crs = exp.gdf
+        exp_crs = exp_crs.to_crs(admin_gdf.crs)
         #Perform a spatial join to associate each exposure point with calculated impact with a grid cell
-        exp_to_admin = exp.gdf.sjoin(admin_gdf, how='left', predicate="within")
+        exp_to_admin = exp_crs.sjoin(admin_gdf, how='left', predicate="within")
 
         #group each exposure point according to grid cell letter
         agg_exp = exp_to_admin.groupby('admin_letter').apply(lambda x: x.index.tolist())
