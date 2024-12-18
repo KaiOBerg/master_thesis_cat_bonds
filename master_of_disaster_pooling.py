@@ -6,7 +6,6 @@ from numpy.random import dirichlet
 import scipy.optimize as sco
 from pathlib import Path
 import n_fct_t_rl_thm_ll as bond_fct
-import prem_ibrd as prib
 
 
 #define directories 
@@ -26,9 +25,6 @@ rf_rates = 0.00
 artemis_multiplier = 4.11
 #set sharpe ratio to beat
 target_sharpe = 0.5
-#inititate IBRD premium calculation function
-params_ibrd = prib.init_prem_ibrd(want_plot=False)
-a, k, b = params_ibrd
 #define bond setting
 lower_share = 0.045
 prot_rp = 250
