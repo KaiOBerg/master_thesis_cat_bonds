@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 import calc_premium as cp
+import prem_ibrd as prib
+
+artemis_multiplier = 4.11
 
 def check_scalar(variable):
     if np.isscalar(variable):
@@ -87,7 +90,7 @@ def calc_rp_bnd_lss(ann_losses, return_period):
 
     return calc_value
 
-def create_tranches(rp_array, ann_losses):
+def create_tranches(rp_array, ann_losses, ibrd_path):
     rows = []
     tranch_df = pd.DataFrame(columns=['RP', 'Loss'])
     for i in rp_array:
@@ -105,7 +108,10 @@ def create_tranches(rp_array, ann_losses):
     tranches['expected_loss_own'] = 0.0
     tranches['lower_bound'] = 0.0
     tranches['upper_bound'] = 0.0
-    tranches['premium'] = 0.0
+    tranches['premium_ibrd'] = 0.0
+    tranches['premium_regression'] = 0.0
+    tranches['premium_required'] = 0.0
+    tranches['premium_artemis'] = 0.0 
 
     # Calculate lower and upper bounds, and expected loss
     for i in tranches.index:
@@ -134,6 +140,12 @@ def create_tranches(rp_array, ann_losses):
     tranches['nominal'] = tranches['Loss'].diff()
     tranches.at[0, 'nominal'] = tranches.at[0, 'Loss']
 
-    tranches['premium'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100
+    params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
+    a, k, b = params_ibrd
+
+    tranches['premium_ibrd'] = prib.monoExp(tranches['expected_loss_own']*100, a, k, b) * tranches['expected_loss_own']
+    tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100
+    tranches['premium_required'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100 #just a fill in 
+    tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier
 
     return tranches

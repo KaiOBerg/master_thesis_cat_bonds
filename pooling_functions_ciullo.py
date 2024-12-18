@@ -1,7 +1,7 @@
-import pandas as pd
 import numpy as np
 
 from pymoo.core.problem import ElementwiseProblem
+from pymoo.core.variable import Integer
 
 def calc_pool_conc(x, data_arr, bools, alpha):
     """Calculate diversification of a given pool. Used to 
@@ -83,151 +83,46 @@ def calc_pools_conc(x, data, bools, alpha, N, fixed_pools=None):
 
     return np.array([CONC_POOL])
 
-class MinConcProblem(ElementwiseProblem):
-    def __init__(self, data, bools, alpha, fun, **kwargs):
+
+class PoolOptimizationProblem(ElementwiseProblem):
+    def __init__(self, nominals, max_nominal, data, bools, alpha, fun, **kwargs):
         self.data_arr = data
         self.bools = bools
         self.alpha = alpha
         self.fun = fun
+        self.nominals = np.array(nominals)
+        self.n_countries = len(nominals)
+        self.max_nominal = max_nominal
+        super().__init__(
+            n_var=self.data_arr.shape[1],
+            n_obj=1,  
+            n_constr = 1,
+            xl=0,                  
+            xu=self.n_countries-1,
+            type_var=int,
+            vars=[Integer(0, self.n_countries - 1) for _ in range(self.n_countries)],
+            **kwargs
+        )
 
-        super().__init__(n_var=self.data_arr.shape[1],
-                         n_obj=1,
-                         xl=0,                  
-                         xu=1,                  
-                         type_var=int,
-                         **kwargs)
-
-    def _evaluate(self, X, out, *args, **kwargs):
-        f = []  # Objective values for all individuals
-
-        # Assign countries to pools
-        pool1_mask = np.where(X == 0)[0]
-        pool2_mask = np.where(X == 1)[0]
+    def _evaluate(self, x, out, *args, **kwargs):
+        pools = {i: [] for i in np.unique(x)}
+        for i, pool_id in enumerate(x):
+            if len(np.where(x == i)[0]) > 0:
+                pool_mask = np.where(x == i)[0]
+                pools[i].append(pool_mask)
         
-        # Extract data for each pool
-        pool1_col = self.data_arr.columns[pool1_mask]
-        pool2_col = self.data_arr.columns[pool2_mask]
+        total_concentration = 0
+        for pool_key, pool_countries in pools.items():
+            pool1_col = self.data_arr.columns[pool_countries[0]]
+            pool1_data = self.data_arr[pool1_col].values
+            pool1_bools = self.bools[pool1_col].values
+            conc = self.fun(np.arange(0, len(pool_countries[0])), pool1_data, pool1_bools, self.alpha)
+            total_concentration += conc
+        constraints = 0
+        for members in pools.values():
+            pool_nominal_diff = np.sum(self.nominals[members[0]]) - self.max_nominal
+            if pool_nominal_diff > 0:
+                constraints += pool_nominal_diff
 
-        pool1_data = self.data_arr[pool1_col].values
-        pool2_data = self.data_arr[pool2_col].values
-
-        # Extract corresponding bools for each pool
-        pool1_bools = self.bools[pool1_col].values
-        pool2_bools = self.bools[pool2_col].values
-
-        # Pass the mask `pool1_mask` and `pool2_mask` as `x` to `calc_pool_conc`
-        conc1 = self.fun(np.arange(0,len(pool1_mask)), pool1_data, pool1_bools, self.alpha)
-        conc2 = self.fun(np.arange(0,len(pool2_mask)), pool2_data, pool2_bools, self.alpha)
-        total_conc = conc1 + conc2
-        f.append(total_conc)
-
-        out["F"] = np.array(f)
-
-class MinNumCntrProblem(ElementwiseProblem):
-    def __init__(self, data, bools, alpha, fun, min_conc, **kwargs):
-        self.data_arr = data.values
-        self.bools = bools
-        self.alpha = alpha
-        self.fun = fun
-        self.min_conc = min_conc
-
-        super().__init__(n_var=self.data_arr.shape[1],
-                         n_obj=1,
-                         n_constr=1,
-                         **kwargs)
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        # pool's concentration and individual concentration
-        pool_conc = self.fun(x, self.data_arr, self.bools, self.alpha)[0]
-
-        out["F"] = np.sum(x)
-        out["G"] = (pool_conc-self.min_conc)
-
-class MinConcsProblem(ElementwiseProblem):
-    def __init__(self, n_var, data, bools, alpha, fun, N,
-                                    fixed_pools=None, **kwargs):
-        self.data_arr = data.values
-        self.bools = bools
-        self.alpha = alpha
-        self.n_var = n_var
-        self.fun = fun
-        self.N = N
-        self.fixed_pools = fixed_pools
-
-        super().__init__(n_var=n_var,
-                         n_obj=self.N,
-                         xl=0,
-                         xu=self.N,          
-                         **kwargs)
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        # pool's concentration and max individual concentration
-        pools_conc = self.fun(x, self.data_arr, self.bools, 
-                            self.alpha, self.N, self.fixed_pools)
-
-        out["F"] = pools_conc
-
-class MinNumCntrProblems(ElementwiseProblem):
-    def __init__(self, n_var, data, bools, alpha, fun, N, min_conc, fixed_pools=None, **kwargs):
-        self.data_arr = data.values
-        self.bools = bools
-        self.alpha = alpha
-        self.n_var = n_var
-        self.N = N
-        self.fun = fun
-        self.min_conc = min_conc
-        self.fixed_pools = fixed_pools
-
-        super().__init__(n_var=self.n_var,
-                         n_obj=1,
-                         n_constr=1,           
-                         **kwargs)
-
-    def _evaluate(self, x, out, *args, **kwargs):
-        # pool's concentration and individual concentration
-        pool_conc = self.fun(x, self.data_arr, self.bools, 
-                            self.alpha, self.N, self.fixed_pools)
-
-        out["F"] = np.sum(x)
-        out["G"] = (pool_conc-self.min_conc)
-
-
-class MinConcProblem(ElementwiseProblem):
-    def __init__(self, data, bools, alpha, fun, **kwargs):
-        self.data_arr = data
-        self.bools = bools
-        self.alpha = alpha
-        self.fun = fun
-
-        super().__init__(n_var=self.data_arr.shape[1],
-                         n_obj=1,
-                         xl=0,                  
-                         xu=1,                  
-                         type_var=int,
-                         **kwargs)
-
-    def _evaluate(self, X, out, *args, **kwargs):
-        f = []  # Objective values for all individuals
-
-        # Assign countries to pools
-        pool1_mask = np.where(X == 0)[0]
-        pool2_mask = np.where(X == 1)[0]
-        
-        # Extract data for each pool
-        pool1_col = self.data_arr.columns[pool1_mask]
-        pool2_col = self.data_arr.columns[pool2_mask]
-
-        pool1_data = self.data_arr[pool1_col].values
-        pool2_data = self.data_arr[pool2_col].values
-
-        # Extract corresponding bools for each pool
-        pool1_bools = self.bools[pool1_col].values
-        pool2_bools = self.bools[pool2_col].values
-
-        # Pass the mask `pool1_mask` and `pool2_mask` as `x` to `calc_pool_conc`
-        conc1 = self.fun(np.arange(0,len(pool1_mask)), pool1_data, pool1_bools, self.alpha)
-        conc2 = self.fun(np.arange(0,len(pool2_mask)), pool2_data, pool2_bools, self.alpha)
-        total_conc = conc1 + conc2
-        f.append(total_conc)
-
-        out["F"] = np.array(f)
+        out["F"] = total_concentration/len(pools)
+        out["G"] = constraints

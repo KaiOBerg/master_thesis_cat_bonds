@@ -1,9 +1,6 @@
 import sys
 from pathlib import Path
-import exposures_alt as exa
-import impact as cimp
 import n_fct_t_rl_thm_ll as bnd_fct
-import set_nominal as snom
 
 # Directories
 OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")

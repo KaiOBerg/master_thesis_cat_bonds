@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from pathlib import Path
 import exposures_cc as ex_cc
 import exposures as ex
@@ -175,7 +176,7 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     #set up hazard intensity matrix per grid and event
     int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat='mean')
 
-    premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
+    premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'artemis': 0}
 
 
     if prot_share is not None:
@@ -202,16 +203,23 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     premium_dic['ibrd'] = ibrd_prem
+    premium_dic['artemis'] = exp_loss_ann * artemis_multiplier
+
+    bond_metrics_list = []
+    bond_returns_list = []
+    #simulate cat bond
+    for prem in premium_dic:
+        bond_metrics, bond_returns = sb.init_bond_simulation(pay_dam_df, premium_dic[prem], rf_rate, nominal, ann_ret) 
+        bond_metrics["Premium Name"] = prem
+        bond_returns["Premium Name"] = prem
+        bond_metrics_list.append(bond_metrics)
+        bond_returns_list.append(bond_returns)
+
+    bond_metrics = pd.concat(bond_metrics_list, ignore_index=True)
+    bond_returns = pd.concat(bond_returns_list, ignore_index=True)
+
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
-    #simulate cat bond
-    bond_metrics, bond_returns = sb.init_bond_simulation(pay_dam_df, premium_dic['regression'], rf_rate, nominal, ann_ret) 
-
-    if plt_save:
-        csv_metrics_name = f"bond_metrics_{country}.csv"
-        csv_returns_name = f"bond_returns_{country}.csv"
-        bond_metrics.to_csv(output_dir.joinpath(csv_metrics_name), index=False, sep=';')
-        bond_returns.to_csv(output_dir.joinpath(csv_returns_name), index=False, sep=';')
 
     return bond_metrics, bond_returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt, ann_losses
 
@@ -260,9 +268,9 @@ def sng_cty_bond_cc(country, cc_model, storm_dir, output_dir, rf_rate=0.0, targe
 
 
 
-def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rate=0.0, target_sharpe=0.5, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), opt_cap=True, incl_plots=False):  
+def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rate=0.0, target_sharpe=0.5, ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), opt_cap=True):  
     #set principal
-    premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'exp_loss': 0, 'att_prob': 0}
+    premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'artemis': 0}
 
     nom_cty = []
     for cty in nominals_dic.keys():
@@ -274,7 +282,7 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rat
     else:
         requ_nom = nominal
     exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominals_dic, print_prob=False)
-    tranches = fct.create_tranches(tranches_array, ann_losses)
+    tranches = fct.create_tranches(tranches_array, ann_losses, ibrd_path)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
@@ -282,10 +290,17 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rat
     premium_dic['ibrd'] = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
     premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
+    premium_dic['artemis'] = exp_loss_ann * artemis_multiplier
     #simulate cat bond
-    ncf, prem = smcb.simulate_ncf_prem(premium_dic['regression'], ann_losses, tranches, MES_cty) 
+    ncf_dic = {}
+    prem_cty_dic = {}
+    for prem in premium_dic:
+        ncf, premium_cty = smcb.simulate_ncf_prem(premium_dic[prem], ann_losses, tranches, MES_cty, prem) 
+        ncf_dic[prem] = ncf
+        prem_cty_dic[prem] = premium_cty
+
     premium_dic['exp_loss'] = exp_loss_ann
     premium_dic['att_prob'] = att_prob
 
-    print(f"Reduction of Principal: {1-requ_nom/nominal*100}%")
-    return ncf, prem, premium_dic, requ_nom, es_metrics, MES_cty, tranches
+    print(f"Reduction of Principal: {round((1-requ_nom/nominal)*100, 2)}%")
+    return ncf_dic, prem_cty_dic, premium_dic, requ_nom, es_metrics, MES_cty, tranches

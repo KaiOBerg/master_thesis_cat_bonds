@@ -8,9 +8,24 @@ from rasterio.transform import from_origin, from_bounds
 from shapely.geometry import box, shape
 
 
+bond_cache = {}
 
-
-
+def get_bond_metrics(pool, pay_dam_pool_it, nominal_pool_it):
+    pool_key = tuple(sorted(pool))  # Create a unique key for the pool
+    if pool_key not in bond_cache:
+        # If result isn't cached, compute and store it
+        pay_dam_temp = {c: pay_dam_pool_it[c] for c in pool}
+        nominal_temp = {c: nominal_pool_it[c] for c in pool}
+        bond_metrics, returns, tot_coverage, premium_dic, nominal, es_metrics, MES_cty = bond_fct.mlt_cty_bond(
+            countries=pool,
+            pay_dam_df_dic=pay_dam_temp,
+            nominals_dic=nominal_temp,
+            opt_cap=True,
+        )
+        bond_cache[pool_key] = {
+            "Returns": returns
+            }
+    return bond_cache[pool_key]
 
 
 def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nominal_dic_cty=None):   

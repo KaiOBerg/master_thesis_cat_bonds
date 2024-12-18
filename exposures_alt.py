@@ -80,12 +80,12 @@ def init_TC_exp(country, grid_specs, file_path, storm_path, buffer_grid_size=5, 
         exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res_exp)
         exp.write_hdf5(file_path.joinpath(exp_str))
     
-    if plot_exp and plt_save:
+    if plot_exp:
         plt_name = f"Litpop_{country}.tiff"
-        exp.plot_raster(label= 'Exposure [log(mUSD)]', save_tiff=file_path.joinpath(plt_name), figsize=(10,5))
+        exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf = grd.create_islands(exp, crs).explode(ignore_index=True)
+    islands_gdf = grd.create_islands(exp, crs).explode(ignore_index=True, index_parts=True)
     buffered_geometries = islands_gdf.geometry.buffer(buffer_grid_size * 1000)
     islands_gdf = unary_union(buffered_geometries)
     islands_gdf = gpd.GeoDataFrame({'geometry': [islands_gdf]}, crs=crs).explode()

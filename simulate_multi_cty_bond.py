@@ -480,7 +480,7 @@ def multi_level_es(losses, confidence_levels):
     return risk_metrics
 
 
-def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, rf=0.0):
+def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, premium_name, rf=0.0):
     ncf = {tranche['RP']: [] for _, tranche in tranches.iterrows()}
     premiums_tot = []
     premiums_tot_alt = []
@@ -495,8 +495,8 @@ def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, rf=0.0):
             ncf_tot.append(ncf_tmp)
             prem_it_alt = 0
             for _, tranche in tranches.iterrows():
-                ncf[tranche['RP']].append(cur_nominal * tranche['nominal'] * (tranche['premium'] + rf))
-                prem_it_alt += cur_nominal * tranche['nominal'] * tranche['premium']
+                ncf[tranche['RP']].append(cur_nominal * tranche['nominal'] * (tranche[f'premium_{premium_name}'] + rf))
+                prem_it_alt += cur_nominal * tranche['nominal'] * tranche[f'premium_{premium_name}']
             premiums_tot_alt.append(prem_it_alt)
         else:
             ncf_tot_tmp = []
@@ -508,8 +508,8 @@ def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, rf=0.0):
             prem_it_alt = 0
             premiums_tot_tmp_alt = []
             for _, tranche in tranches.iterrows():
-                ncf_tmp[tranche['RP']].append(cur_nominal * tranche['nominal'] * (tranche['premium'] + rf) / 12 * months[0])
-                prem_it_alt += cur_nominal * tranche['nominal'] * tranche['premium'] / 12 * months[0]
+                ncf_tmp[tranche['RP']].append(cur_nominal * tranche['nominal'] * (tranche[f'premium_{premium_name}'] + rf) / 12 * months[0])
+                prem_it_alt += cur_nominal * tranche['nominal'] * tranche[f'premium_{premium_name}'] / 12 * months[0]
             premiums_tot_tmp_alt.append(prem_it_alt)
             for j in range(len(losses)):
                 loss = losses[j]
@@ -525,8 +525,8 @@ def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, rf=0.0):
                     ncf_tot_tmp.append(prem_tmp - loss)
                     prem_it_alt = 0
                     for _, tranche in tranches.iloc[::-1].iterrows():
-                        ncf_tmp[tranche['RP']].append(((cur_nominal * tranche['nominal'] * (tranche['premium'] + rf)) / 12 * (nex_month - month)))
-                        prem_it_alt += cur_nominal * tranche['nominal'] * tranche['premium'] / 12 * (nex_month - month)
+                        ncf_tmp[tranche['RP']].append(((cur_nominal * tranche['nominal'] * (tranche[f'premium_{premium_name}'] + rf)) / 12 * (nex_month - month)))
+                        prem_it_alt += cur_nominal * tranche['nominal'] * tranche[f'premium_{premium_name}'] / 12 * (nex_month - month)
                     premiums_tot_tmp_alt.append(prem_it_alt)
                 else:
                     premiums_tot_tmp.append(cur_nominal * premium / 12 * (12 - month))
@@ -534,8 +534,8 @@ def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, rf=0.0):
                     ncf_tot_tmp.append(prem_tmp - loss)
                     prem_it_alt = 0
                     for _, tranche in tranches.iloc[::-1].iterrows():
-                        ncf_tmp[tranche['RP']].append(((cur_nominal * tranche['nominal'] * (tranche['premium'] + rf)) / 12 * (12- month)))
-                        prem_it_alt += cur_nominal * tranche['nominal'] * tranche['premium'] / 12 * (12- month)
+                        ncf_tmp[tranche['RP']].append(((cur_nominal * tranche['nominal'] * (tranche[f'premium_{premium_name}'] + rf)) / 12 * (12- month)))
+                        prem_it_alt += cur_nominal * tranche['nominal'] * tranche[f'premium_{premium_name}'] / 12 * (12- month)
                     premiums_tot_tmp_alt.append(prem_it_alt)
             ncf_tot.append(np.sum(ncf_tot_tmp))
             tmp_loss = np.sum(losses)
@@ -553,10 +553,13 @@ def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, rf=0.0):
     ncf['Total'] = ncf_tot
     prem_cty_dic = {country: [] for country in cty_el_dic}
     for country in prem_cty_dic:
-        prem_cty_dic[country] = np.array(premiums_tot) * cty_el_dic[country]['share_EL']
+        prem_cty_dic[country] = np.array(premiums_tot_alt) * cty_el_dic[country]['share_EL']
     prem_cty_dic['Total'] = premiums_tot
     prem_cty_dic['Total_alt'] = premiums_tot_alt
-    return ncf, prem_cty_dic
+
+    ncf = pd.DataFrame(ncf)
+    prem_cty_df = pd.DataFrame(prem_cty_dic)
+    return ncf, prem_cty_df
 
 
 def init_equ_nom_sim(events_per_year, nominal_dic_cty):
