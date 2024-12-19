@@ -14,7 +14,7 @@ STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 
 #choose country
-countries = [480, 212, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 882, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
+countries = [882, 480, 212, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
 countries_150 = [332, 388, 214, 44, 548, 192, 84, 90] 
 fiji = [242]
 countries_30 = [480, 212, 670, 28, 52, 662, 659, 308, 882, 780, 570, 776, 174, 184, 584, 585]
