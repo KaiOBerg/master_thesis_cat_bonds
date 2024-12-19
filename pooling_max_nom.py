@@ -70,7 +70,7 @@ for cty in countries:
                                                                                                                                                                 grid_specs=[3,3],
                                                                                                                                                                 buffer_grid_size=5,
                                                                                                                                                                 incl_plots=False,
-                                                                                                                                                                plot_save=True,
+                                                                                                                                                                plt_save=True,
                                                                                                                                                                 storm_dir=STORM_DIR,
                                                                                                                                                                 output_dir=OUTPUT_DIR,
                                                                                                                                                                 ibrd_path=IBRD_DIR)
