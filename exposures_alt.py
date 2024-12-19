@@ -57,7 +57,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, grid_specs, file_path, storm_path, buffer_grid_size=5, buffer_distance_km=105, min_pol_size=1000, res_exp=150, crs="EPSG:3857", load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True, plt_save=False):
+def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), storm_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), buffer_grid_size=5, buffer_distance_km=105, min_pol_size=1000, res_exp=150, crs="EPSG:3857", load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True, plt_save=False):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
