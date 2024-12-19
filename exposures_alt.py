@@ -82,7 +82,7 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
     
     if plot_exp:
         plt_name = f"Litpop_{country}.tiff"
-        exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
+        exp.plot_raster(label= 'Exposure [log([USD])]', figsize=(10,5))
 
     """Divide Exposure set into admin/grid cells"""
     islands_gdf = grd.create_islands(exp, crs).explode(ignore_index=True, index_parts=True)
@@ -99,16 +99,17 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
 
     if plt_grd:
         outer_boundary_grd = tc_bound.dissolve()
-        fig, ax = plt.subplots(figsize=(10, 5))
-        islands_gdf.plot(ax=ax, color="green", label="Islands")
-        grid_gdf.plot(ax=ax, facecolor="none", edgecolor="red", label="Admin")
-        outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", edgecolor="black", label="TC Track Boundary")
+        fig, ax = plt.subplots(figsize=(10, 8))
+        islands_gdf.plot(ax=ax, color="green", label="Samoa")
+        grid_gdf.plot(ax=ax, facecolor="none", edgecolor="red" , lw=2, label="Subarea")
+        outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", lw=2, edgecolor="black", label="TC Track Boundary")
         handles = [
             plt.Line2D([0], [0], color="green", lw=4, label="Islands"),           
             plt.Line2D([0], [0], color="red", lw=2, label="Admin"),  
             plt.Line2D([0], [0], color="black", lw=2, label="TC Track Boundary")           
         ]
         ax.legend(handles=handles, loc="upper right")
+        ax.tick_params(axis='both', which='major', labelsize=12)  # Adjusts tick font size
         if plt_save:
             plt_name = f"bond_structure_{country}.png"
             plt.savefig(file_path.joinpath(plt_name))

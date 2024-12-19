@@ -18,7 +18,7 @@ def init_prem_ibrd(file_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Da
         flt_ibrd_bonds = flt_ibrd_bonds.reset_index(drop=True)
 
     elif year is not None:
-        flt_ibrd_bonds = ibrd_bonds[ibrd_bonds['Date'].isin(year)]
+        flt_ibrd_bonds = ibrd_bonds[ibrd_bonds['Issuing date'].isin(year)]
         flt_ibrd_bonds = flt_ibrd_bonds.reset_index(drop=True)
 
     else:
@@ -36,7 +36,7 @@ def init_prem_ibrd(file_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Da
     #print(f"Risk multiple variance explained -> R² = {rSquared}")
 
     if want_plot:
-        plt_data = flt_ibrd_bonds[['Expected Loss', 'Risk Multiple', 'Date', 'Size']]
+        plt_data = flt_ibrd_bonds[['Expected Loss', 'Risk Multiple', 'Issuing date', 'Size [mUSD]']]
         palette = { '2017': 'tab:red',
                     '2018': 'tab:orange',
                     '2019': 'tab:pink',
@@ -46,11 +46,11 @@ def init_prem_ibrd(file_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Da
                     '2024': 'tab:olive'
                     }
         sns.color_palette("rocket")
-        sns.scatterplot(data=plt_data, x='Expected Loss', y='Risk Multiple', hue='Date', size="Size",
+        sns.scatterplot(data=plt_data, x='Expected Loss', y='Risk Multiple', hue='Issuing date', size="Size [mUSD]",
                     sizes=(40, 400), alpha=.5)
         plt.plot(x_fit, y_fitted, color = 'orange', label="fitted")
-        plt.xlabel('Expected Loss [%]')
-        plt.ylabel('Risk Multiple')
+        plt.xlabel('Expected Loss [%]', fontsize=12)
+        plt.ylabel('Risk Multiple []', fontsize=12)
         plt.show()
 
     return params_prem_ibrd

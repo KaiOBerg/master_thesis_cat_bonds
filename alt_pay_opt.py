@@ -165,20 +165,26 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
         ax1.axhline(y = nominal, color = 'r', linestyle = '-', label='Nominal') 
 
         # Add labels and title
-        ax1.set_title("Damage vs. Payout - Damage <= Nominal", fontsize=16)
-        ax1.set_xlabel("Damage [USD]", fontsize=14)
-        ax1.set_ylabel("Payout [USD]", fontsize=14)
+        ax1.set_xlabel("Damage [USD]", fontsize=12)
+        ax1.set_ylabel("Payout [USD]", fontsize=12)
         ax1.legend(loc='upper left', borderpad=2.0)
 
         ax2.scatter(damages, pay_dam_df['pay'], marker='o', color='blue', label='Events')
         ax2.axhline(y = nominal, color = 'r', linestyle = '-', label='Nominal') 
         ax2.set_xscale('log')
         # Add labels and title
-        ax2.set_title("Damage vs. Payout for each Event - Log", fontsize=16)
-        ax2.set_xlabel("Damage [USD]", fontsize=14)
-        ax2.set_ylabel("Payout [USD]", fontsize=14)
+        ax2.set_xlabel("Damage [USD]", fontsize=12)
+        ax2.set_ylabel("Payout [USD]", fontsize=12)
         ax2.legend(loc='upper left', borderpad=2.0)
 
+        panel_labels = ["a)", "b)"]
+        for i, ax in enumerate([ax1, ax2]):
+            ax.annotate(panel_labels[i], 
+                xy=(-0.05, 1),  # Position: top-left corner
+                xycoords="axes fraction",  # Relative to axes
+                fontsize=14, 
+                fontweight="bold")
+            
         # Show both plots
         plt.tight_layout()
         plt.show()
