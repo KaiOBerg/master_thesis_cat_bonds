@@ -40,7 +40,7 @@ RT = 500
 alpha = 1-1/RT 
 
 #set max nominal for pool
-max_nominal = 5000000000
+max_nominal = 6720000000
 
 #define empty dictionaries
 bond_metrics_sng_dic = {}
