@@ -120,6 +120,9 @@ for cty in countries:
     sng_ann_losses[cty] = np.array(ann_losses_dic[cty]['losses'].apply(sum)) * nominal_sng_dic[cty]
     nominals_sng.append(nominal_sng_dic[cty])
 sng_ann_losses = pd.DataFrame(sng_ann_losses)
+df_nominals_sng = pd.DataFrame(nominals_sng, columns=['Nominals'])
+sng_ann_losses.to_csv(OUTPUT_DIR.joinpath("sng_ann_losses_pooling.csv"), index=False, sep=',')
+df_nominals_sng.to_csv(OUTPUT_DIR.joinpath("nominals_sng.csv"), index=False, sep=',')
 
 
 from tqdm import tqdm
@@ -150,7 +153,7 @@ for index in tqdm(opt_rep, desc=f'Repetitions'):
     problem = PoolOptimizationProblem(nominals_sng, max_nominal, df_losses, bools, alpha, calc_pool_conc)
 
     algorithm = GA(
-        pop_size=int(2**(len(countries)/2)),
+        pop_size=2**20,
         sampling = IntegerRandomSampling(),
         crossover = HalfUniformCrossover(),
         mutation = PolynomialMutation(repair=RoundingRepair()),
@@ -165,6 +168,7 @@ for index in tqdm(opt_rep, desc=f'Repetitions'):
     
     #Indices for full regional country list
     x = res_reg.X
+    print(x)
     sorted_unique = sorted(set(x))
     rank_dict = {value: rank + 1 for rank, value in enumerate(sorted_unique)}
     x = [rank_dict[value] for value in x]
@@ -209,4 +213,5 @@ ind_min = list(set(ind_min_conc))
 df_result = df_cntry_allocation.loc[ind_min].reset_index(drop=True)
 df_result.to_csv(OUTPUT_DIR.joinpath("pooling_results.csv"), index=False, sep=',')
 fig.savefig(OUTPUT_DIR.joinpath("convergence_plot.png"), dpi=300, bbox_inches='tight')
+print('round finished')
 
