@@ -1,9 +1,11 @@
 import numpy as np
 from pathlib import Path
 import geopandas as gpd
-from shapely.geometry import Point, LineString, MultiLineString
+from shapely.geometry import Point, LineString, MultiLineString, box
 import matplotlib.pyplot as plt
 import shapely
+import pandas as pd
+from shapely.ops import unary_union
 
 
 #import CLIMADA modules:
@@ -55,7 +57,7 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, cc_model, file_path, storm_path, buffer_distance_km=105, res_exp=30, grid_size=600, buffer_grid_size=1, load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
+def init_TC_exp(country, cc_model, grid_specs, file_path, storm_path, buffer_grid_size=5, buffer_distance_km=105, min_pol_size=1000, res_exp=150, crs="EPSG:3857", load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True):
 
     STORM_DIR = storm_path.joinpath(cc_model)
 
@@ -85,15 +87,23 @@ def init_TC_exp(country, cc_model, file_path, storm_path, buffer_distance_km=105
         exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
-    islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_grid_size)
-    islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
+    islands_gdf = grd.create_islands(exp, crs).explode(ignore_index=True, index_parts=True)
+    buffered_geometries = islands_gdf.geometry.buffer(buffer_grid_size * 1000)
+    islands_gdf = unary_union(buffered_geometries)
+    islands_gdf = gpd.GeoDataFrame({'geometry': [islands_gdf]}, crs=crs).explode()
+    grid_gdf = crop_grid_cells_to_polygon(islands_gdf, grid_specs, min_pol_size)
+    x, y, tc_bound = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs, plt_grd)
+    if crs == "EPSG:3857":
+        exposure_crs = exp.crs
+        islands_gdf = islands_gdf.to_crs(exposure_crs)
+        grid_gdf = grid_gdf.to_crs(exposure_crs)
+    grid_gdf['admin_letter'] = [chr(65 + i) for i in range(len(grid_gdf))]
 
     if plt_grd:
         outer_boundary_grd = grid_gdf.dissolve()
         fig, ax = plt.subplots(figsize=(10, 5))
         islands_gdf.plot(ax=ax, color="green", label="Islands")
-        islands_split_gdf.plot(ax=ax, facecolor="none", edgecolor="red", label="Admin")
+        grid_gdf.plot(ax=ax, facecolor="none", edgecolor="red", label="Admin")
         outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", edgecolor="black", label="TC Track Boundary")
         handles = [
             plt.Line2D([0], [0], color="green", lw=4, label="Islands"),           
@@ -124,6 +134,8 @@ def init_TC_exp(country, cc_model, file_path, storm_path, buffer_distance_km=105
 
         """Filter TC Tracks"""
         tc_tracks_lines = to_geodataframe(track_dic[applicable_basin])
+        if crs != "EPSG:3857":
+            tc_tracks_lines = tc_tracks_lines.to_crs(crs)
         intersected_tracks = gpd.sjoin(tc_tracks_lines, grid_gdf, how='inner', predicate='intersects')
         select_tracks = tc_tracks_lines.index.isin(intersected_tracks.index)
         tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]
@@ -139,7 +151,7 @@ def init_TC_exp(country, cc_model, file_path, storm_path, buffer_distance_km=105
 
     print(f"Number of tracks in {applicable_basin} basin:",storm_basin_sub.size) 
 
-    return exp, applicable_basin, grid_gdf, islands_split_gdf, storm_basin_sub, tc_storms
+    return exp, applicable_basin, tc_bound, grid_gdf, storm_basin_sub, tc_storms
 
 
 
@@ -227,3 +239,47 @@ def to_geodataframe(self):
         ]))
     
     return gdf
+
+
+
+def crop_grid_cells_to_polygon(gdf, grid_cells_per_polygon, min_pol_size):
+    cropped_cells = []
+    
+    # Loop through each polygon in the GeoDataFrame
+    for idx, polygon in gdf.iterrows():
+        polygon_area_km2 = polygon.geometry.area / 1e6 
+        if polygon_area_km2 < min_pol_size:
+            grid_gdf = gpd.GeoDataFrame({'geometry': [polygon.geometry]}, crs=gdf.crs)
+            cropped_cells.append(grid_gdf)
+        else:
+            # Get the bounding box of the polygon
+            minx, miny, maxx, maxy = polygon.geometry.bounds
+
+            # Create a grid of the specified number of grid cells within the bounding box
+            #num_cells_x = grid_cells_per_polygon[idx][0]
+            #num_cells_y = grid_cells_per_polygon[idx][1]
+            num_cells_x = grid_cells_per_polygon[0]
+            num_cells_y = grid_cells_per_polygon[1]
+            x_coords = np.linspace(minx, maxx, num_cells_x + 1)
+            y_coords = np.linspace(miny, maxy, num_cells_y + 1)
+
+            # Create the grid cells (rectangles)
+            grid_cells = []
+            for i in range(num_cells_x):
+                for j in range(num_cells_y):
+                    # Define the coordinates for each grid cell
+                    grid_cell = box(x_coords[i], y_coords[j], x_coords[i + 1], y_coords[j + 1])
+                    cell_cropped = grid_cell.intersection(polygon.geometry)
+                    grid_cells.append(cell_cropped)
+
+            grid_gdf = gpd.GeoDataFrame(grid_cells, columns=['geometry'], crs=gdf.crs)
+
+            cropped_cells.append(grid_gdf)
+
+    grids = gpd.GeoDataFrame(pd.concat(cropped_cells, ignore_index=True), crs=gdf.crs)
+    # Reset index to ensure each geometry is on a new row
+    grids.reset_index(drop=True, inplace=True)
+    grids_clean = grids[~grids.is_empty]
+    grids_clean = grids_clean.reset_index(drop=True)
+    
+    return grids_clean
