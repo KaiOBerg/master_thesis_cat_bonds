@@ -612,3 +612,43 @@ def requ_nom(countries, pay_dam_df_dic, nominal_dic_cty):
     requ_nominal = np.max(total_losses)
 
     return requ_nominal
+
+
+def find_sharpe_tranches(premium, share_nom, tranche_losses, ann_losses, rf, target_sharpe):
+    ncf = []
+    cur_nominal = 1
+    for i in range(len(ann_losses)):
+        losses = ann_losses['losses'].iloc[i]
+        months = ann_losses['months'].iloc[i]
+        if np.sum(losses) == 0:
+            ncf.append(cur_nominal * share_nom * (premium + rf))
+        else:
+            ncf_pre_event = (cur_nominal * share_nom * (premium + rf)) / 12 * (months[0])
+            ncf_post_event = []
+            for j in range(len(losses)):
+                loss = losses[j]
+                month = months[j]
+                cur_nominal -= loss
+                if cur_nominal < 0:
+                    loss += cur_nominal
+                    cur_nominal = 0
+                if j + 1 < len(losses):
+                    nex_month = months[j+1]
+                    ncf_post_event.append(((cur_nominal * share_nom * (premium + rf)) / 12 * (nex_month - month)))
+                else:
+                    ncf_post_event.append(((cur_nominal * share_nom * (premium + rf)) / 12 * (12- month)))
+            ncf.append(ncf_pre_event + np.sum(ncf_post_event) - tranche_losses[i])
+        if (i + 1) % term == 0:
+            cur_nominal = 1
+
+    avg_ret = np.mean(ncf)
+    sigma = np.std(ncf)
+    return ((avg_ret - rf) / sigma - target_sharpe)**2
+
+def init_prem_sharpe_ratio_tranches(ann_losses, share_nom, tranche_losses, rf, target_sharpe):        
+
+    result = minimize(lambda p: find_sharpe_tranches(p, share_nom, tranche_losses, ann_losses, rf, target_sharpe), 
+                      x0=[0.05])
+    optimal_premium = result.x[0]
+
+    return optimal_premium
