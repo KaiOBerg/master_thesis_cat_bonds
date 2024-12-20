@@ -1,4 +1,5 @@
 import numpy as np
+from math import comb
 
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.core.variable import Integer
@@ -85,10 +86,11 @@ def calc_pools_conc(x, data, bools, alpha, N, fixed_pools=None):
 
 
 class PoolOptimizationProblem(ElementwiseProblem):
-    def __init__(self, nominals, max_nominal, data, bools, alpha, fun, **kwargs):
+    def __init__(self, nominals, max_nominal, data, bools, alpha, N, fun, **kwargs):
         self.data_arr = data
         self.bools = bools
         self.alpha = alpha
+        self.N = N
         self.fun = fun
         self.nominals = np.array(nominals)
         self.n_countries = len(nominals)
@@ -98,7 +100,7 @@ class PoolOptimizationProblem(ElementwiseProblem):
             n_obj=1,  
             n_constr = 1,
             xl=0,                  
-            xu=self.n_countries-1,
+            xu=self.N - 1,
             type_var=int,
             vars=[Integer(0, self.n_countries - 1) for _ in range(self.n_countries)],
             **kwargs
@@ -126,3 +128,7 @@ class PoolOptimizationProblem(ElementwiseProblem):
 
         out["F"] = total_concentration/len(pools)
         out["G"] = constraints
+
+def pop_num(n, k):
+    combinations = comb(n + k - 1, k)
+    return combinations

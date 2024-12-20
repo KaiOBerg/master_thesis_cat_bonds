@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import calc_premium as cp
 import prem_ibrd as prib
+import simulate_multi_cty_bond as smcb
 
 artemis_multiplier = 4.11
 
@@ -112,6 +113,7 @@ def create_tranches(rp_array, ann_losses, ibrd_path):
     tranches['premium_regression'] = 0.0
     tranches['premium_required'] = 0.0
     tranches['premium_artemis'] = 0.0 
+    tranche_losses_dic = {}
 
     # Calculate lower and upper bounds, and expected loss
     for i in tranches.index:
@@ -125,6 +127,7 @@ def create_tranches(rp_array, ann_losses, ibrd_path):
             np.clip(annual_losses, tranches.at[i, 'lower_bound'], tranches.at[i, 'upper_bound']) 
             - tranches.at[i, 'lower_bound']
         )
+        tranche_losses_dic[i] = tranche_losses
 
         # Expected loss for the tranche
         tranche_el = np.mean(tranche_losses)
@@ -145,7 +148,8 @@ def create_tranches(rp_array, ann_losses, ibrd_path):
 
     tranches['premium_ibrd'] = prib.monoExp(tranches['expected_loss_own']*100, a, k, b) * tranches['expected_loss_own']
     tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100
-    tranches['premium_required'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100 #just a fill in 
+    for i in tranches.index:
+        tranches.at[i, 'premium_required'] = smcb.init_prem_sharpe_ratio_tranches(ann_losses, tranches.at[i, 'nominal'], tranche_losses_dic[i], 0.0, 0.5)
     tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier
 
     return tranches
