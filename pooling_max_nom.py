@@ -25,8 +25,6 @@ IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 #choose country
 countries = [480, 212, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 882, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
 
-df_returns = pd.read_csv("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/sng_returns_regression.csv")
-
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
 nominals_sng = pd.read_csv(OUTPUT_DIR.joinpath("nominals_sng.csv"))
 max_nominal = 1000000000
