@@ -30,7 +30,7 @@ lower_share = 0.045
 prot_rp = 250
 
 #define tranches for pooling 
-tranches_array = [np.array([5, 50, 500, 5000])]
+tranches_array = np.array([5, 50, 500, 5000])
 
 #define empty dictionaries
 bond_metrics_sng_dic = {}
