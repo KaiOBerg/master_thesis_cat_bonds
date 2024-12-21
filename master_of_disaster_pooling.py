@@ -146,13 +146,20 @@ pay_dam_df_dic = {}
 for cty in countries:
     nominal_dic[cty] = nominal_sng_dic[cty]
     pay_dam_df_dic[cty] = pay_dam_df_sng_dic[cty]
+
+nominal_dic_df = pd.DataFrame(list(nominal_dic.items()), columns=['Key', 'Value'])
+file_name = 'nominal_dic_df.csv'
+nominal_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
+pay_dam_df_dic_df = pd.DataFrame(list(pay_dam_df_dic.items()), columns=['Key', 'Value'])
+file_name = 'pay_dam_df_dic_df.csv'
+pay_dam_df_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
     
-    ncf_pool_tot, premiums_pool_tot, premium_dic_pool_tot, nominal_pool_tot, es_metrics_pool_tot, MES_cty_pool_tot, tranches_tot = bond_fct.mlt_cty_bond(countries=countries,
-                                                                                                                                                         pay_dam_df_dic=pay_dam_df_dic,
-                                                                                                                                                         nominals_dic=nominal_dic, 
-                                                                                                                                                         tranches_array=tranches_array, 
-                                                                                                                                                         opt_cap=True,
-                                                                                                                                                         ibrd_path=IBRD_DIR)
+ncf_pool_tot, premiums_pool_tot, premium_dic_pool_tot, nominal_pool_tot, es_metrics_pool_tot, MES_cty_pool_tot, tranches_tot = bond_fct.mlt_cty_bond(countries=countries,
+                                                                                                                                                     pay_dam_df_dic=pay_dam_df_dic,
+                                                                                                                                                     nominals_dic=nominal_dic, 
+                                                                                                                                                     tranches_array=tranches_array, 
+                                                                                                                                                     opt_cap=True,
+                                                                                                                                                     ibrd_path=IBRD_DIR)
 
 pool_tranches_ann_ret_df_ibrd = pd.DataFrame(ncf_pool_tot['ibrd'])
 pool_tranches_ann_ret_df_regression = pd.DataFrame(ncf_pool_tot['regression'])
