@@ -26,7 +26,7 @@ artemis_multiplier = 4.54
 #set sharpe ratio to beat
 target_sharpe = 0.5
 #define bond setting
-lower_share = 0.045
+lower_share = 0.05
 prot_rp = 250
 
 #define tranches for pooling 
