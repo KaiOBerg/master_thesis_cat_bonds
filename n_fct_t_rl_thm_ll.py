@@ -18,7 +18,7 @@ import simulate_multi_cty_bond as smcb
 import calc_premium as cp
 from colorama import Fore, Style, Back
 
-artemis_multiplier = 4.11
+artemis_multiplier = 4.54
 ann_ret = True
 
 def init_sng_cty_bond_principal(country, prot_share, rf_rate, target_sharpe, grid_size=600, buffer_size=1, low_to_prot=None, to_prot_share=None, int_ws=True, incl_plots=False):    

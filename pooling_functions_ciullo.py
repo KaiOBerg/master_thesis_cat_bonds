@@ -123,7 +123,7 @@ class PoolOptimizationProblem(ElementwiseProblem):
         constraints = 0
         for members in pools.values():
             pool_nominal_diff = np.sum(self.nominals[members[0]]) - self.max_nominal
-            if pool_nominal_diff > 0:
+            if pool_nominal_diff > 0 or len(pools) != self.N:
                 constraints += pool_nominal_diff
 
         out["F"] = total_concentration/len(pools)

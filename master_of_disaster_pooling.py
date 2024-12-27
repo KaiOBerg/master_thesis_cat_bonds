@@ -22,7 +22,7 @@ countries_30 = [480, 212, 670, 28, 52, 662, 659, 308, 882, 780, 570, 776, 174, 1
 #set risk free rate, either single value or array
 rf_rates = 0.00
 #set risk muliplier reported by artems
-artemis_multiplier = 4.11
+artemis_multiplier = 4.54
 #set sharpe ratio to beat
 target_sharpe = 0.5
 #define bond setting
