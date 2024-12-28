@@ -61,7 +61,7 @@ def init_TC_exp(country, buffer_distance_km, file_path, grid_size=600, buffer_si
     exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res)
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, False)
+    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_true=False)
     islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_size)
     islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
 
