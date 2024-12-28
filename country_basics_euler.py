@@ -3,7 +3,7 @@ from pathlib import Path
 import exposure_euler as ex
 
 STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
-OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller")
+OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
 
 
 def process_country(cty):
