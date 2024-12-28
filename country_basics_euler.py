@@ -9,7 +9,7 @@ OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller")
 def process_country(cty):
     """Wrapper function to process a single country."""
     print(f"Processing country: {cty}")
-    ex.init_TC_exp(country=cty, file_path=OUTPUT_DIR, storm_path=STORM_DIR)
+    ex.init_TC_exp(country=cty, OUTPUT_DIR=OUTPUT_DIR, STORM_DIR=STORM_DIR)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
