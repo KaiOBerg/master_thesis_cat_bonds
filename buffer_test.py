@@ -41,7 +41,7 @@ if __name__ == "__main__":
     valid_results = [(buf, cou) for buf, cou in results if cou is not None]
     df = pd.DataFrame(valid_results, columns=["Buffer Distance (km)", "Number Events"])
     # Save the DataFrame to an Excel file
-    output_file = OUTPUT_DIR / "events_vs_buffer.xlsx"
+    output_file = OUTPUT_DIR / "events_vs_buffer_150.xlsx"
     df.to_excel(output_file, index=False)
     print(f"Saved results to {output_file}")
 
