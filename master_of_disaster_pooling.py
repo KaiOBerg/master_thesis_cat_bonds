@@ -395,40 +395,35 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
     plt.legend()
     plt.savefig(OUTPUT_DIR.joinpath(plt_name))
 
-
-    x = countries.copy()
-    x = [str(entry) for entry in x]
-    x.append('Pool')
-    y = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
-    y.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
-    print(y)
-    plt_name = f"insurance_multiple_{prem_mode}.png"
-    plt.figure(figsize=[12,10])
-    plt.scatter(x,y)
-    plt.xlabel("Country", fontsize=12)
-    plt.ylabel("Insurance multiple", fontsize=12)
-    plt.grid(True)
-    plt.savefig(OUTPUT_DIR.joinpath(plt_name))
-
-
     s_pool = []
     n = []
     s = sng_cty_premium
     for cty in countries:
         s_pool.append(np.sum(premiums_pool_tot['regression'][cty])*nominal_pool_tot)
         n.append(nominal_sng_dic[cty])
-
     prem_diff = (np.array(s_pool)/np.array(s)).tolist()
     prem_diff.append(float(np.sum(premiums_pool_tot['regression']['Total_alt'])*nominal_pool_tot/np.sum(s)))
+    y = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
+    y.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
 
     country_str = [str(entry) for entry in countries]
     country_str.append('Pool')
-    print(prem_diff)
+    print(f'Premium savings: {prem_diff}')
+    print(f'Insurance Multiples: {y}')
 
-    plt_name = f"premium_savings_{prem_mode}.png"
-    plt.figure(figsize=[12,10])
-    plt.scatter(country_str, prem_diff)
-    plt.xlabel("Bonds", fontsize=12)
-    plt.ylabel("Premium savings", fontsize=12)
-    plt.grid(True)
+    plt_name = f"prem_sav_ins_mult_{prem_mode}.png"
+    fig, ax1 = plt.subplots(figsize=[12, 10])
+    ax1.scatter(country_str, y, color='blue', label='Insurance Multiple', marker='o')
+    ax1.set_xlabel("Countries", fontsize=12)
+    ax1.set_ylabel("Insurance Multiple", fontsize=12)
+    ax1.tick_params(axis='y')
+    ax1.grid(True)
+
+    ax2 = ax1.twinx()
+    ax2.scatter(country_str, prem_diff, color='green', label='Premium Savings', marker='x')
+    ax2.set_ylabel("Premium Savings", fontsize=12)
+    ax2.tick_params(axis='y')
+
+    fig.legend(loc="upper center", bbox_to_anchor=(1, 1), bbox_transform=ax1.transAxes)
+    plt.tight_layout()
     plt.savefig(OUTPUT_DIR.joinpath(plt_name))

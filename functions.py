@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 import calc_premium as cp
 import prem_ibrd as prib
 import simulate_multi_cty_bond as smcb
+import alt_pay_opt as apo
 
-artemis_multiplier = 4.11
+artemis_multiplier = 4.54
 
 def check_scalar(variable):
     if np.isscalar(variable):
@@ -153,3 +157,195 @@ def create_tranches(rp_array, ann_losses, ibrd_path):
     tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier
 
     return tranches
+
+def plot_TC_hist(tc, categories, ax):
+    #should I limit it to on land centroids?
+    dense_intensity = np.squeeze(np.asarray(tc.intensity.todense()).flatten())
+    
+    ax.hist(dense_intensity, bins=categories[1:], density=True, alpha=0.5, color='k', edgecolor='k', lw=2, zorder=3, label='STORM-P')
+    ax.set_ylabel('Tropical cyclone intensity over land (%)', fontsize=12)
+    
+    locs, xlabels = plt.xticks()
+    newlabel = ['  Trop. storm', '   Cat. 1', ' Cat. 2', '   Cat. 3', '    Cat. 4', '    Cat. 5', '']
+    ax.set_xlabel('Tropical cyclone category', fontsize=12)
+    plt.xticks(categories, newlabel,horizontalalignment='left')
+    plt.xlim(10, 80)
+    ax.legend(loc="upper left")
+    
+    return ax
+
+def plot_vulnerability(impf_TC, fun_id, categories, optimized_min, optimized_max, nominal, exp, admin_gdf, ax):
+    ax = plot_impf(impf_TC, fun_id, ax)
+    #ax = plot_payout_structure(optimized_min, optimized_max, nominal, categories, exp, admin_gdf, ax)
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    # labels will be the keys of the dict, handles will be values
+    temp = {k:v for k,v in zip(labels, handles)}    
+    ax.legend(temp.values(), temp.keys(), loc="lower right")
+    ax.set_ylabel('Damage (%)', fontsize=12)
+    plt.ylim(0, 100)
+
+    return ax
+
+def plot_impf(impf_TC, fun_id, ax):
+    mdd_impf = impf_TC.get_func(fun_id=fun_id)[0].mdd*100
+    intensity_mdd = impf_TC.get_func(fun_id=fun_id)[0].intensity
+    ax.plot(intensity_mdd, mdd_impf, label='Impact \nfunction', c='k', zorder=2)
+    
+    return ax 
+
+def plot_payout_structure(optimized_min, optimized_max, nominal, categories, exp, admin_gdf, ax):
+    exp_crs = exp.gdf
+    exp_crs = exp_crs.to_crs(admin_gdf.crs)
+    #Perform a spatial join to associate each exposure point with calculated impact with a grid cell
+    exp_to_admin = exp_crs.sjoin(admin_gdf, how='left', predicate="within")
+    #group each exposure point according to grid cell letter
+    agg_exp = exp_to_admin.groupby('admin_letter').apply(lambda x: x.index.tolist())
+    agg_exp_sum = exp_to_admin.groupby('admin_letter')['value'].sum()
+    tot_exp = agg_exp_sum['A']
+    TS, cat1, cat2, cat3, cat4, cat5, upper_lim = categories
+    steps1 = np.array([0, cat1, optimized_min, cat2, cat3, cat4, cat5, optimized_max, upper_lim])
+    
+    payouts = []
+    for i in steps1:
+        df = pd.DataFrame({'Intensity': [i]})
+        payouts.append(apo.init_alt_payout(optimized_min, optimized_max, df, nominal, False)/tot_exp*100)
+    percentages = np.array(payouts)
+    ax.plot(steps1, percentages, label='Payout \nfunction', c='k', ls='--', zorder=2)    
+    
+    return ax
+
+def plot_vul_his(tc, categories, impf_TC, impf_id, optimized_min, optimized_max, nominal, exp, admin_gdf):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1 = plot_TC_hist(tc, categories, ax1)
+    ax2 = ax1.twinx()
+    ax2 = plot_vulnerability(impf_TC, impf_id, categories, optimized_min, optimized_max, nominal, exp, admin_gdf, ax2)
+
+    return ax1
+
+def plot_bin_dam_pay(pay_dam_df, nominal):
+    # Calculate damage and pay percentages
+    dam_perc = pay_dam_df['damage'] / nominal * 100
+    dam_perc = dam_perc.clip(lower=0, upper=100)
+
+    pay_perc = pay_dam_df['pay']/nominal*100
+    pay_perc = pay_perc.clip(lower=0, upper=100)
+
+    bins = range(10, 101, 10)  
+
+    binned_dam_data = pd.cut(dam_perc, bins=bins, right=True, include_lowest=True)
+    binned_pay_data = pd.cut(pay_perc, bins=bins, right=True, include_lowest=True)
+
+    counts_per_bin_dam = dam_perc.groupby(binned_dam_data, observed=False).size()
+    mean_per_bin_dam = dam_perc.groupby(binned_dam_data, observed=False).mean()
+    mean_per_bin_pay = pay_perc.groupby(binned_pay_data, observed=False).mean()
+
+    x_labels = ['10-20', '20-30', '30-40', '40-50', '50-60', '60-70', '70-80', '80-90', '90-100']
+
+    result = pd.DataFrame({
+        'bin': x_labels,
+        'count_dam': counts_per_bin_dam.values,
+        'Mean Damage': mean_per_bin_dam.values,
+        'Mean Payout': mean_per_bin_pay.values
+    })
+
+    # Melt data for swarmplot
+    plot_data_melted = pd.melt(
+        result,
+        id_vars='bin',
+        value_vars=['Mean Damage', 'Mean Payout'],
+        var_name='type',
+        value_name='value'
+    )
+
+    # Plotting
+    fig, ax1 = plt.subplots(figsize=(8, 6))
+
+    # Add swarmplot
+    sns.swarmplot(data=plot_data_melted, x='bin', y='value', hue='type', palette='Set2', ax=ax1)
+    ax1.set_ylabel('Damage/Payout [%]', fontsize=12)
+    ax1.set_xlabel('Modeled damage per affected unit and event [%]', fontsize=12)
+    ax1.legend(loc='upper center')
+
+    # Add barplot for counts on a secondary y-axis
+    ax2 = ax1.twinx()
+    sns.barplot(x=x_labels, y=result['count_dam'], alpha=0.4, color='gray', ax=ax2)
+    ax2.set_ylabel('Event Count', fontsize=12)
+    ax2.tick_params(axis='y')
+
+    # Adjustments
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_TC_hist_cc(tc_dic, categories, ax):
+    tc_sets = ["CRCL", "CMCC", "CNRM", "ECEARTH", "HADGEM"]
+
+    # Initialize a dictionary to store the share of each tc_set per category
+    category_shares = {tc_set: [] for tc_set in tc_sets}
+
+    # Extract intensities and compute shares
+    for tc_set in tc_dic:
+        tc = tc_dic[tc_set]
+        dense_intensity = np.squeeze(np.asarray(tc.intensity.todense()).flatten())
+        hist, _ = np.histogram(dense_intensity, bins=categories, density=False)
+        category_shares[tc_set] = hist
+
+    # Sum the total occurrences per category across all tc_sets
+    total_per_category = np.sum([np.array(category_shares[tc_set]) for tc_set in tc_dic.keys()], axis=0)
+    
+    # Normalize shares (percentage of total per category for each tc_set)
+    for tc_set in tc_dic:
+        category_shares[tc_set] = np.array(category_shares[tc_set]) / total_per_category
+
+    # Create a stacked bar plot
+    bottom = np.zeros(len(categories)-1)  # Tracks the bottom of each stack
+    for i, tc_set in enumerate(tc_sets):
+        shares = category_shares[tc_set] * 100  # Convert shares to percentage
+        bars = ax.bar(
+            categories[:-1],  # Category midpoints for x-axis
+            category_shares[tc_set] * 100,  # Convert shares to percentage
+            width=np.diff(categories),  # Match bin width
+            bottom=bottom * 100,  # Stacking bars
+            label=tc_set,
+            color=f"C{i}",  # Cycle through default colors
+            edgecolor="k",
+            linewidth=0.5,
+            align="edge",
+        )
+
+        ## Add share as text inside the bar
+        iterator = 0
+        for rect, share in zip(bars, shares):
+            if share > 0:  # Only label non-zero shares
+                if iterator % 5 == 0 and iterator > 0:
+                    x = rect.get_x() + rect.get_width() / 2 - 22
+                else:
+                    x = rect.get_x() + rect.get_width() / 2
+                y = rect.get_y() + rect.get_height() / 2
+                ax.text(
+                    x,  # X-coordinate (center of bar)
+                    y,  # Y-coordinate (center of stack)
+                    f"{share:.1f}%",  # Label (percentage)
+                    ha="center", va="center", fontsize=8, color="white"
+                )
+            iterator += 1
+
+        # Update the bottom for the next stack
+        bottom += category_shares[tc_set]
+
+    # Label the axes
+    ax.set_ylabel("Share per Category (%)", fontsize=12)
+    ax.set_xlabel("Tropical Cyclone Category", fontsize=12)
+
+    # Custom x-axis ticks and labels
+    newlabel = ['  Trop. storm', '   Cat. 1', ' Cat. 2', '   Cat. 3', '    Cat. 4', '    Cat. 5', '']
+    ax.set_xticks(categories, newlabel,horizontalalignment='left')
+    ax.set_xlim(33, 90)
+    ax.set_ylim(0, 100)
+
+    # Add legend
+    ax.legend(loc="lower right")
+    
+    return ax

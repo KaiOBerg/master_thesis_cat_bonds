@@ -10,7 +10,7 @@ OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
 STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 lower_share = 0.05
 country = 882
-buffer_distance_arr = np.arange(0, 151, 15)  # Buffer distances
+buffer_distance_arr = np.arange(10, 151, 10)  # Buffer distances
 
 
 

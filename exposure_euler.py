@@ -34,7 +34,6 @@ basins_countries = {
 #define variables for exposure
 fin = 'gdp' #fin mode for exposure
 year = 2020 #reference year for exposure
-res = 30 #resolution in arcsec for exposure
 #define variables for grid and centroids
 res_centrs = 150 #resolution in arcsec for centroids
 buffer_distance_km = 105 
@@ -45,7 +44,7 @@ r = 10000 #number of simulated years in tc dataset
 freq_corr_STORM = 1 / r
 
 
-def init_TC_exp(country, OUTPUT_DIR, STORM_DIR, crs="EPSG:3857"):
+def init_TC_exp(country, res, OUTPUT_DIR, STORM_DIR, crs="EPSG:3857"):
 
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():

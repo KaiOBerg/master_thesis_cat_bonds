@@ -88,7 +88,7 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
     islands_gdf = grd.create_islands(exp, crs).explode(ignore_index=True, index_parts=True)
     buffered_geometries = islands_gdf.geometry.buffer(buffer_grid_size * 1000)
     islands_gdf = unary_union(buffered_geometries)
-    islands_gdf = gpd.GeoDataFrame({'geometry': [islands_gdf]}, crs=crs).explode()
+    islands_gdf = gpd.GeoDataFrame({'geometry': [islands_gdf]}, crs=crs).explode(index_parts=True)
     grid_gdf = crop_grid_cells_to_polygon(islands_gdf, grid_specs, min_pol_size)
     x, y, tc_bound = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs, plt_grd)
     if crs == "EPSG:3857":
@@ -119,8 +119,8 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
 
     """initiate TC hazard from tracks and exposure"""
     # initiate new instance of TropCyclone(Hazard) class:
-    haz_str = f"TC_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
-    track_str = f"Track_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
+    haz_str = f"TC_sub_{applicable_basin}_{country}_{res_exp}_{buffer_distance_km}_STORM.hdf5"
+    track_str = f"Track_sub_{applicable_basin}_{country}_{res_exp}_{buffer_distance_km}_STORM.hdf5"
     if load_fls and Path.is_file(file_path.joinpath(haz_str)):
         tc_storms = TropCyclone.from_hdf5(file_path.joinpath(haz_str))
         storm_basin_sub = TCTracks.from_hdf5(file_path.joinpath(track_str))

@@ -90,7 +90,7 @@ def init_TC_exp(country, cc_model, grid_specs, file_path, storm_path, buffer_gri
     islands_gdf = grd.create_islands(exp, crs).explode(ignore_index=True, index_parts=True)
     buffered_geometries = islands_gdf.geometry.buffer(buffer_grid_size * 1000)
     islands_gdf = unary_union(buffered_geometries)
-    islands_gdf = gpd.GeoDataFrame({'geometry': [islands_gdf]}, crs=crs).explode()
+    islands_gdf = gpd.GeoDataFrame({'geometry': [islands_gdf]}, crs=crs).explode(index_parts=True)
     grid_gdf = crop_grid_cells_to_polygon(islands_gdf, grid_specs, min_pol_size)
     x, y, tc_bound = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs, plt_grd)
     if crs == "EPSG:3857":
