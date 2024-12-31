@@ -24,11 +24,11 @@ def process_country(cty):
     centrs = Centroids.from_lat_lon(lat, lon)
     tracks = TCTracks.from_ibtracs_netcdf(basin='SP', year_range=(1980,2022))
     tracks.equal_timestep()
-    tracks.write_hdf5(OUTPUT_DIR.joinpath("TC_tracks_IBTRACS_SP_1980_2022_hist.hdf5"))
-    #tracks.calc_perturbed_trajectories()
+    tracks.calc_perturbed_trajectories()
+    tracks.write_hdf5(OUTPUT_DIR.joinpath("TC_tracks_IBTRACS_SP_1980_2022_synth.hdf5"))
     tc = TropCyclone.from_tracks(tracks, centroids=centrs)
     tc.check()
-    tc.write_hdf5(OUTPUT_DIR.joinpath("IBTRACS_SP_1980_2022_hist.hdf5")) 
+    tc.write_hdf5(OUTPUT_DIR.joinpath("IBTRACS_SP_1980_2022_synth.hdf5")) 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
