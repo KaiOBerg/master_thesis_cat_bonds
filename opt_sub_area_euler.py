@@ -8,6 +8,8 @@ import exposures_alt as aexp
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from scipy.stats import spearmanr
+from sklearn.metrics import mean_squared_error
 
 OUTPUT_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard") #Path("/cluster/work/climate/kbergmueller/cty_data")
 STORM_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks") #Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
@@ -16,7 +18,7 @@ STORM_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_trac
 country = 882
 #define bond charactersitcs
 prot_rp = 250
-lower_share = 0.045
+lower_share = 0.05
 int_stat = np.arange(10, 101, 10)
 selected_buffer = 105
 
@@ -34,13 +36,18 @@ def sng_cty_bond(country, grid_specs, int_stat, prot_rp, file_path, storm_path, 
         int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=float(i))
         result, optimized_1, optimized_2 = apo.init_alt_optimization(int_grid, nominal, damages_grid=imp_admin_evt_flt, damages_evt=imp_per_event_flt, print_params=incl_plots)
         pay_dam_df = apo.alt_pay_vs_damage(imp_per_event_flt, optimized_1, optimized_2, int_grid, nominal, imp_admin_evt)
-        basis_risk_dic[i] = np.sum(pay_dam_df['damage']) - np.sum(pay_dam_df['pay'])
+        pay_dam_df['damage'] = pay_dam_df['damage'].apply(lambda value: min(value, nominal))
+        #basis_risk_dic[i] = np.sum(pay_dam_df['damage']) - np.sum(pay_dam_df['pay'])
+        basis_risk_dic[i] = np.sqrt(mean_squared_error(pay_dam_df['damage'], pay_dam_df['pay']))
+ 
+
 
     int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat='mean')
     result, optimized_1, optimized_2 = apo.init_alt_optimization(int_grid, nominal, damages_grid=imp_admin_evt_flt, damages_evt=imp_per_event_flt, print_params=incl_plots)
     pay_dam_df = apo.alt_pay_vs_damage(imp_per_event_flt, optimized_1, optimized_2, int_grid, nominal, imp_admin_evt)
     pay_dam_df['damage'] = pay_dam_df['damage'].apply(lambda value: min(value, nominal))
-    basis_risk_dic['mean'] = np.sum(pay_dam_df['damage']) - np.sum(pay_dam_df['pay'])
+    #basis_risk_dic['mean'] = np.sum(pay_dam_df['damage']) - np.sum(pay_dam_df['pay'])
+    basis_risk_dic['mean'] = np.sqrt(mean_squared_error(pay_dam_df['damage'], pay_dam_df['pay']))
 
     basis_risk_df = pd.DataFrame([basis_risk_dic])
 
@@ -60,4 +67,4 @@ for i in range(10):
     all_dfs.append(br)
 
 combined_br = pd.concat(all_dfs, ignore_index=True)
-combined_br.to_excel(OUTPUT_DIR / f"basis_risk_grids_{country}.xlsx", index=False)
+combined_br.to_excel(OUTPUT_DIR / f"rmse_grids_{country}.xlsx", index=False)

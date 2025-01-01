@@ -108,7 +108,7 @@ def init_cons(int_haz_cp):
                 {'type': 'ineq', 'fun': cons_ws_2}]
     return cons
 
-def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, damages_grid=None, damages=None):
+def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, damages_grid=None, damages=None, exp=None):
     b = len(damages_flt)
     max_damage = damages_flt.max()
     if max_damage < 1:
@@ -151,6 +151,8 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
         pay_dam_df.loc[i,"pay"] = tot_pay
 
     if damages is not None:
+        tot_exp = exp.gdf['value'].sum()
+
         damages_df = pd.DataFrame(damages, columns=['Damage'])
         mask = damages_df['Damage'] <= nominal
         damages_df_flt = damages_df['Damage'][mask]
@@ -158,29 +160,33 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
 
 
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 4))
 
-        ax1.scatter(damages_df_flt, payout_flt, marker='o', color='blue', label='Events')
-        ax1.plot([0, nominal], [0, nominal], color='red', linestyle='--', label='Trendline')
-        ax1.axhline(y = nominal, color = 'r', linestyle = '-', label='Nominal') 
+        ax1.scatter(damages_df_flt/tot_exp, payout_flt/tot_exp, marker='o', color='blue', label='Events')
+        ax1.plot([0, nominal/tot_exp], [0, nominal/tot_exp], color='black', linestyle='--', label='Trendline')
+        ax1.axhline(y = nominal/tot_exp, color = 'r', linestyle = '-', label='Principal') 
+        ax1.axhline(y = 0.05, color = 'r', linestyle = '-', label='Attachment Point') 
+        ax1.axvline(x = 0.05, color = 'r', linestyle = '--', label='Min. Damage') 
 
         # Add labels and title
-        ax1.set_xlabel("Damage [USD]", fontsize=12)
-        ax1.set_ylabel("Payout [USD]", fontsize=12)
-        ax1.legend(loc='upper left', borderpad=2.0)
+        ax1.set_xlabel("Damage [share of GDP]", fontsize=12)
+        ax1.set_ylabel("Payout [share of GDP]", fontsize=12)
+        ax1.legend(loc='lower right', borderpad=2.0)
 
-        ax2.scatter(damages, pay_dam_df['pay'], marker='o', color='blue', label='Events')
-        ax2.axhline(y = nominal, color = 'r', linestyle = '-', label='Nominal') 
+        ax2.scatter(damages/tot_exp, pay_dam_df['pay']/tot_exp, marker='o', color='blue', label='Events')
+        ax2.axhline(y = nominal/tot_exp, color = 'r', linestyle = '-', label='Principal') 
+        ax2.axhline(y = 0.05, color = 'r', linestyle = '-', label='Attachment Point') 
+        ax2.axvline(x = 0.05, color = 'r', linestyle = '--', label='Min. Damage') 
         ax2.set_xscale('log')
         # Add labels and title
-        ax2.set_xlabel("Damage [USD]", fontsize=12)
-        ax2.set_ylabel("Payout [USD]", fontsize=12)
-        ax2.legend(loc='upper left', borderpad=2.0)
+        ax2.set_xlabel("Damage [share of GDP]", fontsize=12)
+        ax2.set_ylabel("Payout [share of GDP]", fontsize=12)
+        #ax2.legend(loc='upper left', borderpad=2.0)
 
         panel_labels = ["a)", "b)"]
         for i, ax in enumerate([ax1, ax2]):
             ax.annotate(panel_labels[i], 
-                xy=(-0.05, 1),  # Position: top-left corner
+                xy=(-0.1, 1),  # Position: top-left corner
                 xycoords="axes fraction",  # Relative to axes
                 fontsize=14, 
                 fontweight="bold")

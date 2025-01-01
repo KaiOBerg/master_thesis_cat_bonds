@@ -7,6 +7,8 @@ import calc_premium as cp
 import prem_ibrd as prib
 import simulate_multi_cty_bond as smcb
 import alt_pay_opt as apo
+import impact as cimp
+import bound_prot_dam as bpd
 
 artemis_multiplier = 4.54
 
@@ -349,3 +351,72 @@ def plot_TC_hist_cc(tc_dic, categories, ax):
     ax.legend(loc="lower right")
     
     return ax
+
+def prod_test_ibtrac(tc_storms, exp, admin_gdf, nominal, optimized_step1, optimized_step2, imp_per_event_flt, imp_admin_evt_flt, lower_share):
+    imp_hist, imp_per_event_hist, imp_admin_evt_hist = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=False) 
+
+    centrs_to_grid = tc_storms.centroids.gdf.sjoin(admin_gdf, how='left', predicate="within")
+    agg_exp = centrs_to_grid.groupby('admin_letter').apply(lambda x: x.index.tolist())
+    #Initialize a dictionary to hold the calculated statistics
+    int_grid_test = {letter: [None] * len(tc_storms.event_id) for letter in agg_exp.keys()}
+    int_grid_test['Storm_ID'] = [None] * len(tc_storms.event_id)
+    #Iterate over each event
+    for i in range(len(tc_storms.event_id)):
+        int_grid_test['Storm_ID'][i] = tc_storms.event_id[i]
+        #For each grid cell, calculate the desired statistic
+        for letter, line_numbers in agg_exp.items():
+            selected_values = tc_storms.intensity[i, line_numbers]
+            int_grid_test[letter][i] = selected_values.mean()
+
+    int_grid_test = pd.DataFrame.from_dict(int_grid_test)
+
+    minimum_payout = imp_per_event_flt[imp_per_event_flt > 0].min()
+    tot_pay_per_event = []
+    b = len(tc_storms.event_id)
+
+    for i in range(len(imp_per_event_hist)):
+        payout = []
+        for j in range(len(int_grid_test.columns)-1):
+            min_trig = optimized_step1[j]
+            max_trig = optimized_step2[j]
+            grid_hazint = int_grid_test.iloc[i,j]
+            max_dam = np.max(imp_admin_evt_flt.iloc[:,j])
+            if max_dam < nominal:
+                max_pay = max_dam
+            else: 
+                max_pay = nominal
+
+            if grid_hazint >= max_trig:
+                payout.append(max_pay)
+            elif grid_hazint <= min_trig:
+                payout.append(0)
+            else:
+                payout.append((grid_hazint - min_trig) / (max_trig - min_trig) * max_pay)
+
+        tot_pay_test = np.sum(payout)
+        if tot_pay_test > nominal:
+            tot_pay_test = nominal
+        elif tot_pay_test < minimum_payout:
+            tot_pay_test = 0
+        else: 
+            pass
+
+        tot_pay_per_event.append(tot_pay_test)
+
+    dam_pay_data_ibtracs = pd.DataFrame({
+    'imp': imp_per_event_hist,
+    'pay': tot_pay_per_event,
+    'STORM_ID': tc_storms.event_name,
+    })
+
+    min_pay = lower_share * exp.gdf['value'].sum()
+
+    # Filter out rows where `imp` is smaller than `min_pay`
+    filtered_data = dam_pay_data_ibtracs[dam_pay_data_ibtracs['imp'] >= min_pay]
+
+    squaredDiffs = np.square(filtered_data['imp'] - filtered_data['pay'])
+    squaredDiffsFromMean = np.square(filtered_data['imp'] - np.mean(filtered_data['imp']))
+    rSquared = 1 - np.sum(squaredDiffs) / np.sum(squaredDiffsFromMean)
+    print(f"RMSE: {rSquared}")
+    
+    return dam_pay_data_ibtracs, rSquared
