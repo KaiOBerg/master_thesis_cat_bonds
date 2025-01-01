@@ -80,12 +80,12 @@ def init_TC_exp(country, res, OUTPUT_DIR, STORM_DIR, crs="EPSG:3857"):
     tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]
     storm_basin_sub = TCTracks(tracks_in_exp) 
     storm_basin_sub.equal_timestep(time_step_h=1)
-    storm_basin_sub.write_hdf5(OUTPUT_DIR / f"Track_sub_{applicable_basin}_{country}_{res}_STORM.hdf5")
+    storm_basin_sub.write_hdf5(OUTPUT_DIR / f"Track_sub_{applicable_basin}_{country}_{res}_{buffer_distance_km}_STORM.hdf5")
     #generate TropCyclone class from previously loaded TC tracks for one storm data set
     tc_storms = TropCyclone.from_tracks(storm_basin_sub, centroids=centrs)
     tc_storms.frequency = np.ones(tc_storms.event_id.size) * freq_corr_STORM
     tc_storms.check()
-    tc_storms.write_hdf5(OUTPUT_DIR / f"TC_sub_{applicable_basin}_{country}_{res}_STORM.hdf5")
+    tc_storms.write_hdf5(OUTPUT_DIR / f"TC_sub_{applicable_basin}_{country}_{res}_{buffer_distance_km}_STORM.hdf5")
     print('Job done')
 
     return exp, applicable_basin, grid_gdf, storm_basin_sub, tc_storms
