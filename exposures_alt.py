@@ -119,8 +119,8 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
 
     """initiate TC hazard from tracks and exposure"""
     # initiate new instance of TropCyclone(Hazard) class:
-    haz_str = f"TC_sub_{applicable_basin}_{country}_{res_exp}_{buffer_distance_km}_STORM.hdf5"
-    track_str = f"Track_sub_{applicable_basin}_{country}_{res_exp}_{buffer_distance_km}_STORM.hdf5"
+    haz_str = f"TC_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
+    track_str = f"Track_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
     if load_fls and Path.is_file(file_path.joinpath(haz_str)):
         tc_storms = TropCyclone.from_hdf5(file_path.joinpath(haz_str))
         storm_basin_sub = TCTracks.from_hdf5(file_path.joinpath(track_str))
