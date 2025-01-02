@@ -21,6 +21,7 @@ fiji = [242]
 countries_30 = [212, 670, 776, 174, 584]
 
 countries_str = ['DMA', 'HTI', 'VCT', 'JAM', 'VUT', 'FJI', 'TON', 'COM', 'MHL']
+countries_str_x_label = ['DMA', 'HTI', 'VCT', 'JAM', 'VUT', 'FJI', 'TON', 'COM', 'MHL', 'Pool']
 
 #set risk free rate, either single value or array
 rf_rates = 0.00
@@ -403,7 +404,6 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
     im = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
     im.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
 
-    countries_str.append('Pool')
     print(f'Premium savings {prem_mode}: {prem_diff}')
     print(f'Insurance Multiples  {prem_mode}: {im}')
 
@@ -413,11 +413,11 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
         return x + random.uniform(-0.2, .2)
 
     type_ids= {}
-    for i, cty in enumerate(countries_str):
+    for i, cty in enumerate(countries_str_x_label):
         type_ids[cty] = i
 
-    jitter_type_im = [jitter(type_ids[cty]) for cty in countries_str]
-    jitter_type_ps = [jitter(type_ids[cty]) for cty in countries_str]
+    jitter_type_im = [jitter(type_ids[cty]) for cty in countries_str_x_label]
+    jitter_type_ps = [jitter(type_ids[cty]) for cty in countries_str_x_label]
 
     fig, ax1 = plt.subplots(figsize=[12, 10])
     ax1.scatter(jitter_type_im, y=im, color='blue', label='Insurance Multiple', s=100)
@@ -425,7 +425,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
     ax1.set_ylabel("Insurance Multiple []", fontsize=12)
     ax1.tick_params(axis='y')
 
-    x_positions = np.arange(0.5, len(countries_str)-1+0.6).tolist()  # Specify the positions where you want the vertical lines
+    x_positions = np.arange(0.5, len(countries_str_x_label)-1+0.6).tolist()  # Specify the positions where you want the vertical lines
     for x in x_positions:
         ax1.axvline(x=x, color='gray', linestyle='-', linewidth=0.5)
     ax1.grid(True, axis='y', linestyle='-', linewidth=0.5)
@@ -437,7 +437,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
 
     fig.legend(loc="upper center")
     plt.tight_layout()
-    plt.xlim(-0.5, len(countries_str)-0.5)
-    plt.xticks(np.arange(0, len(countries_str)).tolist())
+    plt.xlim(-0.5, len(countries_str_x_label)-0.5)
+    plt.xticks(np.arange(0, len(countries_str_x_label)).tolist())
     plt.gca().set_xticklabels(list(type_ids.keys()))
     plt.savefig(OUTPUT_DIR.joinpath(plt_name))
