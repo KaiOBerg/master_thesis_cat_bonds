@@ -385,7 +385,6 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
 
     # Plot pool point
     plt.scatter(np.std(pool_ann_ret), np.mean(pool_ann_ret), label='Pool', color='purple', s=100)
-    plt.text(np.std(pool_ann_ret)-0.01,np.mean(pool_ann_ret),f'Sharpe: {np.mean(pool_ann_ret)/np.std(pool_ann_ret):.2f}',fontsize=10,ha='right',va='center',color='purple')
 
     for cty in countries:
         plt.scatter(np.std(sng_ann_ret[cty]), np.mean(sng_ann_ret[cty]), label=cty, s=100)

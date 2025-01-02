@@ -288,8 +288,10 @@ def plot_TC_hist_cc(tc_dic, categories, ax):
     category_shares = {tc_set: [] for tc_set in tc_sets}
 
     # Extract intensities and compute shares
+    n_tc = {}
     for tc_set in tc_dic:
         tc = tc_dic[tc_set]
+        n_tc[tc_set] = len(tc.event_id)
         dense_intensity = np.squeeze(np.asarray(tc.intensity.todense()).flatten())
         hist, _ = np.histogram(dense_intensity, bins=categories, density=False)
         category_shares[tc_set] = hist
@@ -310,7 +312,7 @@ def plot_TC_hist_cc(tc_dic, categories, ax):
             category_shares[tc_set] * 100,  # Convert shares to percentage
             width=np.diff(categories),  # Match bin width
             bottom=bottom * 100,  # Stacking bars
-            label=tc_set,
+            label=f"{tc_set}\nn={n_tc[tc_set]}",
             color=f"C{i}",  # Cycle through default colors
             edgecolor="k",
             linewidth=0.5,
@@ -344,11 +346,11 @@ def plot_TC_hist_cc(tc_dic, categories, ax):
     # Custom x-axis ticks and labels
     newlabel = ['  Trop. storm', '   Cat. 1', ' Cat. 2', '   Cat. 3', '    Cat. 4', '    Cat. 5', '']
     ax.set_xticks(categories, newlabel,horizontalalignment='left')
-    ax.set_xlim(33, 90)
+    ax.set_xlim(18, 90)
     ax.set_ylim(0, 100)
 
     # Add legend
-    ax.legend(loc="lower right")
+    ax.legend(loc="lower right", fontsize=10)
     
     return ax
 

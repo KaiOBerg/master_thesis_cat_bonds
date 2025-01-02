@@ -1,6 +1,7 @@
 #import general packages
 import numpy as np
 import pandas as pd
+import random
 import matplotlib.pyplot as plt
 from numpy.random import dirichlet
 import scipy.optimize as sco
@@ -18,6 +19,8 @@ countries = [212, 332, 670, 388, 548, 242, 776, 174, 584]
 countries_150 = [332, 388, 548] 
 fiji = [242]
 countries_30 = [212, 670, 776, 174, 584]
+
+countries_str = ['DMA', 'HTI', 'VCT', 'JAM', 'VUT', 'FJI', 'TON', 'COM', 'MHL']
 
 #set risk free rate, either single value or array
 rf_rates = 0.00
@@ -56,7 +59,7 @@ for cty in countries:
                                                                                                                                                                 to_prot_share=lower_share,
                                                                                                                                                                 buffer_distance_km=105,
                                                                                                                                                                 res_exp=150,
-                                                                                                                                                                grid_size=10000,
+                                                                                                                                                                grid_size=1000,
                                                                                                                                                                 grid_specs=[3,3],
                                                                                                                                                                 buffer_grid_size=5,
                                                                                                                                                                 incl_plots=False,
@@ -70,8 +73,8 @@ for cty in countries:
                                                                                                                                                                 to_prot_share=lower_share,
                                                                                                                                                                 buffer_distance_km=105,
                                                                                                                                                                 res_exp=30,
-                                                                                                                                                                grid_size=10000,
-                                                                                                                                                                grid_specs=[1,1],
+                                                                                                                                                                grid_size=1000,
+                                                                                                                                                                grid_specs=[3,3],
                                                                                                                                                                 buffer_grid_size=1,
                                                                                                                                                                 incl_plots=False,
                                                                                                                                                                 plt_save=True,
@@ -84,8 +87,8 @@ for cty in countries:
                                                                                                                                                                 to_prot_share=lower_share,
                                                                                                                                                                 buffer_distance_km=105,
                                                                                                                                                                 res_exp=150,
-                                                                                                                                                                grid_size=10000,
-                                                                                                                                                                grid_specs=[1,1],
+                                                                                                                                                                grid_size=1000,
+                                                                                                                                                                grid_specs=[3,3],
                                                                                                                                                                 buffer_grid_size=5,
                                                                                                                                                                 crs="EPSG:3832",
                                                                                                                                                                 incl_plots=False,
@@ -129,14 +132,14 @@ bond_metrics_sng_dic_df = bond_metrics_sng_dic_df.reset_index(level=0).reset_ind
 bond_metrics_sng_dic_df.rename(columns={"Key": "Country"}, inplace=True)
 es_metrics_df = pd.DataFrame(es_metrics_sng_dic)
 
-csv_losses_name = "sng_losses.csv"
-csv_metrics_name = "sng_metrics.csv"
-csv_es_name = "sng_es.csv"
+csv_losses_name = "sng_losses_fs.csv"
+csv_metrics_name = "sng_metrics_fs.csv"
+csv_es_name = "sng_es_fs.csv"
 sng_ann_losses.to_csv(OUTPUT_DIR.joinpath(csv_losses_name), index=False, sep=',')
-sng_ann_ret_df_ibrd.to_csv(OUTPUT_DIR.joinpath("sng_returns_ibrd.csv"), index=False, sep=',')
-sng_ann_ret_df_regression.to_csv(OUTPUT_DIR.joinpath("sng_returns_regression.csv"), index=False, sep=',')
-sng_ann_ret_df_required.to_csv(OUTPUT_DIR.joinpath("sng_returns_required.csv"), index=False, sep=',')
-sng_ann_ret_df_artemis.to_csv(OUTPUT_DIR.joinpath("sng_returns_artemis.csv"), index=False, sep=',')
+sng_ann_ret_df_ibrd.to_csv(OUTPUT_DIR.joinpath("sng_returns_ibrd_fs.csv"), index=False, sep=',')
+sng_ann_ret_df_regression.to_csv(OUTPUT_DIR.joinpath("sng_returns_regression_fs.csv"), index=False, sep=',')
+sng_ann_ret_df_required.to_csv(OUTPUT_DIR.joinpath("sng_returns_required_fs.csv"), index=False, sep=',')
+sng_ann_ret_df_artemis.to_csv(OUTPUT_DIR.joinpath("sng_returns_artemis_fs.csv"), index=False, sep=',')
 bond_metrics_sng_dic_df.to_csv(OUTPUT_DIR.joinpath(csv_metrics_name), index=False, sep=',')
 es_metrics_df.to_csv(OUTPUT_DIR.joinpath(csv_es_name), index=False, sep=',')
 
@@ -148,10 +151,10 @@ for cty in countries:
     pay_dam_df_dic[cty] = pay_dam_df_sng_dic[cty]
 
 nominal_dic_df = pd.DataFrame(list(nominal_dic.items()), columns=['Key', 'Value'])
-file_name = 'nominal_dic_df.csv'
+file_name = 'nominal_dic_df_fs.csv'
 nominal_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
 pay_dam_df_dic_df = pd.DataFrame(list(pay_dam_df_dic.items()), columns=['Key', 'Value'])
-file_name = 'pay_dam_df_dic_df.csv'
+file_name = 'pay_dam_df_dic_df_fs.csv'
 pay_dam_df_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
     
 ncf_pool_tot, premiums_pool_tot, premium_dic_pool_tot, nominal_pool_tot, es_metrics_pool_tot, MES_cty_pool_tot, tranches_tot = bond_fct.mlt_cty_bond(countries=countries,
@@ -180,14 +183,14 @@ pool_ann_ret_regression = ncf_pool_tot['regression']['Total']
 pool_ann_ret_artemis = ncf_pool_tot['artemis']['Total']
 pool_ann_ret_required = ncf_pool_tot['required']['Total']
 
-pool_ann_ret_ibrd.to_csv(OUTPUT_DIR.joinpath("pool_returns_ibrd.csv"), index=False, sep=',')
-pool_ann_ret_regression.to_csv(OUTPUT_DIR.joinpath("pool_returns_regression.csv"), index=False, sep=',')
-pool_ann_ret_artemis.to_csv(OUTPUT_DIR.joinpath("pool_returns_artemis.csv"), index=False, sep=',')
-pool_ann_ret_required.to_csv(OUTPUT_DIR.joinpath("pool_returns_required.csv"), index=False, sep=',')
-pool_tranches_ann_ret_df_ibrd.to_csv(OUTPUT_DIR.joinpath("tranches_returns_ibrd.csv"), index=False, sep=',')
-pool_tranches_ann_ret_df_regression.to_csv(OUTPUT_DIR.joinpath("tranches_returns_regression.csv"), index=False, sep=',')
-pool_tranches_ann_ret_df_artemis.to_csv(OUTPUT_DIR.joinpath("tranches_returns_artemis.csv"), index=False, sep=',')
-pool_tranches_ann_ret_df_required.to_csv(OUTPUT_DIR.joinpath("tranches_returns_required.csv"), index=False, sep=',')
+pool_ann_ret_ibrd.to_csv(OUTPUT_DIR.joinpath("pool_returns_ibrd_fs.csv"), index=False, sep=',')
+pool_ann_ret_regression.to_csv(OUTPUT_DIR.joinpath("pool_returns_regression_fs.csv"), index=False, sep=',')
+pool_ann_ret_artemis.to_csv(OUTPUT_DIR.joinpath("pool_returns_artemis_fs.csv"), index=False, sep=',')
+pool_ann_ret_required.to_csv(OUTPUT_DIR.joinpath("pool_returns_required_fs.csv"), index=False, sep=',')
+pool_tranches_ann_ret_df_ibrd.to_csv(OUTPUT_DIR.joinpath("tranches_returns_ibrd_fs.csv"), index=False, sep=',')
+pool_tranches_ann_ret_df_regression.to_csv(OUTPUT_DIR.joinpath("tranches_returns_regression_fs.csv"), index=False, sep=',')
+pool_tranches_ann_ret_df_artemis.to_csv(OUTPUT_DIR.joinpath("tranches_returns_artemis_fs.csv"), index=False, sep=',')
+pool_tranches_ann_ret_df_required.to_csv(OUTPUT_DIR.joinpath("tranches_returns_required_fs.csv"), index=False, sep=',')
 
 
 for prem_mode in ['ibrd', 'regression', 'artemis', 'required']: 
@@ -361,7 +364,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
 
 
     # Plot efficient frontier
-    plt_name = f"risk_return_frontier_{prem_mode}.png"
+    plt_name = f"risk_return_frontier_{prem_mode}_fs.png"
     plt.figure(figsize=[12,10])
 
     scatter = plt.scatter(
@@ -375,20 +378,14 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
     )    
     cbar = plt.colorbar(scatter)
     cbar.set_label('Sharpe Ratio', fontsize=12)
-    #plt.text(max_sharpe_portfolio['Volatility'] + 0.001,max_sharpe_portfolio['Returns'],f"Max Sharpe: {max_sharpe_portfolio['Sharpe Ratio']:.2f}",fontsize=10,ha='left',va='center',color='red')
     plt.plot(risks, target_returns, label="Efficient Frontier - Sng", color='blue')
-    #plt.scatter(x=portfolios_pool['Volatility'], y=portfolios_pool['Returns'], c=portfolios_pool['Sharpe Ratio'], cmap='cividis', marker='o', s=10, alpha=0.3)
-    #plt.text(max_sharpe_portfolio_pool['Volatility'] + 0.001,max_sharpe_portfolio_pool['Returns'],f"Max Sharpe: {max_sharpe_portfolio_pool['Sharpe Ratio']:.2f}",fontsize=10,ha='left',va='center',color='red')
-    #plt.scatter(x=max_sharpe_portfolio_pool['Volatility'], y=max_sharpe_portfolio_pool['Returns'], color='red', marker='x', s=10, alpha=1.0)
-    #plt.scatter(x=max_sharpe_portfolio['Volatility'], y=max_sharpe_portfolio['Returns'], color='red', marker='x', s=10, alpha=1.0)
     plt.plot(risks_pool, target_returns_pool, label="Efficient Frontier - Pool", color='red')
 
     # Plot pool point
     plt.scatter(np.std(pool_ann_ret), np.mean(pool_ann_ret), label='Pool', color='purple', s=100)
-    plt.text(np.std(pool_ann_ret)-0.01,np.mean(pool_ann_ret),f'Sharpe: {np.mean(pool_ann_ret)/np.std(pool_ann_ret):.2f}',fontsize=10,ha='right',va='center',color='purple')
 
-    for cty in countries:
-        plt.scatter(np.std(sng_ann_ret[cty]), np.mean(sng_ann_ret[cty]), label=cty, s=100)
+    for i, cty in enumerate(countries):
+        plt.scatter(np.std(sng_ann_ret[cty]), np.mean(sng_ann_ret[cty]), label=countries_str[i], s=100)
     plt.xlabel("Volatility", fontsize=12)
     plt.ylabel("Returns", fontsize=12)
     plt.grid(True)
@@ -403,27 +400,44 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
         n.append(nominal_sng_dic[cty])
     prem_diff = (np.array(s_pool)/np.array(s)).tolist()
     prem_diff.append(float(np.sum(premiums_pool_tot['regression']['Total_alt'])*nominal_pool_tot/np.sum(s)))
-    y = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
-    y.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
+    im = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
+    im.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
 
-    country_str = [str(entry) for entry in countries]
-    country_str.append('Pool')
-    print(f'Premium savings: {prem_diff}')
-    print(f'Insurance Multiples: {y}')
+    countries_str.append('Pool')
+    print(f'Premium savings {prem_mode}: {prem_diff}')
+    print(f'Insurance Multiples  {prem_mode}: {im}')
 
-    plt_name = f"prem_sav_ins_mult_{prem_mode}.png"
+    plt_name = f"prem_sav_ins_mult_{prem_mode}_fs.png"
+
+    def jitter(x):
+        return x + random.uniform(-0.2, .2)
+
+    type_ids= {}
+    for i, cty in enumerate(countries_str):
+        type_ids[cty] = i
+
+    jitter_type_im = [jitter(type_ids[cty]) for cty in countries_str]
+    jitter_type_ps = [jitter(type_ids[cty]) for cty in countries_str]
+
     fig, ax1 = plt.subplots(figsize=[12, 10])
-    ax1.scatter(country_str, y, color='blue', label='Insurance Multiple', marker='o')
-    ax1.set_xlabel("Countries", fontsize=12)
-    ax1.set_ylabel("Insurance Multiple", fontsize=12)
+    ax1.scatter(jitter_type_im, y=im, color='blue', label='Insurance Multiple', s=100)
+    ax1.set_xlabel("Bonds", fontsize=12)
+    ax1.set_ylabel("Insurance Multiple []", fontsize=12)
     ax1.tick_params(axis='y')
-    ax1.grid(True)
+
+    x_positions = np.arange(0.5, len(countries_str)-1+0.6).tolist()  # Specify the positions where you want the vertical lines
+    for x in x_positions:
+        ax1.axvline(x=x, color='gray', linestyle='-', linewidth=0.5)
+    ax1.grid(True, axis='y', linestyle='-', linewidth=0.5)
 
     ax2 = ax1.twinx()
-    ax2.scatter(country_str, prem_diff, color='green', label='Premium Savings', marker='x')
-    ax2.set_ylabel("Premium Savings", fontsize=12)
+    ax2.scatter(jitter_type_ps, prem_diff, color='green', label='Premium Savings', s=100)
+    ax2.set_ylabel("Premium Savings []", fontsize=12)
     ax2.tick_params(axis='y')
 
-    fig.legend(loc="upper center", bbox_to_anchor=(1, 1), bbox_transform=ax1.transAxes)
+    fig.legend(loc="upper center")
     plt.tight_layout()
+    plt.xlim(-0.5, len(countries_str)-0.5)
+    plt.xticks(np.arange(0, len(countries_str)).tolist())
+    plt.gca().set_xticklabels(list(type_ids.keys()))
     plt.savefig(OUTPUT_DIR.joinpath(plt_name))
