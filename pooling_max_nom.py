@@ -108,7 +108,7 @@ def process_pool(n):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python country_basics_cc_euler.py <country_code>")
+        print("Usage: pooling_max_nom.py <number_pools>")
         sys.exit(1)
 
     number_pools = int(sys.argv[1])
