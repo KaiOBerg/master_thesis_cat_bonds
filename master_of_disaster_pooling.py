@@ -1,6 +1,7 @@
 #import general packages
 import numpy as np
 import pandas as pd
+import random
 import matplotlib.pyplot as plt
 from numpy.random import dirichlet
 import scipy.optimize as sco
@@ -14,10 +15,12 @@ STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 
 #choose country
-countries = [480, 212, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 882, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
+countries = [480, 212, 882, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
 countries_150 = [332, 388, 214, 44, 548, 192, 84, 90] 
 fiji = [242]
 countries_30 = [480, 212, 670, 28, 52, 662, 659, 308, 882, 780, 570, 776, 174, 184, 584, 585]
+
+countries_str = ['MUS', 'DMA', 'WSM', 'HTI', 'VCT', 'ATG', 'JAM', 'BRB', 'LCA', 'KNA', 'GRD', 'DOM', 'BHS', 'VUT', 'FJI', 'TTO', 'CUB', 'NIU', 'BLZ', 'TON', 'SLB', 'COM', 'COK', 'MHL', 'PLW']
 
 #set risk free rate, either single value or array
 rf_rates = 0.00
@@ -402,27 +405,45 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
         n.append(nominal_sng_dic[cty])
     prem_diff = (np.array(s_pool)/np.array(s)).tolist()
     prem_diff.append(float(np.sum(premiums_pool_tot['regression']['Total_alt'])*nominal_pool_tot/np.sum(s)))
-    y = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
-    y.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
+    im = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
+    im.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
 
-    country_str = [str(entry) for entry in countries]
-    country_str.append('Pool')
-    print(f'Premium savings: {prem_diff}')
-    print(f'Insurance Multiples: {y}')
+    countries_str.append('Pool')
+    print(f'Premium savings {prem_mode}: {prem_diff}')
+    print(f'Insurance Multiples: {im}')
 
     plt_name = f"prem_sav_ins_mult_{prem_mode}.png"
+
+    def jitter(x):
+        return x + random.uniform(-0.2, .2)
+
+    type_ids= {}
+    for i, cty in enumerate(countries_str):
+        type_ids[cty] = i
+
+    jitter_type_im = [jitter(type_ids[cty]) for cty in countries_str]
+    jitter_type_ps = [jitter(type_ids[cty]) for cty in countries_str]
+
     fig, ax1 = plt.subplots(figsize=[12, 10])
-    ax1.scatter(country_str, y, color='blue', label='Insurance Multiple', marker='o')
-    ax1.set_xlabel("Countries", fontsize=12)
-    ax1.set_ylabel("Insurance Multiple", fontsize=12)
+    ax1.scatter(jitter_type_im, im, color='blue', label='Insurance Multiple', s=100)
+    ax1.set_xlabel("Bonds", fontsize=12)
+    ax1.set_ylabel("Insurance Multiple []", fontsize=12)
     ax1.tick_params(axis='y')
-    ax1.grid(True)
+
+    x_positions = np.arange(0.5, len(countries_str)-1+0.6).tolist()  # Specify the positions where you want the vertical lines
+    for x in x_positions:
+        ax1.axvline(x=x, color='gray', linestyle='-', linewidth=0.5)
+    ax1.grid(True, axis='y', linestyle='-', linewidth=0.5)
 
     ax2 = ax1.twinx()
-    ax2.scatter(country_str, prem_diff, color='green', label='Premium Savings', marker='x')
-    ax2.set_ylabel("Premium Savings", fontsize=12)
+    ax2.scatter(jitter_type_ps, prem_diff, color='green', label='Premium Savings', s=100)
+    ax2.set_ylabel("Premium Savings []", fontsize=12)
     ax2.tick_params(axis='y')
 
-    fig.legend(loc="upper center", bbox_to_anchor=(1, 1), bbox_transform=ax1.transAxes)
+    fig.legend(loc="upper center")
     plt.tight_layout()
+    plt.xlim(-0.5, len(countries_str)-0.5)
+    plt.xticks(np.arange(0, len(countries_str)).tolist())
+    plt.gca().set_xticklabels(list(type_ids.keys()))
+
     plt.savefig(OUTPUT_DIR.joinpath(plt_name))

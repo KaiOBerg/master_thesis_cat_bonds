@@ -3,16 +3,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
-import sys
-
+import n_fct_t_rl_thm_ll as bond_fct
+from tqdm import tqdm
 
 from pymoo.operators.sampling.rnd import IntegerRandomSampling
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.crossover.hux import HalfUniformCrossover
 from pymoo.algorithms.soo.nonconvex.ga import GA
-from pooling_functions_ciullo import calc_pool_conc, pop_num, PoolOptimizationProblemFS
+from pooling_functions_ciullo import calc_pool_conc, pop_num, PoolOptimizationProblem
 from pymoo.optimize import minimize
 from pymoo.operators.repair.rounding import RoundingRepair
+import concurrent.futures
 
 
 
@@ -22,11 +23,11 @@ STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 
 #choose country
-countries = [212, 332, 670, 388, 548, 242, 776, 174, 584]
+countries = [480, 212, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 882, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
 
-sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses_fs.csv"))
-nominals_sng = pd.read_csv(OUTPUT_DIR.joinpath("nominals_sng_fs.csv"))
-max_nominal = 6000000000
+sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
+nominals_sng = pd.read_csv(OUTPUT_DIR.joinpath("nominals_sng.csv"))
+max_nominal = 100000000000
 
 #set alpha for risk diversification optimization
 RT = 200
@@ -34,6 +35,8 @@ alpha = 1-1/RT
 
 n_opt_rep = 100
 opt_rep = range(0,n_opt_rep,1)
+
+N_arr = [1,2,3,4,5]
 
 def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, output_file):
     fig, ax = plt.subplots(1, 1, figsize=(10,5))
@@ -50,7 +53,7 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
     # Loop through repetitions for seed analysis
     for index in opt_rep:
         # Define Problem and Algorithm (same as inside the loop)
-        problem = PoolOptimizationProblemFS(nominals_sng, max_nominal, df_losses, bools, alpha, n, calc_pool_conc)
+        problem = PoolOptimizationProblem(nominals_sng, max_nominal, df_losses, bools, alpha, n, calc_pool_conc)
         algorithm = GA(
             pop_size=500,
             sampling=IntegerRandomSampling(),
@@ -100,17 +103,19 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
     print(f'Round {n} finished')
     return df_result, fig, min_conc
 
-def process_pool(n):
-    df_result, fig, min_conc = process_n(n, countries, sng_ann_losses, alpha, nominals_sng, max_nominal, OUTPUT_DIR)
-    print(df_result)
-    print("Min conc: ", min_conc)
+def main():
+    # Use ThreadPoolExecutor to parallelize the outer loop (over N_arr)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [
+            executor.submit(process_n, n, countries, sng_ann_losses, alpha, nominals_sng, max_nominal, OUTPUT_DIR)
+            for n in N_arr
+        ]
+        for future in concurrent.futures.as_completed(futures):
+            result, fig, min_conc = future.result()
+            print(result)
+            print("Min conc: ", min_conc)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python country_basics_cc_euler.py <country_code>")
-        sys.exit(1)
-
-    number_pools = int(sys.argv[1])
-    process_pool(number_pools)
+    main()
 
 

@@ -132,3 +132,48 @@ class PoolOptimizationProblem(ElementwiseProblem):
 def pop_num(n, k):
     combinations = comb(n + k - 1, k)
     return combinations
+
+
+class PoolOptimizationProblemFS(ElementwiseProblem):
+    def __init__(self, nominals, max_nominal, data, bools, alpha, N, fun, **kwargs):
+        self.data_arr = data
+        self.bools = bools
+        self.alpha = alpha
+        self.N = N
+        self.fun = fun
+        self.nominals = np.array(nominals)
+        self.n_countries = len(nominals)
+        self.max_nominal = max_nominal
+        super().__init__(
+            n_var=self.data_arr.shape[1],
+            n_obj=1,  
+            n_constr = 1,
+            xl=0,                  
+            xu=self.N - 1,
+            type_var=int,
+            vars=[Integer(0, self.n_countries - 1) for _ in range(self.n_countries)],
+            **kwargs
+        )
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        pools = {i: [] for i in np.unique(x)}
+        for i, pool_id in enumerate(x):
+            if len(np.where(x == i)[0]) > 0:
+                pool_mask = np.where(x == i)[0]
+                pools[i].append(pool_mask)
+        
+        total_concentration = 0
+        for pool_key, pool_countries in pools.items():
+            pool1_col = self.data_arr.columns[pool_countries[0]]
+            pool1_data = self.data_arr[pool1_col].values
+            pool1_bools = self.bools[pool1_col].values
+            conc = self.fun(np.arange(0, len(pool_countries[0])), pool1_data, pool1_bools, self.alpha)
+            total_concentration += conc
+        constraints = 0
+        for members in pools.values():
+            pool_nominal_diff = np.sum(self.nominals[members[0]]) - self.max_nominal
+            if pool_nominal_diff > 0:
+                constraints += pool_nominal_diff
+
+        out["F"] = total_concentration/len(pools)
+        out["G"] = constraints
