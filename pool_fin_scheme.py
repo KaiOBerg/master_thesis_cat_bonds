@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import random
+import pickle
 import matplotlib.pyplot as plt
 from numpy.random import dirichlet
 import scipy.optimize as sco
@@ -34,7 +35,7 @@ lower_share = 0.05
 prot_rp = 250
 
 #define tranches for pooling 
-tranches_array = np.array([5, 50, 500, 5000])
+tranches_array = np.array([50, 250, 1000])
 
 #define empty dictionaries
 bond_metrics_sng_dic = {}
@@ -154,9 +155,10 @@ for cty in countries:
 nominal_dic_df = pd.DataFrame(list(nominal_dic.items()), columns=['Key', 'Value'])
 file_name = 'nominal_dic_df_fs.csv'
 nominal_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
-pay_dam_df_dic_df = pd.DataFrame(list(pay_dam_df_dic.items()), columns=['Key', 'Value'])
-file_name = 'pay_dam_df_dic_df_fs.csv'
-pay_dam_df_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
+output_path = Path("/cluster/work/climate/kbergmueller/cty_data/pay_dam_df_dic_fs.pkl")
+output_path.parent.mkdir(parents=True, exist_ok=True)
+with open(output_path, "wb") as file:
+    pickle.dump(pay_dam_df_dic, file)
     
 ncf_pool_tot, premiums_pool_tot, premium_dic_pool_tot, nominal_pool_tot, es_metrics_pool_tot, MES_cty_pool_tot, tranches_tot = bond_fct.mlt_cty_bond(countries=countries,
                                                                                                                                                      pay_dam_df_dic=pay_dam_df_dic,
@@ -200,6 +202,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
         sng_ann_ret_df = sng_ann_ret_df_ibrd
         pool_tranches_ann_ret_df = pool_tranches_ann_ret_df_ibrd
         pool_ann_ret = pool_ann_ret_ibrd
+        premiums_pool = premiums_pool_tot['ibrd']
         sng_cty_premium = []
         sng_cty_pay = []
         for cty in bond_metrics_sng_dic:
@@ -211,6 +214,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
         sng_ann_ret_df = sng_ann_ret_df_regression
         pool_tranches_ann_ret_df = pool_tranches_ann_ret_df_regression
         pool_ann_ret = pool_ann_ret_regression
+        premiums_pool = premiums_pool_tot['regression']
         sng_cty_premium = []
         sng_cty_pay = []
         for cty in bond_metrics_sng_dic:
@@ -222,6 +226,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
         sng_ann_ret_df = sng_ann_ret_df_artemis
         pool_tranches_ann_ret_df = pool_tranches_ann_ret_df_artemis
         pool_ann_ret = pool_ann_ret_artemis
+        premiums_pool = premiums_pool_tot['artemis']
         sng_cty_premium = []
         sng_cty_pay = []
         for cty in bond_metrics_sng_dic:
@@ -233,6 +238,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
         sng_ann_ret_df = sng_ann_ret_df_required
         pool_tranches_ann_ret_df = pool_tranches_ann_ret_df_required
         pool_ann_ret = pool_ann_ret_required
+        premiums_pool = premiums_pool_tot['required']
         sng_cty_premium = []
         sng_cty_pay = []
         for cty in bond_metrics_sng_dic:
@@ -397,12 +403,12 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
     n = []
     s = sng_cty_premium
     for cty in countries:
-        s_pool.append(np.sum(premiums_pool_tot['regression'][cty])*nominal_pool_tot)
+        s_pool.append(np.sum(premiums_pool[cty])*nominal_pool_tot)
         n.append(nominal_sng_dic[cty])
     prem_diff = (np.array(s_pool)/np.array(s)).tolist()
-    prem_diff.append(float(np.sum(premiums_pool_tot['regression']['Total_alt'])*nominal_pool_tot/np.sum(s)))
+    prem_diff.append(float(np.sum(premiums_pool['Total_alt'])*nominal_pool_tot/np.sum(s)))
     im = (np.array(sng_cty_premium)/np.array(sng_cty_pay)).tolist()
-    im.append(np.sum(premiums_pool_tot['regression']['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
+    im.append(np.sum(premiums_pool['Total_alt'])/(es_metrics_pool_tot['Payout']/nominal_pool_tot))
 
     print(f'Premium savings {prem_mode}: {prem_diff}')
     print(f'Insurance Multiples  {prem_mode}: {im}')

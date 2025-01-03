@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import random
+import pickle
 import matplotlib.pyplot as plt
 from numpy.random import dirichlet
 import scipy.optimize as sco
@@ -156,9 +157,12 @@ for cty in countries:
 nominal_dic_df = pd.DataFrame(list(nominal_dic.items()), columns=['Key', 'Value'])
 file_name = 'nominal_dic_df.csv'
 nominal_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
-pay_dam_df_dic_df = pd.DataFrame(list(pay_dam_df_dic.items()), columns=['Key', 'Value'])
-file_name = 'pay_dam_df_dic_df.csv'
-pay_dam_df_dic_df.to_csv(OUTPUT_DIR.joinpath(file_name), index=False, sep=',')
+# Specify the output path
+output_path = Path("/cluster/work/climate/kbergmueller/cty_data/pay_dam_df_dic.pkl")
+output_path.parent.mkdir(parents=True, exist_ok=True)
+with open(output_path, "wb") as file:
+    pickle.dump(pay_dam_df_dic, file)
+
     
 ncf_pool_tot, premiums_pool_tot, premium_dic_pool_tot, nominal_pool_tot, es_metrics_pool_tot, MES_cty_pool_tot, tranches_tot = bond_fct.mlt_cty_bond(countries=countries,
                                                                                                                                                      pay_dam_df_dic=pay_dam_df_dic,
