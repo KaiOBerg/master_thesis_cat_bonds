@@ -97,7 +97,7 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
     ind_min = list(set(ind_min_conc))
     df_result = df_cntry_allocation.loc[ind_min].reset_index(drop=True)
     df_result.to_csv(output_file.joinpath(f"df_result_{n}_pools.csv"), index=False, sep=',')
-    fig.savefig(output_file.joinpath(f"convergence_plot_{n}_pools.png"), dpi=300, bbox_inches='tight')
+    fig.savefig(output_file.joinpath(f"convergence_plot_{n}_fs_pools.png"), dpi=300, bbox_inches='tight')
     print(f'Round {n} finished')
     return df_result, fig, min_conc
 

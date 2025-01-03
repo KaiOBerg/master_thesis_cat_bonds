@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import n_fct_t_rl_thm_ll as bond_fct
 from tqdm import tqdm
+import sys
 
 from pymoo.operators.sampling.rnd import IntegerRandomSampling
 from pymoo.operators.mutation.pm import PolynomialMutation
@@ -26,8 +27,9 @@ IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 countries = [480, 212, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 882, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
 
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
-nominals_sng = pd.read_csv(OUTPUT_DIR.joinpath("nominals_sng.csv"))
-max_nominal = 100000000000
+nominals_sng_dic = pd.read_csv(OUTPUT_DIR.joinpath("nominal_dic_df.csv"))
+nominals_sng = nominals_sng_dic.set_index('Key').loc[countries, 'Value'].tolist()
+max_nominal = 1000000000000
 
 #set alpha for risk diversification optimization
 RT = 200
@@ -103,19 +105,17 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
     print(f'Round {n} finished')
     return df_result, fig, min_conc
 
-def main():
-    # Use ThreadPoolExecutor to parallelize the outer loop (over N_arr)
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [
-            executor.submit(process_n, n, countries, sng_ann_losses, alpha, nominals_sng, max_nominal, OUTPUT_DIR)
-            for n in N_arr
-        ]
-        for future in concurrent.futures.as_completed(futures):
-            result, fig, min_conc = future.result()
-            print(result)
-            print("Min conc: ", min_conc)
+def process_pool(n):
+    df_result, fig, min_conc = process_n(n, countries, sng_ann_losses, alpha, nominals_sng, max_nominal, OUTPUT_DIR)
+    print(df_result)
+    print("Min conc: ", min_conc)
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        print("Usage: pooling_n_pools.py <number_pools>")
+        sys.exit(1)
+
+    number_pools = int(sys.argv[1])
+    process_pool(number_pools)
 
 

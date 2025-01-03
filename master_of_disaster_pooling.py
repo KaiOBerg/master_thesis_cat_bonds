@@ -390,7 +390,7 @@ for prem_mode in ['ibrd', 'regression', 'artemis', 'required']:
     plt.plot(risks_pool, target_returns_pool, label="Efficient Frontier - Pool", color='red')
 
     # Plot pool point
-    plt.scatter(np.std(pool_ann_ret), np.mean(pool_ann_ret), label='Pool', color='purple', s=100)
+    plt.scatter(np.std(pool_ann_ret), np.mean(pool_ann_ret), label='Pool', marker='x', color='purple', s=100)
 
     for i, cty in enumerate(countries):
         plt.scatter(np.std(sng_ann_ret[cty]), np.mean(sng_ann_ret[cty]), label=countries_str[i], s=100)

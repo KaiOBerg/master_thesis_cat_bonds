@@ -176,7 +176,7 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
         ax2.scatter(damages/tot_exp, pay_dam_df['pay']/tot_exp, marker='o', color='blue', label='Events')
         ax2.axhline(y = nominal/tot_exp, color = 'r', linestyle = '-', label='Principal') 
         ax2.axhline(y = 0.05, color = 'r', linestyle = '-', label='Attachment Point') 
-        ax2.axvline(x = 0.05, color = 'r', linestyle = '--', label='Min. Damage') 
+        ax2.axvline(x = 0.05, color = 'black', linestyle = '--', label='Min. Damage') 
         ax2.set_xscale('log')
         # Add labels and title
         ax2.set_xlabel("Damage [share of GDP]", fontsize=12)

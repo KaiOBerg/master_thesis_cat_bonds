@@ -99,17 +99,29 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
 
     if plt_grd:
         outer_boundary_grd = tc_bound.dissolve()
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig, ax = plt.subplots(figsize=(6.4, 4.8))
         islands_gdf.plot(ax=ax, color="green", label="Samoa")
         grid_gdf.plot(ax=ax, facecolor="none", edgecolor="red" , lw=2, label="Subarea")
-        outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", lw=2, edgecolor="black", label="TC Track Boundary")
+        outer_boundary_grd.boundary.plot(ax=ax, facecolor="none", lw=2, edgecolor="black", label="TC Boundary")
         handles = [
-            plt.Line2D([0], [0], color="green", lw=4, label="Islands"),           
-            plt.Line2D([0], [0], color="red", lw=2, label="Admin"),  
-            plt.Line2D([0], [0], color="black", lw=2, label="TC Track Boundary")           
+            plt.Line2D([0], [0], color="green", lw=4, label="Samoa"),           
+            plt.Line2D([0], [0], color="red", lw=2, label="Subareas"),  
+            plt.Line2D([0], [0], color="black", lw=2, label="TC Boundary")           
         ]
         ax.legend(handles=handles, loc="upper right")
         ax.tick_params(axis='both', which='major', labelsize=12)  # Adjusts tick font size
+        ax.set_yticks(ax.get_yticks()[1:])
+        ax.set_xticks(ax.get_xticks())
+        xlabel= ax.get_xticks()
+        new_xlabel = []
+        for label in xlabel:
+           new_xlabel.append(str(int(-label))+'°W') 
+        ax.set_xticklabels(new_xlabel)
+        ylabel= ax.get_yticks()
+        new_ylabel = []
+        for label in ylabel:
+           new_ylabel.append(str(int(-label))+'°S') 
+        ax.set_yticklabels(new_ylabel)
         if plt_save:
             plt_name = f"bond_structure_{country}.png"
             plt.savefig(file_path.joinpath(plt_name))
