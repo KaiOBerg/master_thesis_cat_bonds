@@ -24,7 +24,7 @@ STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 
 #choose country
-countries = [480, 212, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 882, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
+countries = [480, 212, 882, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
 
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
 nominals_sng_dic = pd.read_csv(OUTPUT_DIR.joinpath("nominal_dic_df.csv"))
