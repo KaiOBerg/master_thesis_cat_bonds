@@ -131,9 +131,6 @@ sng_ann_ret_df_ibrd = pd.DataFrame(sng_ann_ret_ibrd)
 sng_ann_ret_df_regression = pd.DataFrame(sng_ann_ret_regression)
 sng_ann_ret_df_required = pd.DataFrame(sng_ann_ret_required)
 sng_ann_ret_df_artemis = pd.DataFrame(sng_ann_ret_artemis)
-bond_metrics_sng_dic_df = pd.concat(bond_metrics_sng_dic, names=["Key"])
-bond_metrics_sng_dic_df = bond_metrics_sng_dic_df.reset_index(level=0).reset_index(drop=True)
-bond_metrics_sng_dic_df.rename(columns={"Key": "Country"}, inplace=True)
 es_metrics_df = pd.DataFrame(es_metrics_sng_dic)
 
 csv_losses_name = "sng_losses.csv"
@@ -144,8 +141,12 @@ sng_ann_ret_df_ibrd.to_csv(OUTPUT_DIR.joinpath("sng_returns_ibrd.csv"), index=Fa
 sng_ann_ret_df_regression.to_csv(OUTPUT_DIR.joinpath("sng_returns_regression.csv"), index=False, sep=',')
 sng_ann_ret_df_required.to_csv(OUTPUT_DIR.joinpath("sng_returns_required.csv"), index=False, sep=',')
 sng_ann_ret_df_artemis.to_csv(OUTPUT_DIR.joinpath("sng_returns_artemis.csv"), index=False, sep=',')
-bond_metrics_sng_dic_df.to_csv(OUTPUT_DIR.joinpath(csv_metrics_name), index=False, sep=',')
 es_metrics_df.to_csv(OUTPUT_DIR.joinpath(csv_es_name), index=False, sep=',')
+
+output_path = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/simulation_results/bond_metrics_sng_dic.pkl")
+output_path.parent.mkdir(parents=True, exist_ok=True)
+with open(output_path, "wb") as file:
+    pickle.dump(bond_metrics_sng_dic, file)
 
 
 nominal_dic = {}
