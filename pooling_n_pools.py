@@ -38,8 +38,6 @@ alpha = 1-1/RT
 n_opt_rep = 100
 opt_rep = range(0,n_opt_rep,1)
 
-N_arr = [1,2,3,4,5]
-
 def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, output_file):
     fig, ax = plt.subplots(1, 1, figsize=(10,5))
     fig.suptitle('Convergence Plot for Risk Concentration Minimization')
@@ -57,7 +55,7 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
         # Define Problem and Algorithm (same as inside the loop)
         problem = PoolOptimizationProblem(nominals_sng, max_nominal, df_losses, bools, alpha, n, calc_pool_conc)
         algorithm = GA(
-            pop_size=500,
+            pop_size=1000,
             sampling=IntegerRandomSampling(),
             crossover=HalfUniformCrossover(),
             mutation=PolynomialMutation(repair=RoundingRepair()),
