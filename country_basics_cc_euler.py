@@ -12,7 +12,7 @@ countries_30 = [480, 212, 670, 28, 52, 662, 659, 308, 882, 780, 570, 776, 174, 1
 def process_country(cty, cc_model, res, crs):
     """Wrapper function to process a single country."""
     print(f"Processing country: {cty}")
-    ex_cc.init_TC_exp(country=cty, cc_model=cc_model, file_path=OUTPUT_DIR, storm_path=STORM_DIR, buffer_distance_km=105, res_exp=res, grid_size=6000, buffer_grid_size=1, crs=crs, load_fls=False, plot_exp=False, plot_centrs=False, plt_grd=False)
+    ex_cc.init_TC_exp(country=cty, cc_model=cc_model, file_path=OUTPUT_DIR, storm_path=STORM_DIR, grid_specs=[1,1], buffer_distance_km=105, res_exp=res, min_pol_size=6000, buffer_grid_size=1, crs=crs, load_fls=False, plot_exp=False, plot_centrs=False, plt_grd=False)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
