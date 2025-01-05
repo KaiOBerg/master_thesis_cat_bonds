@@ -55,7 +55,7 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
         # Define Problem and Algorithm (same as inside the loop)
         problem = PoolOptimizationProblem(nominals_sng, max_nominal, df_losses, bools, alpha, n, calc_pool_conc)
         algorithm = GA(
-            pop_size=1000,
+            pop_size=2000,
             sampling=IntegerRandomSampling(),
             crossover=HalfUniformCrossover(),
             mutation=PolynomialMutation(repair=RoundingRepair()),
