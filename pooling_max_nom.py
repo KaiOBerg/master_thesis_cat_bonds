@@ -18,8 +18,6 @@ from pymoo.operators.repair.rounding import RoundingRepair
 
 #define directories 
 OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
-STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
-IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 
 #choose country
 countries = [212, 332, 670, 388, 548, 242, 776, 174, 584]

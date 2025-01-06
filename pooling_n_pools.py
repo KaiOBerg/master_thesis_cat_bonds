@@ -53,7 +53,7 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
     # Loop through repetitions for seed analysis
     for index in opt_rep:
         # Define Problem and Algorithm (same as inside the loop)
-        problem = PoolOptimizationProblem(nominals_sng, max_nominal, df_losses, bools, alpha, n, calc_pool_conc)
+        problem = PoolOptimizationProblem(nominals_sng, df_losses, bools, alpha, n, calc_pool_conc)
         algorithm = GA(
             pop_size=2000,
             sampling=IntegerRandomSampling(),
