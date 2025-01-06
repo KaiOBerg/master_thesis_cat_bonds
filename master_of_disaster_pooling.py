@@ -143,7 +143,7 @@ sng_ann_ret_df_required.to_csv(OUTPUT_DIR.joinpath("sng_returns_required.csv"), 
 sng_ann_ret_df_artemis.to_csv(OUTPUT_DIR.joinpath("sng_returns_artemis.csv"), index=False, sep=',')
 es_metrics_df.to_csv(OUTPUT_DIR.joinpath(csv_es_name), index=False, sep=',')
 
-output_path = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/simulation_results/bond_metrics_sng_dic.pkl")
+output_path = Path("/cluster/work/climate/kbergmueller/cty_data/bond_metrics_sng_dic.pkl")
 output_path.parent.mkdir(parents=True, exist_ok=True)
 with open(output_path, "wb") as file:
     pickle.dump(bond_metrics_sng_dic, file)

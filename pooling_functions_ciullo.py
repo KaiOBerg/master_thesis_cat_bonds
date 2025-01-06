@@ -86,7 +86,7 @@ def calc_pools_conc(x, data, bools, alpha, N, fixed_pools=None):
 
 
 class PoolOptimizationProblem(ElementwiseProblem):
-    def __init__(self, nominals, max_nominal, data, bools, alpha, N, fun, **kwargs):
+    def __init__(self, nominals, data, bools, alpha, N, fun, **kwargs):
         self.data_arr = data
         self.bools = bools
         self.alpha = alpha
@@ -94,7 +94,6 @@ class PoolOptimizationProblem(ElementwiseProblem):
         self.fun = fun
         self.nominals = np.array(nominals)
         self.n_countries = len(nominals)
-        self.max_nominal = max_nominal
         super().__init__(
             n_var=self.data_arr.shape[1],
             n_obj=1,  
@@ -121,10 +120,8 @@ class PoolOptimizationProblem(ElementwiseProblem):
             conc = self.fun(np.arange(0, len(pool_countries[0])), pool1_data, pool1_bools, self.alpha)
             total_concentration += conc
         constraints = 0
-        for members in pools.values():
-            pool_nominal_diff = np.sum(self.nominals[members[0]]) - self.max_nominal
-            if pool_nominal_diff > 0 or len(pools) != self.N:
-                constraints += pool_nominal_diff
+        if len(pools) != self.N:
+            constraints += 1
 
         out["F"] = total_concentration/len(pools)
         out["G"] = constraints
