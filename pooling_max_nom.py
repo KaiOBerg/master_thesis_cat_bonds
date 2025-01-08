@@ -25,7 +25,7 @@ countries = [212, 332, 670, 388, 548, 242, 776, 174, 584]
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses_fs.csv"))
 nominals_sng_dic = pd.read_csv(OUTPUT_DIR.joinpath("nominal_dic_df_fs.csv"))
 nominals_sng = nominals_sng_dic.set_index('Key').loc[countries, 'Value'].tolist()
-max_nominal = 6000000000
+max_nominal = 8000000000
 
 #set alpha for risk diversification optimization
 RT = 10000
