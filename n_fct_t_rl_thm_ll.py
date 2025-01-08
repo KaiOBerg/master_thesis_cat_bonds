@@ -296,7 +296,7 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rat
     else:
         requ_nom = nominal
     exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominals_dic, print_prob=False)
-    tranches = fct.create_tranches(tranches_array, ann_losses, ibrd_path)
+    tranches = fct.create_tranches(tranches_array, total_losses, ann_losses, ibrd_path)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
