@@ -148,6 +148,10 @@ output_path.parent.mkdir(parents=True, exist_ok=True)
 with open(output_path, "wb") as file:
     pickle.dump(bond_metrics_sng_dic, file)
 
+output_path = Path("/cluster/work/climate/kbergmueller/cty_data/premium_dic_sng_dic.pkl")
+output_path.parent.mkdir(parents=True, exist_ok=True)
+with open(output_path, "wb") as file:
+    pickle.dump(premium_dic_sng_dic, file)
 
 nominal_dic = {}
 pay_dam_df_dic = {}
