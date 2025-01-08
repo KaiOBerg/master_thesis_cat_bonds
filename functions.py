@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pathlib import Path
 
 import calc_premium as cp
 import prem_ibrd as prib
@@ -86,8 +87,9 @@ def calc_rp_bnd_lss(ann_losses, return_period):
     A number.
     """
 
-    annual_losses = ann_losses['losses'].apply(sum)
-    df = pd.DataFrame(annual_losses.sort_values(ascending=True))
+    #annual_losses = ann_losses['losses'].apply(sum)
+    annual_losses = ann_losses
+    df = pd.DataFrame(annual_losses.sort_values(ascending=True), columns=['losses'])
     df['Rank'] = df.rank(method='first', ascending=False)
     df['RP'] = (len(df) + 1)/df['Rank']
     df = df.sort_values(by='RP')
@@ -97,13 +99,13 @@ def calc_rp_bnd_lss(ann_losses, return_period):
 
     return calc_value
 
-def create_tranches(rp_array, ann_losses, ibrd_path):
+def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path):
     rows = []
     tranch_df = pd.DataFrame(columns=['RP', 'Loss'])
     for i in rp_array:
         loss = calc_rp_bnd_lss(ann_losses, i)
         rows.append({'RP': i, 'Loss': (loss)})
-    rows.append({'RP': 'Max', 'Loss': (calc_rp_bnd_lss(ann_losses, 10000))})
+    rows.append({'RP': 'Max', 'Loss': (calc_rp_bnd_lss(ann_losses, len(ann_losses)))})
 
     # Combine the rows into a DataFrame
     tranches = pd.concat([tranch_df, pd.DataFrame(rows)], ignore_index=True)
@@ -128,11 +130,23 @@ def create_tranches(rp_array, ann_losses, ibrd_path):
         tranches.at[i, 'upper_bound'] = tranches.at[i, 'Loss']
 
         # Losses within the tranche layer
-        annual_losses = ann_losses['losses'].apply(sum)
-        tranche_losses = (
-            np.clip(annual_losses, tranches.at[i, 'lower_bound'], tranches.at[i, 'upper_bound']) 
-            - tranches.at[i, 'lower_bound']
-        )
+        annual_losses = ann_losses_alt['losses'].apply(sum)
+        sum_term_loss = 0
+        tranche_loss_term = 0
+        tranche_losses = []
+        for j in range(len(annual_losses)):
+            tranche_losses_tmp = (
+                np.clip(annual_losses[j] + sum_term_loss, tranches.at[i, 'lower_bound'], tranches.at[i, 'upper_bound']) 
+                - tranches.at[i, 'lower_bound']
+            )
+            tranche_losses_tmp -= tranche_loss_term
+            tranche_loss_term += tranche_losses_tmp
+            tranche_losses.append(tranche_losses_tmp)
+            sum_term_loss += annual_losses[j]
+            if (j + 1) % 3 == 0:
+                sum_term_loss = 0
+                tranche_loss_term = 0
+        tranche_losses = np.array(tranche_losses)
         tranche_losses_dic[i] = tranche_losses
 
         # Expected loss for the tranche
@@ -155,7 +169,7 @@ def create_tranches(rp_array, ann_losses, ibrd_path):
     tranches['premium_ibrd'] = prib.monoExp(tranches['expected_loss_own']*100, a, k, b) * tranches['expected_loss_own']
     tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100
     for i in tranches.index:
-        tranches.at[i, 'premium_required'] = smcb.init_prem_sharpe_ratio_tranches(ann_losses, tranches.at[i, 'nominal'], tranche_losses_dic[i], 0.0, 0.5)
+        tranches.at[i, 'premium_required'] = smcb.init_prem_sharpe_ratio_tranches(ann_losses_alt, tranches.at[i, 'nominal'], tranche_losses_dic[i], 0.0, 0.5)
     tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier
 
     return tranches
@@ -422,3 +436,52 @@ def prod_test_ibtrac(tc_storms, exp, admin_gdf, nominal, optimized_step1, optimi
     print(f"RMSE: {rSquared}")
     
     return dam_pay_data_ibtracs, rSquared
+
+
+def plot_prem_share(weighter=1, eu=True, threshold_other=1, file_path="C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"):    
+    OUTPUT_DIR = Path(file_path)
+    EU = ['AUT', 'BEL', 'CYP', 'CZE', 'DNK', 'EST', 'FIN', 'FRA', 'DEU', 'GRC', 'HUN', 'IRL', 'ITA', 'LVA', 'LTU', 'LUX', 'MLT', 'NLD', 'PRT', 
+      'SVK', 'SVN', 'ESP', 'SWE']
+
+    finance_scheme = pd.read_excel(OUTPUT_DIR.joinpath("fs_high_inc.xlsx"))
+
+    finance_scheme['Relative Carbon Footprint'] = (finance_scheme['Carbon Footprint per Capita (absolute)'] / finance_scheme['Carbon Footprint per Capita (absolute)'].median())**weighter
+    finance_scheme['GDP share'] = finance_scheme['GDP (absolute)'] / finance_scheme['GDP (absolute)'].sum() * 100
+    finance_scheme['Pay formula'] = finance_scheme['Relative Carbon Footprint'] * finance_scheme['GDP share']
+    finance_scheme['Share of Pay'] = finance_scheme['Pay formula'] / finance_scheme['Pay formula'].sum() * 100
+    
+    if eu:
+        eu_share = finance_scheme[finance_scheme['Code'].isin(EU)]['Share of Pay'].sum()
+        eu_gdp_share = finance_scheme[finance_scheme['Code'].isin(EU)]['GDP share'].sum()
+        eu_row = pd.DataFrame({'Code': ['EU'],'GDP share': [eu_gdp_share] ,'Share of Pay': [eu_share]})
+        finance_scheme_no_eu = finance_scheme[~finance_scheme['Code'].isin(EU)]
+        finance_scheme_up = pd.concat([finance_scheme_no_eu, eu_row], ignore_index=True)
+    
+    
+    filtered_data = finance_scheme_up[finance_scheme_up['Share of Pay'] >= threshold_other]
+    filtered_data = filtered_data.sort_values(by='Share of Pay', ascending=False, inplace=False)
+    rest_value = finance_scheme_up[finance_scheme_up['Share of Pay'] < threshold_other]['Share of Pay'].sum()
+    new_row = {'Code': 'Other', 'Share of Pay': rest_value}
+    
+    if rest_value > 0:
+        filtered_data = pd.concat([filtered_data, pd.DataFrame(new_row, index=[0])], ignore_index=True)
+    
+    unique_codes = finance_scheme_up['Code'].unique().tolist() + ['Other'] 
+    color_palette = sns.color_palette("tab20", len(unique_codes))
+    color_map = {code: color for code, color in zip(unique_codes, color_palette)}
+    filtered_data['Color'] = filtered_data['Code'].map(color_map)
+
+    plt.figure(figsize=(8, 8))
+    plt.pie(
+        filtered_data['Share of Pay'],
+        colors=filtered_data['Color'],
+        labels=filtered_data['Code'],
+        autopct='%1.1f%%',
+        textprops={'rotation_mode': 'anchor', 'va': 'center', 'rotation': -0}  # Rotate labels
+    )
+    plt.legend(loc="upper right", ncol=2)
+    plt.show()
+
+    return_df = pd.DataFrame({"Country": finance_scheme['Code'], "Share": finance_scheme['Share of Pay']/100, "GDP": finance_scheme['GDP (absolute)']})
+
+    return return_df
