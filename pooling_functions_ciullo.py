@@ -164,7 +164,7 @@ class PoolOptimizationProblemFS(ElementwiseProblem):
             pool1_col = self.data_arr.columns[pool_countries[0]]
             pool1_data = self.data_arr[pool1_col].values
             pool1_bools = self.bools[pool1_col].values
-            conc = self.fun(np.arange(0, len(pool_countries[0])), pool1_data, pool1_bools, self.alpha)
+            conc = self.fun(np.arange(0, len(pool_countries[0])), pool1_data, pool1_bools, self.alpha) * np.sum(self.nominals[pool_countries[0]])
             total_concentration += conc
         constraints = 0
         for members in pools.values():
@@ -172,5 +172,5 @@ class PoolOptimizationProblemFS(ElementwiseProblem):
             if pool_nominal_diff > 0:
                 constraints += pool_nominal_diff
 
-        out["F"] = total_concentration/len(pools)
+        out["F"] = total_concentration / np.sum(self.nominals)
         out["G"] = constraints
