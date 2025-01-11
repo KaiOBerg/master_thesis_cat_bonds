@@ -24,7 +24,7 @@ countries = [480, 212, 882, 332, 670, 388, 662, 214, 548, 242, 776, 174, 584]
 countries_str = ['480', '212', '882', '332', '670', '388', '662', '214', '548', '242', '776', '174', '584']
 
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
-sng_ann_losses_filtered = sng_ann_losses[countries_str]
+sng_ann_losses = sng_ann_losses[countries_str]
 
 nominals_sng_dic = pd.read_csv(OUTPUT_DIR.joinpath("nominal_dic_df.csv"))
 nominals_sng = nominals_sng_dic.set_index('Key').loc[countries, 'Value'].tolist()
