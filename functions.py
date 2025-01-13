@@ -99,7 +99,7 @@ def calc_rp_bnd_lss(ann_losses, return_period):
 
     return calc_value
 
-def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path):
+def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0):
     rows = []
     tranch_df = pd.DataFrame(columns=['RP', 'Loss'])
     for i in rp_array:
@@ -154,7 +154,10 @@ def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path):
         el += tranche_el
         tranches.at[i, 'expected_loss'] = tranche_el
 
-        tranches_loss_own =  np.array(tranche_losses)/tranches.at[i, 'nominal']
+        if tranches.at[i, 'nominal'] > 0:
+            tranches_loss_own =  np.array(tranche_losses)/tranches.at[i, 'nominal']
+        else:
+            tranches_loss_own = 0
         tranches.at[i, 'expected_loss_own'] = np.mean(tranches_loss_own)
         
     # Calculate share of expected loss
@@ -166,11 +169,11 @@ def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path):
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
     a, k, b = params_ibrd
 
-    tranches['premium_ibrd'] = prib.monoExp(tranches['expected_loss_own']*100, a, k, b) * tranches['expected_loss_own']
-    tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100
+    tranches['premium_ibrd'] = prib.monoExp(tranches['expected_loss_own']*100, a, k, b) * tranches['expected_loss_own'] + prem_corr
+    tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100 + prem_corr
     for i in tranches.index:
-        tranches.at[i, 'premium_required'] = smcb.init_prem_sharpe_ratio_tranches(ann_losses_alt, tranches.at[i, 'nominal'], tranche_losses_dic[i], 0.0, 0.5)
-    tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier
+        tranches.at[i, 'premium_required'] = smcb.init_prem_sharpe_ratio_tranches(ann_losses_alt, tranches.at[i, 'nominal'], tranche_losses_dic[i], 0.0, 0.5) + prem_corr
+    tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier + prem_corr
 
     return tranches
 
