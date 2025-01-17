@@ -331,7 +331,7 @@ def sng_cty_bond_test(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_k
     else:
         imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, prot_share=to_prot_share, exposure=exp)
     #set up hazard intensity matrix per grid and event
-    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat='mean')
+    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=60)
 
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'artemis': 0}
 

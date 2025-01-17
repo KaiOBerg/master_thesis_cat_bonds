@@ -25,13 +25,22 @@ countries_str = ['480', '212', '882', '332', '670', '388', '662', '214', '548', 
 
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
 sng_ann_losses = sng_ann_losses[countries_str]
+tot_loss = []
+tot_loss_dic = {key: [] for key in sng_ann_losses.columns}
+for key in sng_ann_losses.columns:
+    for i in range(len(sng_ann_losses[key])):
+        tot_loss.append(sng_ann_losses[key][i])
+        if len(tot_loss) == 3:
+            tot_loss_dic[key].append(np.sum(tot_loss))
+            tot_loss = []
+tot_loss_df = pd.DataFrame(tot_loss_dic)
 
 nominals_sng_dic = pd.read_csv(OUTPUT_DIR.joinpath("nominal_dic_df.csv"))
 nominals_sng = nominals_sng_dic.set_index('Key').loc[countries, 'Value'].tolist()
 max_nominal = 26000000000
 
 #set alpha for risk diversification optimization
-RT = 10000
+RT = len(tot_loss_df[key])
 alpha = 1-1/RT 
 
 n_opt_rep = 100
@@ -103,7 +112,7 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
     return df_result, fig, min_conc
 
 def process_pool(n):
-    df_result, fig, min_conc = process_n(n, countries, sng_ann_losses, alpha, nominals_sng, max_nominal, OUTPUT_DIR)
+    df_result, fig, min_conc = process_n(n, countries, tot_loss_df, alpha, nominals_sng, max_nominal, OUTPUT_DIR)
     print(df_result)
     print("Min conc: ", min_conc)
 

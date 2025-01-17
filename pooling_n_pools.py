@@ -29,16 +29,25 @@ countries = [480, 212, 882, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 548, 
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
 nominals_sng_dic = pd.read_csv(OUTPUT_DIR.joinpath("nominal_dic_df.csv"))
 nominals_sng = nominals_sng_dic.set_index('Key').loc[countries, 'Value'].tolist()
-max_nominal = 1000000000000
+
+tot_loss = []
+tot_loss_dic = {key: [] for key in sng_ann_losses.columns}
+for key in sng_ann_losses.columns:
+    for i in range(len(sng_ann_losses[key])):
+        tot_loss.append(sng_ann_losses[key][i])
+        if len(tot_loss) == 3:
+            tot_loss_dic[key].append(np.sum(tot_loss))
+            tot_loss = []
+tot_loss_df = pd.DataFrame(tot_loss_dic)
 
 #set alpha for risk diversification optimization
-RT = 10000
+RT = len(tot_loss_df[key])
 alpha = 1-1/RT 
 
 n_opt_rep = 100
 opt_rep = range(0,n_opt_rep,1)
 
-def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, output_file):
+def process_n(n, cntry_names, df_losses, alpha, nominals_sng, output_file):
     fig, ax = plt.subplots(1, 1, figsize=(10,5))
     fig.suptitle('Convergence Plot for Risk Concentration Minimization')
 
@@ -104,7 +113,7 @@ def process_n(n, cntry_names, df_losses, alpha, nominals_sng, max_nominal, outpu
     return df_result, fig, min_conc
 
 def process_pool(n):
-    df_result, fig, min_conc = process_n(n, countries, sng_ann_losses, alpha, nominals_sng, max_nominal, OUTPUT_DIR)
+    df_result, fig, min_conc = process_n(n, countries, tot_loss_df, alpha, nominals_sng, OUTPUT_DIR)
     print(df_result)
     print("Min conc: ", min_conc)
 
