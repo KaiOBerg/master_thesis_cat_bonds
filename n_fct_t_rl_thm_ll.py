@@ -174,7 +174,7 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     else:
         imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, prot_share=to_prot_share, exposure=exp)
     #set up hazard intensity matrix per grid and event
-    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat='mean')
+    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=60)
 
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'artemis': 0}
 
@@ -233,7 +233,7 @@ def sng_cty_bond_cc(country, cc_model, rf_rate=0.0, target_sharpe=0.5, buffer_di
     else:
         imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, prot_share=to_prot_share, exposure=exp)
     #set up hazard intensity matrix per grid and event
-    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=90, cc_model=cc_model)
+    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat=60, cc_model=cc_model)
 
     premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'artemis': 0}
 
@@ -318,3 +318,64 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rat
 
     print(f"Reduction of Principal: {round((1-requ_nom/nominal)*100, 2)}%")
     return ncf_dic, prem_cty_dic, premium_dic, requ_nom, es_metrics, MES_cty, tranches
+
+
+
+def sng_cty_bond_test(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, grid_specs=[1,1], buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, crs="EPSG:3857", storm_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), output_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False, plt_save=False):    
+    #load tc_tracks, create hazard class and calculate exposure
+    exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = exa.init_TC_exp(country=country, grid_specs=grid_specs, buffer_grid_size=buffer_grid_size, buffer_distance_km=buffer_distance_km, res_exp=res_exp, min_pol_size=grid_size, file_path=output_dir, storm_path=storm_dir, crs=crs, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots, plt_save=plt_save)
+    #calculate impact and aggregate impact per grid
+    imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
+    if low_to_prot is not None: 
+            imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, lower_rp=low_to_prot)
+    else:
+        imp_per_event_flt, imp_admin_evt_flt, imp_lower_rp = bpd.init_imp_flt(imp_per_event, imp_admin_evt, prot_share=to_prot_share, exposure=exp)
+    #set up hazard intensity matrix per grid and event
+    int_grid = hig.init_haz_int(grid_gdf, admin_gdf, tc_storms=tc_storms, stat='mean')
+
+    premium_dic = {'ibrd': 0, 'regression': 0, 'required': 0, 'artemis': 0}
+
+
+    if prot_share is not None:
+        nominal = snom.init_nominal(impact=imp, exposure=exp, prot_share=prot_share)
+    else:
+        nominal = snom.init_nominal(impact=imp, exposure=exp, prot_rp=prot_rp)
+    if nominal < imp_lower_rp:
+        print(Back.RED + "Warning: Given Budget to small to cover specified minimal damage")
+        print("The specified damage which should be covered is: ",round(imp_lower_rp, 3), " [USD]")
+        print(Style.RESET_ALL)
+    #optimize minimum and maximum triggering wind speed per grid cell
+    result, optimized_1, optimized_2 = apo.init_alt_optimization(int_grid, nominal, damages_grid=imp_admin_evt_flt, damages_evt=imp_per_event_flt, print_params=incl_plots)
+    #create data frame containing payment vs damage per event
+    pay_dam_df = apo.alt_pay_vs_damage(imp_per_event_flt, optimized_1, optimized_2, int_grid, nominal, imp_admin_evt)
+    if np.sum(pay_dam_df['damage']) == 0 or np.sum(pay_dam_df['pay']) == 0:
+        raise Exception(f'no damage {country}')
+    #calculate expected loss and attachment probability
+    exp_loss_ann, att_prob, ann_losses, es_metrics = sb.init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=False)
+    #calculate premiums using different approaches
+    requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
+    params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path,want_plot=False)
+    a, k, b = params_ibrd
+    ibrd_prem = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
+    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
+    premium_dic['required'] = requ_prem
+    premium_dic['ibrd'] = ibrd_prem
+    premium_dic['artemis'] = exp_loss_ann * artemis_multiplier
+
+    bond_metrics_list = []
+    bond_returns_list = []
+    #simulate cat bond
+    for prem in premium_dic:
+        bond_metrics, bond_returns = sb.init_bond_simulation(pay_dam_df, premium_dic[prem], rf_rate, nominal, ann_ret) 
+        bond_metrics["Premium Name"] = prem
+        bond_returns["Premium Name"] = prem
+        bond_metrics_list.append(bond_metrics)
+        bond_returns_list.append(bond_returns)
+
+    bond_metrics = pd.concat(bond_metrics_list, ignore_index=True)
+    bond_returns = pd.concat(bond_returns_list, ignore_index=True)
+
+    premium_dic['exp_loss'] = exp_loss_ann
+    premium_dic['att_prob'] = att_prob
+
+    return bond_metrics, bond_returns, premium_dic, nominal, pay_dam_df, es_metrics, int_grid, imp_per_event_flt, imp_admin_evt_flt, ann_losses, optimized_1, optimized_2
