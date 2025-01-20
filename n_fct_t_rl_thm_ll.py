@@ -169,6 +169,8 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = exa.init_TC_exp(country=country, grid_specs=grid_specs, buffer_grid_size=buffer_grid_size, buffer_distance_km=buffer_distance_km, res_exp=res_exp, min_pol_size=grid_size, file_path=output_dir, storm_path=storm_dir, crs=crs, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots, plt_save=plt_save)
     if applicable_basin == 'NA':
         peak_multi=1
+    else:
+        peak_multi=0
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 
@@ -230,6 +232,8 @@ def sng_cty_bond_cc(country, cc_model, rf_rate=0.0, target_sharpe=0.5, buffer_di
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex_cc.init_TC_exp(country=country, cc_model=cc_model, grid_specs=grid_specs, buffer_grid_size=buffer_grid_size, buffer_distance_km=buffer_distance_km, res_exp=res_exp, min_pol_size=grid_size, file_path=output_dir, storm_path=storm_dir, crs=crs, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
     if applicable_basin == 'NA':
         peak_multi=1
+    else:
+        peak_multi=0
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 
@@ -330,6 +334,8 @@ def sng_cty_bond_test(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_k
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = exa.init_TC_exp(country=country, grid_specs=grid_specs, buffer_grid_size=buffer_grid_size, buffer_distance_km=buffer_distance_km, res_exp=res_exp, min_pol_size=grid_size, file_path=output_dir, storm_path=storm_dir, crs=crs, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots, plt_save=plt_save)
     if applicable_basin == 'NA':
         peak_multi=1
+    else:
+        peak_multi=0
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 
