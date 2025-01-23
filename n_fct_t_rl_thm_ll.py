@@ -167,10 +167,7 @@ def init_mlt_cty_bond_principal(countries, pay_dam_df_dic_ps, prot_share, nomina
 def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, grid_specs=[1,1], buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, crs="EPSG:3857", storm_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), output_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False, plt_save=False):    
     #load tc_tracks, create hazard class and calculate exposure
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = exa.init_TC_exp(country=country, grid_specs=grid_specs, buffer_grid_size=buffer_grid_size, buffer_distance_km=buffer_distance_km, res_exp=res_exp, min_pol_size=grid_size, file_path=output_dir, storm_path=storm_dir, crs=crs, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots, plt_save=plt_save)
-    if applicable_basin == 'NA':
-        peak_multi=1
-    else:
-        peak_multi=0
+
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 
@@ -204,7 +201,7 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path,want_plot=False)
     a, k, b = params_ibrd
     ibrd_prem = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
-    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100, peak_multi)/100
+    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     premium_dic['ibrd'] = ibrd_prem
     premium_dic['artemis'] = exp_loss_ann * artemis_multiplier
@@ -230,10 +227,7 @@ def sng_cty_bond(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105
 def sng_cty_bond_cc(country, cc_model, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, grid_specs=[1,1], buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, crs="EPSG:3857", storm_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), output_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False):    
     #load tc_tracks, create hazard class and calculate exposure
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = ex_cc.init_TC_exp(country=country, cc_model=cc_model, grid_specs=grid_specs, buffer_grid_size=buffer_grid_size, buffer_distance_km=buffer_distance_km, res_exp=res_exp, min_pol_size=grid_size, file_path=output_dir, storm_path=storm_dir, crs=crs, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots)
-    if applicable_basin == 'NA':
-        peak_multi=1
-    else:
-        peak_multi=0
+
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 
@@ -264,7 +258,7 @@ def sng_cty_bond_cc(country, cc_model, rf_rate=0.0, target_sharpe=0.5, buffer_di
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
     a, k, b = params_ibrd
     ibrd_prem = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
-    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100, peak_multi)/100
+    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     premium_dic['ibrd'] = ibrd_prem
     premium_dic['artemis'] = exp_loss_ann * artemis_multiplier
@@ -304,7 +298,7 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rat
     else:
         requ_nom = nominal
     exp_loss_ann, att_prob, ann_losses, total_losses, es_metrics, MES_cty = smcb.init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, requ_nom, nominals_dic, print_prob=False)
-    tranches = fct.create_tranches(tranches_array, total_losses, ann_losses, ibrd_path, prem_corr)
+    tranches = fct.create_tranches(tranches_array, total_losses, ann_losses, ibrd_path, prem_corr, peak_multi)
     #calculate premiums using different approaches
     requ_prem = sb.init_prem_sharpe_ratio(ann_losses, rf_rate, target_sharpe)
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path, want_plot=False)
@@ -332,10 +326,7 @@ def mlt_cty_bond(countries, pay_dam_df_dic, nominals_dic, tranches_array, rf_rat
 def sng_cty_bond_test(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_km=105, res_exp=30, grid_size=6000, grid_specs=[1,1], buffer_grid_size=1, prot_share=None, prot_rp=None, low_to_prot=None, to_prot_share=None, crs="EPSG:3857", storm_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), output_dir=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), ibrd_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"), incl_plots=False, plt_save=False):    
     #load tc_tracks, create hazard class and calculate exposure
     exp, applicable_basin, grid_gdf, admin_gdf, storm_basin_sub, tc_storms = exa.init_TC_exp(country=country, grid_specs=grid_specs, buffer_grid_size=buffer_grid_size, buffer_distance_km=buffer_distance_km, res_exp=res_exp, min_pol_size=grid_size, file_path=output_dir, storm_path=storm_dir, crs=crs, load_fls=True, plot_exp=incl_plots, plot_centrs=incl_plots, plt_grd=incl_plots, plt_save=plt_save)
-    if applicable_basin == 'NA':
-        peak_multi=1
-    else:
-        peak_multi=0
+
     #calculate impact and aggregate impact per grid
     imp, imp_per_event, imp_admin_evt = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=incl_plots) 
     if low_to_prot is not None: 
@@ -369,7 +360,7 @@ def sng_cty_bond_test(country, rf_rate=0.0, target_sharpe=0.5, buffer_distance_k
     params_ibrd = prib.init_prem_ibrd(file_path=ibrd_path,want_plot=False)
     a, k, b = params_ibrd
     ibrd_prem = prib.monoExp(exp_loss_ann*100, a, k, b) * exp_loss_ann
-    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100, peak_multi)/100
+    premium_dic['regression'] = cp.calc_premium_regression(exp_loss_ann *100)/100
     premium_dic['required'] = requ_prem
     premium_dic['ibrd'] = ibrd_prem
     premium_dic['artemis'] = exp_loss_ann * artemis_multiplier

@@ -99,7 +99,7 @@ def calc_rp_bnd_lss(ann_losses, return_period):
 
     return calc_value
 
-def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0):
+def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0, peak_mulit=1):
     rows = []
     tranch_df = pd.DataFrame(columns=['RP', 'Loss'])
     for i in rp_array:
@@ -170,7 +170,7 @@ def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0
     a, k, b = params_ibrd
 
     tranches['premium_ibrd'] = prib.monoExp(tranches['expected_loss_own']*100, a, k, b) * tranches['expected_loss_own'] + prem_corr
-    tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100)/100 + prem_corr
+    tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100, peak_mulit)/100 + prem_corr
     for i in tranches.index:
         tranches.at[i, 'premium_required'] = smcb.init_prem_sharpe_ratio_tranches(ann_losses_alt, tranches.at[i, 'nominal'], tranche_losses_dic[i], 0.0, 0.5) + prem_corr
     tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier + prem_corr
