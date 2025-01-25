@@ -447,7 +447,7 @@ def plot_prem_share(weighter=1, eu=True, threshold_other=1, file_path="C:/Users/
       'SVK', 'SVN', 'ESP', 'SWE']
 
     finance_scheme = pd.read_excel(OUTPUT_DIR.joinpath("fs_high_inc.xlsx"))
-
+    finance_scheme = finance_scheme[finance_scheme['Carbon Footprint per Capita (absolute)'] >= 6.5].copy()
     finance_scheme['Relative Carbon Footprint'] = (finance_scheme['Carbon Footprint per Capita (absolute)'] / finance_scheme['Carbon Footprint per Capita (absolute)'].median())**weighter
     finance_scheme['GDP share'] = finance_scheme['GDP (absolute)'] / finance_scheme['GDP (absolute)'].sum() * 100
     finance_scheme['Pay formula'] = finance_scheme['Relative Carbon Footprint'] * finance_scheme['GDP share']
@@ -459,6 +459,8 @@ def plot_prem_share(weighter=1, eu=True, threshold_other=1, file_path="C:/Users/
         eu_row = pd.DataFrame({'Code': ['EU'],'GDP share': [eu_gdp_share] ,'Share of Pay': [eu_share]})
         finance_scheme_no_eu = finance_scheme[~finance_scheme['Code'].isin(EU)]
         finance_scheme_up = pd.concat([finance_scheme_no_eu, eu_row], ignore_index=True)
+    else:
+        finance_scheme_up = finance_scheme.copy()
     
     
     filtered_data = finance_scheme_up[finance_scheme_up['Share of Pay'] >= threshold_other]
@@ -485,6 +487,7 @@ def plot_prem_share(weighter=1, eu=True, threshold_other=1, file_path="C:/Users/
     plt.legend(loc="upper right", ncol=2)
     plt.show()
 
-    return_df = pd.DataFrame({"Country": finance_scheme['Code'], "Share": finance_scheme['Share of Pay']/100, "GDP": finance_scheme['GDP (absolute)']})
+    return_df = pd.DataFrame({"Country": finance_scheme['Code'], "Share": finance_scheme['Share of Pay']/100, "GDP": finance_scheme['GDP (absolute)'],
+                               "CEFC": finance_scheme['Carbon Footprint per Capita (absolute)']})
 
     return return_df

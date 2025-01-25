@@ -3,10 +3,10 @@
 #define TLM equation
 
 Term = 36
-IG = 1
+IG = 0
 Hybrid = 0
-GCIndex = 200.8
-BBSpread = 1.83
+GCIndex = 180
+BBSpread = 1.6
 
 b_0 = -0.5907
 b_1 = 1.3986
