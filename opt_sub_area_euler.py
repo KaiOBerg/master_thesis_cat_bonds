@@ -11,8 +11,8 @@ from pathlib import Path
 from scipy.stats import spearmanr
 from sklearn.metrics import mean_squared_error
 
-OUTPUT_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard") #Path("/cluster/work/climate/kbergmueller/cty_data")
-STORM_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks") #Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
+OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
+STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
 
 #choose country
 country = 882
