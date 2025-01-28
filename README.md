@@ -40,7 +40,7 @@ The construction of the CAT bond proposed for Samoi in the first case study of t
 Results for the pooling set up described in Case Study 2 are presented in:
    * results_main_pool_sub.ipynb\
    The notebook first imports the data on the respective single country bonds which were calculated on euler with the script
-      * master_of_disaster_pooling.py\
+      * master_of_disaster_pooling.py
       This script makes use of the script:
          * n_fct_t_rl_thm_ll.py\
       which includes all the wrapper function to design single-country or multi-country bonds making use of
@@ -58,9 +58,9 @@ Results for the pooling set up described in Case Study 2 are presented in:
 
 Results for the financial scheme described in Case Study 3 are presented in:
    * results_fs_pools.ipynb\
-   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script\
+   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script
       * master_of_disaster_pooling.py\
-      This script makes use of the script:\
+      This script makes use of the script:
          * n_fct_t_rl_thm_ll.py\
       which includes all the wrapper function to design single-country or multi-country bonds making use of
          * simulate_multi_cty_bond.py -> simulate multi-country bonds used for derive losses and related metrics as well as returns\
@@ -83,9 +83,9 @@ Results for the financial scheme described in Case Study 3 are presented in:
 
 TC data was created with the following functions on euler:
    * IBTRACS_import.py\
-   * country_basics_euler.py\
+   * country_basics_euler.py
    using
-      * exposure_euler.py\
+      * exposure_euler.py
    * country_basics_cc_euler.py\
    using
       * exposures_cc_euler.py
@@ -94,16 +94,16 @@ TC data was created with the following functions on euler:
 
 Other scripts:\
 For each country damage for the 250-year return period event was derived with:
-   * assess_tc_danger.py\
+   * assess_tc_danger.py
 And to test the bond simulating functions the following script was used:
-   * hands_on_example_simulate_bond.py\
+   * hands_on_example_simulate_bond.py
 An analysis what happens to IBRD-Pricing premiums when pooling is presented in:
    * prem_ibrd_analysis.ipynb
 
 
 
 Other notebooks whcih were not used for final results but could be useful in the future:
-   * wang_transformation.ipynb -> very popular method to calculate reinsurance prices\
+   * wang_transformation.ipynb -> very popular method to calculate reinsurance prices
    * model_sofr.ipynb -> implementing Cox-Ingersoll-Ross Model to simulate risk free rate
 
 
