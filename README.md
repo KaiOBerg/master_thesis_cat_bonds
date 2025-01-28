@@ -18,16 +18,16 @@ The construction of the CAT bond proposed for Samoi in the first case study of t
    Testing of the bond was done by using:
       * sng_cty_cc.py -> for testing climate change resilience\
       which made use of the following script to get exposure and hazard data:\
-         * exposures_cc.py 
+         * exposures_cc.py\ 
    and\
-      * product_test_historic.ipynb -> tests product with historic and perturbed tracks\
+      * product_test_historic.ipynb -> tests product with historic and perturbed tracks
    
    Addtionally, to derive optimal product combinations (subareas and parametric index statistic) the following script was used:\
       * opt_sub_area_euler.py\
    and to test TC boundary distance:\
       * buffer_test.py\
       which made use of a reduced version of exposures_alt.py saved in:\
-         * exposure_buffer_test.py\
+         * exposure_buffer_test.py
 
    The dependance of the optimization of the payout function on the number of events was tested in:\
       * testing_optimization.ipynb\
@@ -38,72 +38,72 @@ The construction of the CAT bond proposed for Samoi in the first case study of t
 
 
 Results for the pooling set up described in Case Study 2 are presented in:
-   * results_main_pool_sub.ipynb
-   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script
-      * master_of_disaster_pooling.py
-      This script makes use of the script:
-         * n_fct_t_rl_thm_ll.py 
-      which includes all the wrapper function to design single-country or multi-country bonds making use of
-         * simulate_multi_cty_bond.py -> simulate multi-country bonds used for derive losses and related metrics as well as returns
-      premiums were calculated with the same scripts as in Case Study 1.
-      Tranches were calculated with the script:
-         * functions.py
-   Optimal pools for the set of countries were cacluated with:
-      * pooling_n_pools.py 
-      based on the optimization function from Ciullo et al. (2022) and Elsener (2024) saved in:
+   * results_main_pool_sub.ipynb\
+   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script\
+      * master_of_disaster_pooling.py\
+      This script makes use of the script:\
+         * n_fct_t_rl_thm_ll.py\
+      which includes all the wrapper function to design single-country or multi-country bonds making use of\
+         * simulate_multi_cty_bond.py -> simulate multi-country bonds used for derive losses and related metrics as well as returns\
+      premiums were calculated with the same scripts as in Case Study 1\
+      Tranches were calculated with the script:\
+         * functions.py\
+   Optimal pools for the set of countries were cacluated with:\
+      * pooling_n_pools.py\
+      based on the optimization function from Ciullo et al. (2022) and Elsener (2024) saved in:\
          * pooling_functions_ciullo.py
 
           
 
 
-Results for the financial scheme described in Case Study 3 are presented in:
-   * results_fs_pools.ipynb
-   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script
-      * master_of_disaster_pooling.py
-      This script makes use of the script:
-         * n_fct_t_rl_thm_ll.py 
-      which includes all the wrapper function to design single-country or multi-country bonds making use of
-         * simulate_multi_cty_bond.py -> simulate multi-country bonds used for derive losses and related metrics as well as returns
-      premiums were calculated with the same scripts as in Case Study 1.
-      Tranches were calculated with the script:
-         * functions.py
-   Optimal pools for the set of countries were cacluated with:
-      * pooling_max_nom.py 
-      based on the optimization function from Ciullo et al. (2022) and Elsener (2024) saved in:
-         * pooling_functions_ciullo.py
-   The share of premium donation calculations is presented in: 
-      * plot_fs_share_pay.ipynb
-      and a automated function to derive premium shares was implemeted in:
-         * functions.py
-   The historical risk-return performance of the Norwegian Pension fund was derived in:
+Results for the financial scheme described in Case Study 3 are presented in:\
+   * results_fs_pools.ipynb\
+   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script\
+      * master_of_disaster_pooling.py\
+      This script makes use of the script:\
+         * n_fct_t_rl_thm_ll.py\
+      which includes all the wrapper function to design single-country or multi-country bonds making use of\
+         * simulate_multi_cty_bond.py -> simulate multi-country bonds used for derive losses and related metrics as well as returns\
+      premiums were calculated with the same scripts as in Case Study 1\
+      Tranches were calculated with the script:\
+         * functions.py\
+   Optimal pools for the set of countries were cacluated with:\
+      * pooling_max_nom.py\
+      based on the optimization function from Ciullo et al. (2022) and Elsener (2024) saved in:\
+         * pooling_functions_ciullo.py\
+   The share of premium donation calculations is presented in:\
+      * plot_fs_share_pay.ipynb\
+      and a automated function to derive premium shares was implemeted in:\
+         * functions.py\
+   The historical risk-return performance of the Norwegian Pension fund was derived in:\
       * risk_return_profile.ipynb 
 
 
 
 
-TC data was created with the following functions on euler:
-   * IBTRACS_import.py
-   * country_basics_euler.py
-   using 
-      * exposure_euler.py
-   * country_basics_cc_euler.py
-   using
+TC data was created with the following functions on euler:\
+   * IBTRACS_import.py\
+   * country_basics_euler.py\
+   using\
+      * exposure_euler.py\
+   * country_basics_cc_euler.py\
+   using\
       * exposures_cc_euler.py
 
 
 
-Other scripts:
-For each country damage for the 250-year return period event was derived with:
-   * assess_tc_danger.py
-And to test the bond simulating functions the following script was used:
-   * hands_on_example_simulate_bond.py
-An analysis what happens to IBRD-Pricing premiums when pooling is presented in:
+Other scripts:\
+For each country damage for the 250-year return period event was derived with:\
+   * assess_tc_danger.py\
+And to test the bond simulating functions the following script was used:\
+   * hands_on_example_simulate_bond.py\
+An analysis what happens to IBRD-Pricing premiums when pooling is presented in:\
    * prem_ibrd_analysis.ipynb
 
 
 
-Other notebooks whcih were not used for final results but could be useful in the future: 
-   * wang_transformation.ipynb -> very popular method to calculate reinsurance prices
+Other notebooks whcih were not used for final results but could be useful in the future:\
+   * wang_transformation.ipynb -> very popular method to calculate reinsurance prices\
    * model_sofr.ipynb -> implementing Cox-Ingersoll-Ross Model to simulate risk free rate
 
 
