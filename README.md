@@ -1,6 +1,6 @@
 ## Corresponding code for the Master Thesis: Closing the Insurance Gap - Enhancing Access to the CAT Bond Market by Kai Bergmüller (2025)
 
-The construction of the CAT bond proposed for Samoi in the first case study of the thesis is saved in:
+The construction of the CAT bond proposed for Samoa in the first case study of the thesis is saved in:
    * single_country_bond_main.ipynb
 
    The notebook depends on various python scripts each dedicated to a specific part of the CAT bond design. The scripts are the following:\
@@ -15,7 +15,7 @@ The construction of the CAT bond proposed for Samoi in the first case study of t
       * calc_prem.py; simulate_bond.py; prem_ibrd.py -> used to derive premiums using various pricing methods based on loss data. calc_prem.py = Chatoro-Pricing; simulate_bond.py = Benchmark-Pricing; prem_ibrd.py = IBRD-Pricing\
       * simulate_bond.py -> using the premium estimates now the returns of the bond can be simulated and the bond set up is complete
 
-   Testing of the bond was done by using:
+   Testing of the bond was done by using:\
       * sng_cty_cc.py -> for testing climate change resilience\
       which made use of the following script to get exposure and hazard data:\
          * exposures_cc.py 
@@ -48,7 +48,7 @@ Results for the pooling set up described in Case Study 2 are presented in:
       premiums were calculated with the same scripts as in Case Study 1\
       Tranches were calculated with the script:
          * functions.py\
-   Optimal pools for the set of countries were cacluated with:\
+   Optimal pools for the set of countries were cacluated with:
       * pooling_n_pools.py\
       based on the optimization function from Ciullo et al. (2022) and Elsener (2024) saved in:
          * pooling_functions_ciullo.py
@@ -82,7 +82,7 @@ Results for the financial scheme described in Case Study 3 are presented in:
 
 
 TC data was created with the following functions on euler:
-   * IBTRACS_import.py\
+   * IBTRACS_import.py
    * country_basics_euler.py
    using
       * exposure_euler.py
@@ -94,9 +94,9 @@ TC data was created with the following functions on euler:
 
 Other scripts:\
 For each country damage for the 250-year return period event was derived with:
-   * assess_tc_danger.py
+   * assess_tc_danger.py\
 And to test the bond simulating functions the following script was used:
-   * hands_on_example_simulate_bond.py
+   * hands_on_example_simulate_bond.py\
 An analysis what happens to IBRD-Pricing premiums when pooling is presented in:
    * prem_ibrd_analysis.ipynb
 
