@@ -1,3 +1,4 @@
+'''Simplified script with the only goal to create TC hazards not caring about anything else -> used to create data on euler'''
 import numpy as np
 from pathlib import Path
 import geopandas as gpd
@@ -62,7 +63,7 @@ def init_TC_exp(country, res, OUTPUT_DIR, STORM_DIR, crs="EPSG:3857"):
     exp.write_hdf5(OUTPUT_DIR / f"Exp_{country}_{fin}_{year}_{res}.hdf5")
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs, False)
+    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs)
 
     """initiate TC hazard from tracks and exposure"""
     """Generating Centroids"""
@@ -109,6 +110,7 @@ def init_STORM_tracks(basin, STORM_DIR, load_fls=False):
 
     return storms_basin
 
+#costumized function to turn track data into geodataframe
 def to_geodataframe(self):
     gdf = gpd.GeoDataFrame([dict(track.attrs) for track in self.data])
 
@@ -124,7 +126,6 @@ def to_geodataframe(self):
 
     gdf.crs = DEF_CRS
 
-    # for splitting, restrict to tracks that come close to the antimeridian
     t_split_mask = np.asarray([
         (lon > 170).any() and (lon < -170).any() and lon.size > 1
         for lon in t_lons])

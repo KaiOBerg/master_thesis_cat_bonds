@@ -1,3 +1,4 @@
+'''Script to calculate parametric index for CAT bonds per subarea'''
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -11,27 +12,28 @@ import matplotlib.pyplot as plt
 
 def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100, cc_model=None):
     """
-    Calculates a specified statistic (mean, max, or median) for each events sustained wind speeds
-    from tc_storms for each grid cell.
+    Calculates a specified statistic (mean, percentiles) for each events sustained wind speeds
+    from tc_storms/tc_tracks for each grid cell. Use tc_track if parametric index is central pressure and 
+    tc_strom if parametric index is wind speed.
 
     Args:
         tc_storms: A hazard object containing wind speed data per centroid.
-        agg_exp (dict): A dictionary where keys are the labels of grid cells and values are lists of 
-                        line numbers corresponding to indices in tc_storms.intensity.
+        tc_tracks: A hazard object containing central pressure data per along tc track.
+        grid: Input subareas as grid cells
+        admin: Input subareas as administrative boundaries
         stat (str or float): The statistic to calculate. Can either be a numer to calculate percentile or the
                     string 'mean' to calculate the average.
+        cc_model: input global circulation model if you want to derive statistics for climate change scenarios
     Returns:
         pd.DataFrame: A DataFrame containing the calculated statistics with labels as columns.
     """
 
     if tc_storms:
-        #group each exposure point according to grid cell letter
         hazard = tc_storms.centroids.gdf
         hazard = hazard.to_crs(admin.crs)
         centrs_to_grid = hazard.sjoin(admin, how='left', predicate="within")
         agg_exp = centrs_to_grid.groupby('admin_letter').apply(lambda x: x.index.tolist())
 
-        #Initialize a dictionary to hold the calculated statistics
         int_grid = {letter: [None] * len(tc_storms.event_id) for letter in agg_exp.keys()}
         int_grid['year'] = [None] * len(tc_storms.event_id)
         int_grid['month'] = [None] * len(tc_storms.event_id)
@@ -47,7 +49,6 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
             for letter, line_numbers in agg_exp.items():
                 selected_values = tc_storms.intensity[i, line_numbers]
 
-                # Calculate the statistic based on the user's choice
                 if stat == 'mean':
                     int_grid[letter][i] = selected_values.mean()
                 elif isinstance(stat, (int, float)):
@@ -57,14 +58,12 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
                 else:
                     raise ValueError("Invalid statistic choice. Choose number for percentile or 'mean'")        
         int_grid = pd.DataFrame.from_dict(int_grid)
-        #int_grid = int_grid.where(int_grid >= 33, 0)
         int_grid['count_grids'] = (int_grid > 0).sum(axis=1)
         int_grid.loc[int_grid['count_grids'] > 0, 'count_grids'] -= 2
 
     elif tc_tracks:
         grid_crs = grid.crs
 
-        #Initialize a dictionary to hold the calculated statistics
         int_grid = {letter: [None] * len(tc_tracks.data) for letter in grid['grid_letter']}
         int_grid['year'] = [None] * len(tc_tracks.data)
         int_grid['month'] = [None] * len(tc_tracks.data)
@@ -87,7 +86,6 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
                 else:
                     int_grid[letter][i] = 0
         int_grid = pd.DataFrame.from_dict(int_grid)
-        #int_grid = int_grid.where(int_grid < 979, 0)
         int_grid['count_grids'] = (int_grid > 0).sum(axis=1)
         int_grid.loc[int_grid['count_grids'] > 0, 'count_grids'] -= 1
 
@@ -104,7 +102,7 @@ def init_haz_int(grid=None, admin=None, tc_storms=None, tc_tracks=None, stat=100
 pattern = r'(\d+)\.txt-(\d+)'
 pattern_cc = r'(\d+)_IBTRACSDELTA\.txt-(\d+)'
 
-# Function to extract the numbers
+'''Extract the year of event'''
 def extract_year(string, cc_model):
     if cc_model is not None:
         match = re.search(pattern_cc, string)
@@ -116,11 +114,11 @@ def extract_year(string, cc_model):
         year = before_txt * 1000 + after_txt
     return year
 
-
+'''plot the intensity and damage for each event'''
 def plt_int_dam(imp_admin_evt, int_grid):
 
     num_grids = len(imp_admin_evt.columns)
-    n_cols = 2  # Choose the number of columns (for a wide layout)
+    n_cols = 2  
     n_rows = math.ceil(num_grids / n_cols) 
 
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(30, 8 * n_rows))
@@ -133,7 +131,6 @@ def plt_int_dam(imp_admin_evt, int_grid):
         ax = axes[i]
 
         ax.scatter(columnData, int_grid[columnName], marker='o', edgecolor='blue', facecolor='none', label='Events')
-        # Add labels and title
         ax.set_title(f"Damage vs. Wind Speed - Island {columnName}", fontsize=18)
         ax.set_xlabel("Damage [USD]", fontsize=16)
         ax.set_ylabel("Wind Speed [m/s]", fontsize=16)
@@ -141,10 +138,8 @@ def plt_int_dam(imp_admin_evt, int_grid):
         ax.set_ylim(0,80)
         ax.legend(loc='lower right')
 
-    # Remove any extra axes that are not used
     for j in range(i + 1, len(axes)):
         fig.delaxes(axes[j])
 
-    # Show both plots
     plt.tight_layout()
     plt.show()

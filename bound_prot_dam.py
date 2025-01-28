@@ -1,3 +1,5 @@
+'''Script used to calculate return periods and filter events so that they meet the minimum payout criteria'''
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -7,6 +9,66 @@ import set_nominal as snom
 
 r = 10000 #number of simulated years in tc dataset
 
+
+'''calculate return beriods for damages or payouts'''
+def calc_rp(df, return_period, damage=True):
+    """
+    Compute impacts/payouts for specific return periods using a DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        A DataFrame containing impacts/payouts and their associated return periods.
+        Should have columns 'Damage'or 'Pay and 'RP'.
+    return_periods : Object
+        The return period where we want to compute the exceedance impact/pay.
+    damage : Boolean
+        Indicating if function should return associated damage value or payout for given return period.
+
+    Returns
+    -------
+    A number.
+    """
+
+    if damage == True:
+        calc_rp_for = 'Damage'
+    else:
+        calc_rp_for = 'pay'
+    #Create a DataFrame to sort the values and assign ranks
+    df = df.sort_values(by=calc_rp_for, ascending=False)
+    #Assign unique ranks
+    df['Rank'] = range(1, len(df) + 1)
+    #Map the ranks back to the original DataFrame
+    #Sort the original DataFrame to match the original order
+    df['RP'] = (r + 1)/df['Rank']
+    df = df.sort_values(by='RP')
+    #Extract sorted return periods and impacts
+    sorted_rp = df['RP'].values
+    sorted_damage = df[calc_rp_for].values
+    #Interpolate impacts for the given return periods
+    calc_value = np.interp(return_period, sorted_rp, sorted_damage)
+
+
+    return calc_value
+
+'''calculate return period and filter damage data for events with damage greater than minimum payout'''
+def init_imp_flt(imp_per_event, imp_admin_evt, lower_rp=None, prot_share=None, exposure=None):
+    imp_per_event_df = pd.DataFrame({'Damage': imp_per_event})
+    imp_per_event_flt=np.array(imp_per_event_df)
+    if lower_rp is not None:
+        to_protect = calc_rp(imp_per_event_df, lower_rp, damage=True)
+    else: 
+        to_protect = snom.init_nominal(exposure=exposure, prot_share=prot_share, print_nom=False)
+
+    imp_per_event_flt[imp_per_event_flt < to_protect] = 0
+    imp_admin_evt_flt = imp_admin_evt.copy()
+    imp_admin_evt_flt.loc[imp_admin_evt_flt.sum(axis=1) < to_protect, :] = 0
+
+
+    return imp_per_event_flt, imp_admin_evt_flt, to_protect
+
+
+'''not used for final results'''
 def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, plt_dam_rp_grid=None):
     """
     Initializes the return period grid by calculating damages per grid cell and their corresponding return periods.
@@ -48,13 +110,11 @@ def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, p
 
         ax1.plot(return_period_flt, impact_flt, label='Filtered Data', linestyle='-', color='red')
 
-        # Add labels and title
         ax1.set_title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid}')
         ax1.set_xlabel("Return Period [Years]")
         ax1.set_ylabel("Impact [USD]")
 
-        # Create an inset plot (overview of total data)
-        inset_ax1 = inset_axes(ax1, width="30%", height="30%", loc='upper left', borderpad=3.0)  # adjust size and position
+        inset_ax1 = inset_axes(ax1, width="30%", height="30%", loc='upper left', borderpad=3.0)  
         inset_ax1.plot(dam_rp_per_grid[plt_dam_rp_grid]['RP'], dam_rp_per_grid[plt_dam_rp_grid]['Damage'], label='Overview Data', linestyle='-', color='red')
         inset_ax1.set_xlabel("Return Period [Years]", fontsize=8)
         inset_ax1.set_ylabel("Impact [USD]", fontsize=8)
@@ -72,7 +132,6 @@ def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, p
         ax3.set_ylabel('Impact [USD]')
         ax3.set_title(f'Exceedance frequency curve - Grid {plt_dam_rp_grid} - LogLog')
 
-        # Show both plots
         plt.tight_layout()
         plt.show()
 
@@ -80,7 +139,7 @@ def init_dam_ret_per_grid(imp_grid_evt, lower_rp, adj_max=False, nominal=None, p
 
     return rp_dam_grid, dam_rp_per_grid, imp_grid_evt_flt
 
-
+'''sets damages to 0 if there below minimum payout and if wanted sets damages greater than the principal to the principal -> not used for final results'''
 def adj_imp_grid_evt(imp_grid_evt, rp_dam_grid, adj_max=False, nominal=None):
 
     imp_grid_evt_flt = imp_grid_evt.copy()
@@ -98,59 +157,3 @@ def adj_imp_grid_evt(imp_grid_evt, rp_dam_grid, adj_max=False, nominal=None):
                 pass
     
     return imp_grid_evt_flt
-
-
-def calc_rp(df, return_period, damage=True):
-    """
-    Compute impacts/payouts for specific return periods using a DataFrame.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        A DataFrame containing impacts/payouts and their associated return periods.
-        Should have columns 'Damage'or 'Pay and 'RP'.
-    return_periods : Object
-        The return period where we want to compute the exceedance impact/pay.
-    damage : Boolean
-        Indicating if function should return associated damage value or payout for given return period.
-
-    Returns
-    -------
-    A number.
-    """
-
-    if damage == True:
-        calc_rp_for = 'Damage'
-    else:
-        calc_rp_for = 'pay'
-    #Create a DataFrame to sort the values and assign ranks
-    df = df.sort_values(by=calc_rp_for, ascending=False)
-    #Assign unique ranks
-    df['Rank'] = range(1, len(df) + 1)
-    #Map the ranks back to the original DataFrame
-    #Sort the original DataFrame to match the original order
-    df['RP'] = (r + 1)/df['Rank']
-    df = df.sort_values(by='RP')
-    #Extract sorted return periods and impacts
-    sorted_rp = df['RP'].values
-    sorted_damage = df[calc_rp_for].values
-    #Interpolate impacts for the given return periods
-    calc_value = np.interp(return_period, sorted_rp, sorted_damage)
-
-
-    return calc_value
-
-def init_imp_flt(imp_per_event, imp_admin_evt, lower_rp=None, prot_share=None, exposure=None):
-    imp_per_event_df = pd.DataFrame({'Damage': imp_per_event})
-    imp_per_event_flt=np.array(imp_per_event_df)
-    if lower_rp is not None:
-        to_protect = calc_rp(imp_per_event_df, lower_rp, damage=True)
-    else: 
-        to_protect = snom.init_nominal(exposure=exposure, prot_share=prot_share, print_nom=False)
-
-    imp_per_event_flt[imp_per_event_flt < to_protect] = 0
-    imp_admin_evt_flt = imp_admin_evt.copy()
-    imp_admin_evt_flt.loc[imp_admin_evt_flt.sum(axis=1) < to_protect, :] = 0
-
-
-    return imp_per_event_flt, imp_admin_evt_flt, to_protect

@@ -1,3 +1,4 @@
+'''Script to calculate IBRD-Pricing'''
 from scipy.optimize import curve_fit
 import pandas as pd
 from pathlib import Path

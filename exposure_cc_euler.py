@@ -1,3 +1,5 @@
+'''script intended to calculate exposure and tc hazards based on cliamte change conditions using STORM-F datasets'''
+
 import numpy as np
 from pathlib import Path
 import geopandas as gpd
@@ -41,7 +43,6 @@ basins_countries = {
 fin = 'gdp' #fin mode for exposure
 year = 2020 #reference year for exposure
 #define variables for grid and centroids
-res_centrs = 150 #resolution in arcsec for centroids
 grid_cell_size_km = 30 
 min_overlap_percent = 10 
 #define variables for TC class
@@ -61,7 +62,6 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
     for basin, countries in basins_countries.items():
         if country in countries:
             applicable_basin = basin
-            #print('STORM basin of country: ', applicable_basin)
     if 'applicable_basin' not in locals():
         print('Error: Applicable basin not found - Do not proceed.')
         return 0, 0, 0, 0, 0, 0
@@ -82,7 +82,7 @@ def init_TC_exp(country, cc_model, buffer_distance_km, res_exp, grid_size=600, b
         exp.plot_raster(label= 'Exposure [log(mUSD)]', figsize=(10,5))
 
     """Divide Exposure set into admin/grid cells"""
-    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, plt_grd)
+    islands_gdf, buffered_islands, grid_gdf = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent)
     islands_split_gdf = grd.init_equ_pol(exp, grid_size, buffer_grid_size)
     islands_split_gdf['admin_letter'] = [chr(65 + i) for i in range(len(islands_split_gdf))]
 
@@ -166,34 +166,7 @@ def init_STORM_tracks(basin, STORM_path, cc_model, load_fls=False):
 
     return storms_basin
 
-
-
-def init_centrs(grid_gdf, resolution_arcsec):
-    points = []
-    
-    #Convert arcseconds to degrees
-    resolution_degrees = resolution_arcsec / 3600.0
-    
-    for idx, row in grid_gdf.iterrows():
-
-        geometry = row.geometry
-        minx, miny, maxx, maxy = geometry.bounds
-        
-        #Calculate the number of points in x and y directions based on the resolution in degrees
-        num_points_x = int((maxx - minx) / resolution_degrees)
-        num_points_y = int((maxy - miny) / resolution_degrees)
-        
-        #Generate points
-        for i in range(num_points_x + 1):  #+1 to include maxx
-            for j in range(num_points_y + 1):  #+1 to include maxy
-                x = minx + i * resolution_degrees
-                y = miny + j * resolution_degrees
-                points.append(Point(x, y))
-
-    points_gdf = gpd.GeoDataFrame(geometry=points, crs=grid_gdf.crs)
-
-    return points_gdf
-
+#costumized function to turn track data into geodataframe
 def to_geodataframe(self):
     gdf = gpd.GeoDataFrame([dict(track.attrs) for track in self.data])
 
@@ -214,7 +187,7 @@ def to_geodataframe(self):
         (lon > 170).any() and (lon < -170).any() and lon.size > 1
         for lon in t_lons])
 
-    antimeridian = LineString([(180, -90), (180, 90)]).buffer(1e-9)  # Tiny buffer to avoid exact overlap
+    antimeridian = LineString([(180, -90), (180, 90)]).buffer(1e-9)  
     gdf.loc[t_split_mask, "geometry"] = gdf.geometry[t_split_mask] \
         .to_crs({"proj": "longlat", "lon_wrap": 180}) \
         .apply(lambda line: MultiLineString([

@@ -1,14 +1,16 @@
+'''Calibrate payout function by optimizing basis risk and compute payouts per event and return dataframe conatining all necessary information on each hazard event for the final bond simulations'''
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-
 from scipy.optimize import minimize
 
-#Define bounds for minimum and maximum wind speeds
+#Define initial guesses for optimization
 initial_guess_ws = [30, 40]  # Wind speed initial guess
 initial_guess_cp = [990, 920]  # Central pressure initial guess
 
+#this function calculates the payout for an event in a subarea -> defines the payout function
 def init_alt_payout(min_trig, max_trig, haz_int, max_pay, int_haz_cp):
     intensities = np.array(haz_int.iloc[:, 0])
     payouts = np.zeros_like(intensities)
@@ -24,6 +26,8 @@ def init_alt_payout(min_trig, max_trig, haz_int, max_pay, int_haz_cp):
 
     return payouts
 
+#this function defines the objective function used in the optimization of the payout function to derive optimal minimum and maximum thresholds of the paramteric index
+#returns the basis risk
 def init_alt_objective_function(params, haz_int, damages, nominal, int_haz_cp):
     min_trig, max_trig = params
     max_dam = np.max(damages)
@@ -41,8 +45,8 @@ def init_alt_objective_function(params, haz_int, damages, nominal, int_haz_cp):
     basis_risk = np.sum((arr_damages - payouts)**2)
     return basis_risk
 
+#funtion to minimze basis risk by adjusting minimum and maximum parametric index thresholds used in the payout funciton
 def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None, print_params=True):
-    # Define bounds and initial guesses for each grid cell
     grid_cells = range(len(haz_int.columns)-3)  
     grid_specific_results = {}
    
@@ -55,7 +59,6 @@ def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None,
 
     results = {}
     for cell in grid_cells:
-        cons = init_cons(int_haz_cp)
 
         damages = damages_evt if int_haz_cp else damages_grid.iloc[:,cell]
 
@@ -64,7 +67,6 @@ def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None,
                           initial_guess, 
                           args=(haz_int.iloc[:,[cell, -1]], damages, nominal, int_haz_cp), 
                           method='COBYLA',
-                          #constraints=cons,
                           options={'maxiter': 100000})
         
         results[cell] = result
@@ -78,36 +80,14 @@ def init_alt_optimization(haz_int, nominal, damages_evt=None, damages_grid=None,
     if print_params:
         print(grid_specific_results)
 
-    #Reshape parameters into a more interpretable form if needed
     optimized_1 = np.array([values[0] for values in grid_specific_results.values()])  
     optimized_2 = np.array([values[1] for values in grid_specific_results.values()])  
 
 
     return results, optimized_1, optimized_2
 
-
-def cons_ws_1(params):
-    return params[0] -  23
-def cons_ws_2(params):
-    return params[1] - (params[0] + 0)
-def cons_ws_3(params):
-    return 50 - params[0]  
-def cons_ws_4(params):
-    return 70 - params[1]  
-def cons_cp_1(params):
-    return -params[0] + 990  
-def cons_cp_2(params):
-    return params[0] - (params[1] + 30)  
-
-def init_cons(int_haz_cp):
-    if int_haz_cp:
-        cons = [{'type': 'ineq', 'fun': cons_cp_1},
-                {'type': 'ineq', 'fun': cons_cp_2}]
-    else:
-        cons = [{'type': 'ineq', 'fun': cons_ws_1},
-                {'type': 'ineq', 'fun': cons_ws_2}]
-    return cons
-
+#calculates the payout for each event in the dataframe and creates a dataframe containing damage, payout, year, and month for each event
+#can create a plot optionally 
 def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, damages_grid=None, damages=None, exp=None):
     b = len(damages_flt)
     max_damage = damages_flt.max()
@@ -158,8 +138,6 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
         damages_df_flt = damages_df['Damage'][mask]
         payout_flt = pay_dam_df['pay'][mask]
 
-
-
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 4))
 
         ax1.scatter(damages_df_flt/tot_exp, payout_flt/tot_exp, marker='o', color='blue', label='Events')
@@ -167,8 +145,6 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
         ax1.axhline(y = nominal/tot_exp, color = 'r', linestyle = '-', label='Principal') 
         ax1.axhline(y = 0.05, color = 'r', linestyle = '-', label='Attachment Point') 
         ax1.axvline(x = 0.05, color = 'r', linestyle = '--', label='Min. Damage') 
-
-        # Add labels and title
         ax1.set_xlabel("Damage [share of GDP]", fontsize=12)
         ax1.set_ylabel("Payout [share of GDP]", fontsize=12)
         ax1.legend(loc='lower right', borderpad=2.0)
@@ -178,20 +154,17 @@ def alt_pay_vs_damage(damages_flt, optimized_1, optimized_2, haz_int, nominal, d
         ax2.axhline(y = 0.05, color = 'r', linestyle = '-', label='Attachment Point') 
         ax2.axvline(x = 0.05, color = 'black', linestyle = '--', label='Min. Damage') 
         ax2.set_xscale('log')
-        # Add labels and title
         ax2.set_xlabel("Damage [share of GDP]", fontsize=12)
         ax2.set_ylabel("Payout [share of GDP]", fontsize=12)
-        #ax2.legend(loc='upper left', borderpad=2.0)
 
         panel_labels = ["a)", "b)"]
         for i, ax in enumerate([ax1, ax2]):
             ax.annotate(panel_labels[i], 
-                xy=(-0.1, 1),  # Position: top-left corner
-                xycoords="axes fraction",  # Relative to axes
+                xy=(-0.1, 1),  
+                xycoords="axes fraction", 
                 fontsize=14, 
                 fontweight="bold")
             
-        # Show both plots
         plt.tight_layout()
         plt.show()
 

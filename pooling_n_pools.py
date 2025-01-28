@@ -1,20 +1,18 @@
+'''Script to perform risk pool optimization using a fixed number of pools - Case Study 2'''
+
 #import general packages
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
-import n_fct_t_rl_thm_ll as bond_fct
-from tqdm import tqdm
 import sys
-
 from pymoo.operators.sampling.rnd import IntegerRandomSampling
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.crossover.hux import HalfUniformCrossover
 from pymoo.algorithms.soo.nonconvex.ga import GA
-from pooling_functions_ciullo import calc_pool_conc, pop_num, PoolOptimizationProblem
+from pooling_functions_ciullo import calc_pool_conc, PoolOptimizationProblem
 from pymoo.optimize import minimize
 from pymoo.operators.repair.rounding import RoundingRepair
-import concurrent.futures
 
 
 
@@ -26,6 +24,7 @@ IBRD_DIR = Path("/cluster/work/climate/kbergmueller")
 #choose country
 countries = [480, 212, 882, 332, 670, 28, 388, 52, 662, 659, 308, 214, 44, 548, 242, 780, 192, 570, 84, 776, 90, 174, 184, 584, 585]
 
+#import losses and nominals per country
 sng_ann_losses = pd.read_csv(OUTPUT_DIR.joinpath("sng_losses.csv"))
 nominals_sng_dic = pd.read_csv(OUTPUT_DIR.joinpath("nominal_dic_df.csv"))
 nominals_sng = nominals_sng_dic.set_index('Key').loc[countries, 'Value'].tolist()
@@ -44,6 +43,7 @@ tot_loss_df = pd.DataFrame(tot_loss_dic)
 RT = len(tot_loss_df[key])
 alpha = 1-1/RT 
 
+#set number of repitions for optimization
 n_opt_rep = 100
 opt_rep = range(0,n_opt_rep,1)
 

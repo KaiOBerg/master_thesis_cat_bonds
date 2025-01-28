@@ -1,18 +1,16 @@
+'''Script for simulating single-country CAT bonds'''
 import pandas as pd
 import numpy as np
 import random
-from scipy.interpolate import interp1d
-from scipy.optimize import fsolve, minimize
+from scipy.optimize import minimize
 import matplotlib.pyplot as plt
-from decimal import Decimal, getcontext
+from decimal import getcontext
 getcontext().prec = 17  
-
-import functions as fct
-
 
 term = 3
 simulated_years = 10000
 
+'''Simulate one term of bond to derive losses'''
 def init_bond_exp_loss(events_per_year, nominal):
     losses = []
     loss_month = pd.DataFrame(columns=['losses', 'months'])
@@ -56,7 +54,7 @@ def init_bond_exp_loss(events_per_year, nominal):
     return rel_losses, att_prob, tot_loss, loss_month
 
 
-
+'''Loop over all terms of bond to derive losses'''
 def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=True):
     att_prob_list = []
     annual_losses = []
@@ -113,6 +111,8 @@ def init_exp_loss_att_prob_simulation(pay_dam_df, nominal, print_prob=True):
 
     return exp_loss_ann, att_prob, df_loss_month, es_metrics
 
+
+'''Simulate over all terms of bond to derive returns'''
 def init_bond_simulation(pay_dam_df, premium, rf_rate, nominal, want_ann_returns=True, model_rf=False):
 
     metric_names = ['tot_payout', 'tot_damage', 'tot_premium', 'tot_pay']
@@ -178,6 +178,7 @@ def init_bond_simulation(pay_dam_df, premium, rf_rate, nominal, want_ann_returns
 
     return bond_metrics, bond_returns
 
+'''Simulate over one term of bond to derive returns'''
 def init_bond(events_per_year, premium, risk_free_rates, nominal):
     simulated_ncf = []
     simulated_premiums = []
@@ -247,28 +248,7 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal):
 
     return simulated_ncf_rel, metrics, rf_rates_list
 
-def init_requ_premium(requ_sharpe_ratio, simulation_matrix, rf_rate, print_prem=True):
-
-    # Define the difference function between Sharpe ratio curve and required Sharpe ratio
-    def intersection_func(x):
-        return np.float64(sharpe_interp(x).item()) - requ_sharpe_ratio
-    
-    premiums = simulation_matrix['Premium']
-    sharpe_ratios = simulation_matrix['Sharpe_ratio_ann']
-    # Interpolate the Sharpe ratio curve
-    sharpe_interp = interp1d(premiums, sharpe_ratios, kind='linear')
-    # Use fsolve to find the intersection point(s), provide a guess
-    x_guess = 0.01  # Initial guess based on the range of premiums
-    x_intersection = fsolve(intersection_func, x_guess)[0]
-    # Calculate the corresponding Sharpe ratio at the intersection point
-    y_intersection = sharpe_interp(x_intersection)
-    requ_premium = x_intersection
-
-    if print_prem:
-        print(f"Intersection point using risk free interest rate of {rf_rate*100}%: Premium = {x_intersection:.4f}, Sharpe Ratio = {y_intersection:.4f}")
-
-    return requ_premium
-
+'''plot function to see relationship between premiums and sharpe ratio -> not used for final results'''
 def display_premiums(requ_premiums, requ_sharpe_ratio, rf_rate, simulated_metrics, exp_loss):
     
     fig, ax1 = plt.subplots()
@@ -285,6 +265,7 @@ def display_premiums(requ_premiums, requ_sharpe_ratio, rf_rate, simulated_metric
         print(f'Required Sharpe Ratio: {requ_sharpe_ratio[i]}; Risk free rate: {round(rf_rate*100,3)}%; Required Premium: {round(requ_premiums[i]*100,3)}%; Risk Multiple: {round(risk_multiple,3)}', )
     plt.show()
 
+'''Calculate Sharpe ratio'''
 def init_sharpe_ratio(rel_returns, risk_free_rate, exp_short=None):
     exp_ret = np.mean(rel_returns)
     rf = np.mean(risk_free_rate)
@@ -295,6 +276,7 @@ def init_sharpe_ratio(rel_returns, risk_free_rate, exp_short=None):
     sharpe_ratio = (exp_ret - rf) / std
     return sharpe_ratio
 
+'''calculate coverare, basis risk, and total payments'''
 def init_coverage(payouts, damages):
     if np.sum(payouts) == np.sum(damages) == 0:
         coverage = np.nan
@@ -311,6 +293,7 @@ def init_coverage(payouts, damages):
 
     return coverage, basis_risk, tot_pay
 
+'''Calculate expected loss based on returns -> not used for final results'''
 def init_expected_loss(returns):
     #Filter to get the returns that are negative -> losses
     losses = returns.apply(lambda x: 0 if x > 0 else x)
@@ -318,12 +301,14 @@ def init_expected_loss(returns):
     expected_loss = np.mean(loss_magnitudes)
     return expected_loss
 
+'''Can be adjusted to model risk free rate but idea was discarded for now -> not used for final results'''
 def init_model_rf(risk_free_rate):
 
     modeled_rf_rates = [risk_free_rate] * term
 
     return modeled_rf_rates
 
+'''Check if risk free rate is am array or not'''
 def check_rf(risk_free_rates, iterator):
 
     if isinstance(risk_free_rates, list):
@@ -333,7 +318,7 @@ def check_rf(risk_free_rates, iterator):
 
     return rf
 
-
+'''Benchmark pricing function -> goes through all losses and determines requuired premium for ceratin sharpe ratio'''
 def find_sharpe(premium, ann_losses, rf, target_sharpe):
     ncf = []
     cur_nominal = 1
@@ -365,6 +350,7 @@ def find_sharpe(premium, ann_losses, rf, target_sharpe):
     sigma = np.std(ncf)
     return ((avg_ret - rf) / sigma - target_sharpe)**2
 
+'''Benchmark pricing function'''
 def init_prem_sharpe_ratio(ann_losses, rf, target_sharpe):        
 
     result = minimize(lambda p: find_sharpe(p, ann_losses, rf, target_sharpe), 

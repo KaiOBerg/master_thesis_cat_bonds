@@ -1,5 +1,6 @@
-from climada.engine import ImpactCalc
-
+'''Script derives the needed principal/nominal to pretect certain % of GDP or certain return period of damage'''
+#prot_rep for principal based on return period
+#prot_share for principal based on share of GDP
 def init_nominal(exposure, impact=None, prot_rp=None, prot_share=None, print_nom=True):
     tot_exp = exposure.gdf['value'].sum()
     if prot_rp is not None:

@@ -1,3 +1,5 @@
+'''Main script to calculate exposure and tc hazards for present climate conditions. Contains a few functions not used for final results'''
+
 import numpy as np
 from pathlib import Path
 import geopandas as gpd
@@ -46,7 +48,6 @@ basins_countries = {
 fin = 'gdp' #fin mode for exposure
 year = 2020 #reference year for exposure
 #define variables for grid and centroids
-res_centrs = 150 #resolution in arcsec for centroids
 grid_cell_size_km = 30 
 min_overlap_percent = 10 
 #define variables for TC class
@@ -63,7 +64,6 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
     for basin, countries in basins_countries.items():
         if country in countries:
             applicable_basin = basin
-            #print('STORM basin of country: ', applicable_basin)
     if 'applicable_basin' not in locals():
         print('Error: Applicable basin not found - Do not proceed.')
         return 0, 0, 0, 0, 0, 0
@@ -90,7 +90,7 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
     islands_gdf = unary_union(buffered_geometries)
     islands_gdf = gpd.GeoDataFrame({'geometry': [islands_gdf]}, crs=crs).explode(index_parts=True)
     grid_gdf = crop_grid_cells_to_polygon(islands_gdf, grid_specs, min_pol_size)
-    x, y, tc_bound = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs, plt_grd)
+    x, y, tc_bound = grd.process_islands(exp, buffer_distance_km, grid_cell_size_km, min_overlap_percent, crs)
     if crs == "EPSG:3857":
         exposure_crs = exp.crs
         islands_gdf = islands_gdf.to_crs(exposure_crs)
@@ -171,7 +171,7 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
 
 
 
-#Load all STORM tracks for the basin of interest.
+'''Load all STORM tracks for the basin of interest.'''
 def init_STORM_tracks(basin, file_path, load_fls=False):
     """Import TC Tracks"""
     all_tracks = []
@@ -187,7 +187,7 @@ def init_STORM_tracks(basin, file_path, load_fls=False):
 
     return storms_basin
 
-
+'''costumized function to turn track data into geodataframe'''
 def to_geodataframe(self):
     gdf = gpd.GeoDataFrame([dict(track.attrs) for track in self.data])
 
@@ -220,6 +220,7 @@ def to_geodataframe(self):
     return gdf
 
 
+'''create subareas for countries; needs country gdf, grids per polygon and minimum ploygon size for splitting'''
 def crop_grid_cells_to_polygon(gdf, grid_cells_per_polygon, min_pol_size):
     cropped_cells = []
     
@@ -230,22 +231,16 @@ def crop_grid_cells_to_polygon(gdf, grid_cells_per_polygon, min_pol_size):
             grid_gdf = gpd.GeoDataFrame({'geometry': [polygon.geometry]}, crs=gdf.crs)
             cropped_cells.append(grid_gdf)
         else:
-            # Get the bounding box of the polygon
             minx, miny, maxx, maxy = polygon.geometry.bounds
 
-            # Create a grid of the specified number of grid cells within the bounding box
-            #num_cells_x = grid_cells_per_polygon[idx][0]
-            #num_cells_y = grid_cells_per_polygon[idx][1]
             num_cells_x = grid_cells_per_polygon[0]
             num_cells_y = grid_cells_per_polygon[1]
             x_coords = np.linspace(minx, maxx, num_cells_x + 1)
             y_coords = np.linspace(miny, maxy, num_cells_y + 1)
 
-            # Create the grid cells (rectangles)
             grid_cells = []
             for i in range(num_cells_x):
                 for j in range(num_cells_y):
-                    # Define the coordinates for each grid cell
                     grid_cell = box(x_coords[i], y_coords[j], x_coords[i + 1], y_coords[j + 1])
                     cell_cropped = grid_cell.intersection(polygon.geometry)
                     grid_cells.append(cell_cropped)
@@ -255,7 +250,6 @@ def crop_grid_cells_to_polygon(gdf, grid_cells_per_polygon, min_pol_size):
             cropped_cells.append(grid_gdf)
 
     grids = gpd.GeoDataFrame(pd.concat(cropped_cells, ignore_index=True), crs=gdf.crs)
-    # Reset index to ensure each geometry is on a new row
     grids.reset_index(drop=True, inplace=True)
     grids_clean = grids[~grids.is_empty]
     grids_clean = grids_clean.reset_index(drop=True)

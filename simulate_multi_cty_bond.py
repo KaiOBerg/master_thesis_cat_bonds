@@ -1,17 +1,15 @@
+'''Script for simulating multi-country CAT bonds'''
+
 import pandas as pd
 import numpy as np
-from scipy.interpolate import interp1d
-from scipy.optimize import fsolve, minimize
-import matplotlib.pyplot as plt
-from decimal import Decimal, getcontext
+from scipy.optimize import minimize
+from decimal import getcontext
 getcontext().prec = 17  
-import functions as fct
-import time
 
 term = 3
 simulated_years = 10000
 
-
+'''Simulate one term of bond to derive losses'''
 def init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty=None):
     ann_loss = np.zeros(term)  
     loss_month_data = []
@@ -91,7 +89,7 @@ def init_bond_exp_loss(countries, events_per_year, nominal, nominal_dic_cty=None
     return rel_losses, att_prob, rel_tot_loss, cty_losses, loss_month, coverage_tot, coverage_cty
 
 
-
+'''Loop over all terms of bond to derive losses'''
 def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nominal_dic_cty, confidence_levels=[0.95, 0.99], print_prob=True):
     att_prob_list = []
     annual_losses = []
@@ -133,7 +131,6 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
 
     df_loss_month = pd.concat(list_loss_month, ignore_index=True)
 
-    # Convert simulated net cash flows to a series
     att_prob = np.mean(att_prob_list)
     exp_loss_ann = np.mean(annual_losses)
 
@@ -142,15 +139,6 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
 
     risk_metrics_annual = multi_level_es(annual_losses, confidence_levels)
     risk_metrics_total = multi_level_es(total_losses, confidence_levels)
-
-    #MES_cty = {country: {'EL': None} for country in ann_cty_losses.keys()} # MES_cty = {country: {'95': None, '99': None, 'EL': None} for country in ann_cty_losses.keys()}
-    #for country, ann_cty_losses_iter in ann_cty_losses.items():
-    #    ann_cty_losses_iter = pd.Series(ann_cty_losses_iter)
-    #    MES_cty[country]['95'] = ann_cty_losses_iter[annual_losses > VaR_95_ann].mean()
-    #    MES_cty[country]['99'] = ann_cty_losses_iter[annual_losses > VaR_99_ann].mean()
-    #MES_cty = {country: {'EL': np.mean(ann_cty_losses[country])} for country in ann_cty_losses}
-    #for cty in MES_cty:
-    #    MES_cty[cty]['share_EL'] = MES_cty[cty]['EL'] / exp_loss_ann
 
     for key in tot_coverage_cty.keys():
         tot_coverage_cty[key]['payout'] = sum(tot_coverage_cty[key]['payout'])
@@ -173,6 +161,8 @@ def init_exp_loss_att_prob_simulation(countries, pay_dam_df_dic, nominal, nomina
         print(f'Attachment Probability = {att_prob}')
     return exp_loss_ann, att_prob, df_loss_month, total_losses, es_metrics, tot_coverage_cty
 
+
+'''Simulate over all terms of bond to derive returns'''
 def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, nominal_dic_cty=None, el_dic=None, want_ann_returns=True, model_rf=False):
 
     metric_names = ['tot_payout', 'tot_damage', 'tot_premium', 'tot_pay']
@@ -259,6 +249,7 @@ def init_bond_simulation(pay_dam_df_dic, premium, rf_rate, nominal, countries, n
             
     return bond_metrics, bond_returns, tot_coverage_cty
 
+'''Simulate over one term of bond to derive returns'''
 def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nominal_dic_cty=None, share_prem=None, nom_prem=None):   
     simulated_ncf = []
     simulated_premium = []
@@ -380,6 +371,7 @@ def init_bond(events_per_year, premium, risk_free_rates, nominal, countries, nom
 
     return NCF, metrics, rf_rates_list, coverage_cty
 
+'''Calculate sharpe ratio'''
 def init_sharpe_ratio(rel_returns, risk_free_rate, exp_short=None):
     exp_ret = np.mean(rel_returns)
     rf = np.mean(risk_free_rate)
@@ -390,12 +382,14 @@ def init_sharpe_ratio(rel_returns, risk_free_rate, exp_short=None):
     sharpe_ratio = (exp_ret - rf) / std
     return sharpe_ratio
 
+'''Can be adjusted to model risk free rate but idea was discarded for now -> not used for final results'''
 def init_model_rf(risk_free_rate):
 
     modeled_rf_rates = [risk_free_rate] * term
 
     return modeled_rf_rates
 
+'''Check if risk free rate is am array or not'''
 def check_rf(risk_free_rates, iterator):
 
     if isinstance(risk_free_rates, list):
@@ -405,7 +399,7 @@ def check_rf(risk_free_rates, iterator):
 
     return rf
 
-
+'''Benchmark pricing function -> goes through all losses and determines requuired premium for ceratin sharpe ratio'''
 def find_sharpe(premium, ann_losses, rf, target_sharpe):
     ncf = []
     cur_nominal = 1
@@ -437,6 +431,7 @@ def find_sharpe(premium, ann_losses, rf, target_sharpe):
     sigma = np.std(ncf)
     return ((avg_ret - rf) / sigma - target_sharpe)**2
 
+'''Benchmark pricing function'''
 def init_prem_sharpe_ratio(ann_losses, rf, target_sharpe):        
 
     result = minimize(lambda p: find_sharpe(p, ann_losses, rf, target_sharpe), 
@@ -445,7 +440,7 @@ def init_prem_sharpe_ratio(ann_losses, rf, target_sharpe):
 
     return optimal_premium
 
-
+'''Calculate value at risk and expected shorfall for various alphas'''
 def multi_level_es(losses, confidence_levels):
     """
     Calculate VaR and ES for multiple confidence levels.
@@ -479,7 +474,7 @@ def multi_level_es(losses, confidence_levels):
     
     return risk_metrics
 
-
+'''reduced function to derive returns of the bond -> was used to save time during calculation'''
 def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, premium_name, rf=0.0):
     ncf = {tranche['RP']: [] for _, tranche in tranches.iterrows()}
     premiums_tot = []
@@ -561,7 +556,7 @@ def simulate_ncf_prem(premium, ann_losses, tranches, cty_el_dic, premium_name, r
     prem_cty_df = pd.DataFrame(prem_cty_dic)
     return ncf, prem_cty_df
 
-
+'''derives losses for one term of bond'''
 def init_equ_nom_sim(events_per_year, nominal_dic_cty):
     ann_loss = np.zeros(term)
     cur_nom_cty = nominal_dic_cty.copy()
@@ -593,7 +588,7 @@ def init_equ_nom_sim(events_per_year, nominal_dic_cty):
     return tot_loss
 
 
-
+'''Calculates required nominal for multi-country bonds -> derives maximal loss over simulation period'''
 def requ_nom(countries, pay_dam_df_dic, nominal_dic_cty):
     total_losses = []
 
@@ -613,7 +608,7 @@ def requ_nom(countries, pay_dam_df_dic, nominal_dic_cty):
 
     return requ_nominal
 
-
+'''Benchmark pricing function specifically for tranches -> goes through all losses and determines requuired premium for ceratin sharpe ratio'''
 def find_sharpe_tranches(premium, share_nom, tranche_losses, ann_losses, rf, target_sharpe):
     ncf = []
     cur_nominal = 1
@@ -645,6 +640,7 @@ def find_sharpe_tranches(premium, share_nom, tranche_losses, ann_losses, rf, tar
     sigma = np.std(ncf)
     return ((avg_ret - rf) / sigma - target_sharpe)**2
 
+'''Benchmark pricing function specifically for tranches'''
 def init_prem_sharpe_ratio_tranches(ann_losses, share_nom, tranche_losses, rf, target_sharpe):        
 
     result = minimize(lambda p: find_sharpe_tranches(p, share_nom, tranche_losses, ann_losses, rf, target_sharpe), 

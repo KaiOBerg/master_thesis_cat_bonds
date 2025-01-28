@@ -1,3 +1,5 @@
+'''Intended for use on euler to extract and create tc hazards using STORM-P datasets'''
+
 import sys
 from pathlib import Path
 import exposure_euler as ex

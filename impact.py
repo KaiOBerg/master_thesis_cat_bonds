@@ -1,3 +1,4 @@
+'''Derive impact for hazard events'''
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,9 +12,9 @@ from climada.engine import ImpactCalc
 
 def init_imp(exp, haz, admin_gdf=None, plot_frequ=True):
     #import regional calibrated impact function for TC
-    # prepare impact calcuation - after Samuel Eberenz
-    # The iso3n codes need to be consistent with the column “region_id” in the 
-    # 1. Init impact functions:
+    #prepare impact calcuation - after Samuel Eberenz
+    #The iso3n codes need to be consistent with the column “region_id” in the 
+    #1. Init impact functions:
     impact_func_set = trop_cyclone.ImpfSetTropCyclone()
     impf_set = impact_func_set.from_calibrated_regional_ImpfSet()
     impf_set.check()
@@ -24,7 +25,7 @@ def init_imp(exp, haz, admin_gdf=None, plot_frequ=True):
     code_regions = {'NA1': 1, 'NA2': 2, 'NI': 3, 'OC': 4, 'SI': 5, 'WP1': 6, \
                     'WP2': 7, 'WP3': 8, 'WP4': 9, 'ROW': 10}
 
-    # match exposure with correspoding impact function
+    #match exposure with correspoding impact function
     for calibration_region in impf_id_per_region:
         for country_iso3n in iso3n_per_region[calibration_region]:
             exp.gdf.loc[exp.gdf.region_id== country_iso3n, 'impf_TC'] = code_regions[calibration_region]
@@ -41,28 +42,23 @@ def init_imp(exp, haz, admin_gdf=None, plot_frequ=True):
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(23, 6), gridspec_kw={'width_ratios': [10, 5, 5]})
     
-        # Plot on ax1
         ax1.plot(return_period_flt, impact_flt, label='Filtered Data')
     
-        # Add labels and title with increased font size
         ax1.set_title("Impact Frequency Curve", fontsize=16)
         ax1.set_xlabel("Return Period [Years]", fontsize=14)
         ax1.set_ylabel("Impact [USD]", fontsize=14)
     
-        # Create an inset plot (overview of total data)
-        inset_ax1 = inset_axes(ax1, width="30%", height="30%", loc='lower right', borderpad=3.0)  # adjust size and position
+        inset_ax1 = inset_axes(ax1, width="30%", height="30%", loc='lower right', borderpad=3.0)  
         inset_ax1.plot(frequ_curve.return_per, frequ_curve.impact, label='Overview Data')
         inset_ax1.set_xlabel("Return Period [Years]", fontsize=10)
         inset_ax1.set_ylabel("Impact [USD]", fontsize=10)
     
-        # Plot on ax2 (log x-axis)
         ax2.plot(frequ_curve.return_per, frequ_curve.impact)
         ax2.set_xscale('log')
         ax2.set_xlabel('Return Period [Years]', fontsize=14)
         ax2.set_ylabel('Impact [USD]', fontsize=14)
         ax2.set_title('Impact Frequency Curve - Log', fontsize=16)
     
-        # Plot on ax3 (log-log scale)
         ax3.plot(frequ_curve.return_per, frequ_curve.impact)
         ax3.set_xscale('log')
         ax3.set_yscale('log')
@@ -70,10 +66,8 @@ def init_imp(exp, haz, admin_gdf=None, plot_frequ=True):
         ax3.set_ylabel('Impact [USD]', fontsize=14)
         ax3.set_title('Impact Frequency Curve - LogLog', fontsize=16)
         
-        # Adjust layout
         plt.tight_layout()
     
-        # Show both plots
         plt.show()
 
 

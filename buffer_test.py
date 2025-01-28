@@ -1,3 +1,6 @@
+'''used to test which TC boundary distance is the most appropriate for Samoa'''
+#intended for use on Euler cluster
+
 import exposure_buffer_test as ex_buf
 import impact as cimp
 import set_nominal as snom
@@ -8,8 +11,10 @@ from concurrent.futures import ProcessPoolExecutor
 
 OUTPUT_DIR = Path("/cluster/work/climate/kbergmueller/cty_data")
 STORM_DIR = Path("/cluster/work/climate/kbergmueller/storm_tc_tracks")
+#cat bond set ups
 lower_share = 0.05
 country = 882
+#Tc boundary distance
 buffer_distance_arr = np.arange(10, 151, 10)  # Buffer distances
 
 
@@ -33,14 +38,11 @@ def process_buffer(buffer):
 if __name__ == "__main__":
     print("Started")
 
-    # Parallelize processing of buffer distances
     with ProcessPoolExecutor() as executor:
         results = list(executor.map(process_buffer, buffer_distance_arr))
 
-    # Filter out failed results and prepare DataFrame
     valid_results = [(buf, cou) for buf, cou in results if cou is not None]
     df = pd.DataFrame(valid_results, columns=["Buffer Distance (km)", "Number Events"])
-    # Save the DataFrame to an Excel file
     output_file = OUTPUT_DIR / "events_vs_buffer_150.xlsx"
     df.to_excel(output_file, index=False)
     print(f"Saved results to {output_file}")

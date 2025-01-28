@@ -1,6 +1,6 @@
+'''Risk pooling optimization functions adapted from Ciullo et al., 2022'''
 import numpy as np
 from math import comb
-
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.core.variable import Integer
 
@@ -49,42 +49,7 @@ def calc_pool_conc(x, data_arr, bools, alpha):
 
     return np.round(POOL_CONC, 2) #, IND_CONC, MES, ES_cntry, tot_damage
 
-def calc_pools_conc(x, data, bools, alpha, N, fixed_pools=None):
-    """Calculate diversification of N pools where all passed countries
-    must be in one pool
-
-    x : np.array
-        Integers. Integers assess what pool do countries join. 
-        It must hold that x.size equals + fixed_pools.size equals n_countries.
-    data : np.array
-        Numpy array with annual damages for all countries
-    bools : np.array
-        Numpy array with the same shape as data, indicating when 
-        annual damages are higher/lower than the country VaR
-    alpha : float
-        Confidence level to estimating VaR and ES
-    N : int
-        Number of pools
-    fixed_pools : np.array
-        Integers for countries which will always join the same pool. It 
-        concatenates x from the left (beginning of the array). It must hold that 
-        x.size equals + fixed_pools.size equals n_countries.
-    """
-
-    CONC_POOL = []
-
-    if fixed_pools is not None:
-        x = np.hstack([fixed_pools, x])
-
-    for i in range(1, N+1):
-        countries_in_pool = x == i
-        conc_pool = calc_pool_conc(countries_in_pool, data, bools, alpha)[0]
-
-        CONC_POOL.append(conc_pool)
-
-    return np.array([CONC_POOL])
-
-
+'''Pool optimization problem for Case Study 2'''
 class PoolOptimizationProblem(ElementwiseProblem):
     def __init__(self, nominals, data, bools, alpha, N, fun, **kwargs):
         self.data_arr = data
@@ -130,7 +95,7 @@ def pop_num(n, k):
     combinations = comb(n + k - 1, k)
     return combinations
 
-
+'''Pool optimization problem for Case Study 3'''
 class PoolOptimizationProblemFS(ElementwiseProblem):
     def __init__(self, nominals, max_nominal, data, bools, alpha, N, fun, **kwargs):
         self.data_arr = data

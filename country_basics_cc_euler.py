@@ -1,3 +1,4 @@
+'''Intended for use on euler to extract and create tc hazards based on climate change conditions using STORM-F datasets'''
 import sys
 from pathlib import Path
 import exposures_cc as ex_cc

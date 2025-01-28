@@ -1,31 +1,109 @@
-## Description taken from `description_code_sam.docx`
+## Corresponding code for the Master Thesis: Closing the Insurance Gap - Enhancing Access to the CAT Bond Market by Kai Bergmüller (2025)
 
-The heart of the code is saved in 
+The construction of the CAT bond proposed for Samoi in the first case study of the thesis is saved in:
+   * single_country_bond_main.ipynb
 
-   * Simulate_bond.py
-   * Simulate_multi_cty_bond.py
-    
-The first one is for single country bonds and the second one is for multi country bonds. The function “init_exp_loss_att_prob_simulation” is used to simulate important metrics of the bond such as expected loss and attachment probability so that the premiums can be calculated based on its results. This function uses “init_bond_exp_loss” for each term of the bond. 
-The function “init_bond_simulation” simulates the bond with the premiums and uses “init_bond” for each term of the bond. 
-In the same python script, there is also the function “find_sharpe” which estimates the premium necessary to meet a certain sharpe ratio based on the simulations of “init_exp_loss_att_prob_simulation”.
+   The notebook depends on various python scripts each dedicated to a specific part of the CAT bond design. The scripts are the following:
+      * exposures_alt.py -> derive exposure, TC boundary, subareas, and hazard data; this script makes use of 
+         * grider.py -> created TC boundary to filter for eligible hazards
+      * impact.py -> takes the hazard and subarea data and derives the damage per event and subarea 
+      * bound_prot_dam.py -> calculates return periods and sets damages below minimum payout to zero
+      * haz_int_grd.py -> takes the hazard and subarea data and derives the parametric index per event and subarea (wind speed or central pressure)
+      * set_nominal.py -> takes the hazard and damage data and derives the nominal/principal based on return periods of damage or the share of GDP
+      * alt_pay_opt.py -> takes the damage,hazard, and parametric index data and calibrates the payout function and results in a dataframe indicating damage, payout, year, and month per hazard event
+      * simulate_bond.py -> used to simulate the bond using all hazard events. First, the losses as well as the relevant metrics for the losses will be derive (expected loss, attachment probability, and various financial metrics)
+      * calc_prem.py; simulate_bond.py; prem_ibrd.py -> used to derive premiums using various pricing methods based on loss data. calc_prem.py = Chatoro-Pricing; simulate_bond.py = Benchmark-Pricing; prem_ibrd.py = IBRD-Pricing
+      * simulate_bond.py -> using the premium estimates now the returns of the bond can be simulated and the bond set up is complete
 
-Another important python script is
+   Testing of the bond was done by using:
+      * sng_cty_cc.py -> for testing climate change resilience
+      which made use of the following script to get exposure and hazard data:
+         * exposures_cc.py 
+   and
+      * product_test_historic.ipynb -> tests product with historic and perturbed tracks
+   
+   Addtionally, to derive optimal product combinations (subareas and parametric index statistic) the following script was used:
+      * opt_sub_area_euler.py  
+   and to test TC boundary distance:
+      * buffer_test.py
+      which made use of a reduced version of exposures_alt.py saved in:
+         * exposure_buffer_test.py
 
-   * alt_pay_opt.py
-    
-The first functions are used to optimize the payouts. The problem we discussed about last time, that the optimization is not stable for high principals, is solved. The problem was that the minimum payout of the bond was in percentage. So, if the minimum payout of a bond with a high principal was higher than the minimum damage, I want to protect the coverage decreased. I now changed the minimum payout to an absolute value which works fine. The functions are a bit messy because I tried to write them in a way that the payout can also be calibrated with central pressures instead of wind speed, though I did not test yet if it works appropriately because I always use wind speeds.
-The last function in the script calculates then the total payout per event which is also very important for the bond simulation.
+   The dependance of the optimization of the payout function on the number of events was tested in:
+      * testing_optimization.ipynb
+   and the test regarding the sequence of years in the bond set up was done in:
+      * test_simulation_years.ipynb
 
-Another important python script is
 
-   * exposure.py
-    
-This script is used to calculate exposure, import tracks, filter tracks, generate TC class and create the TC track boundary as well as subareas. So, in a sense this function creates the base of simulation for each country. This script also uses a function from grider.py. In this script are a few functions currently not used because I am still deciding what’s the best way to create subareas for each country.
 
-There are a few other important scripts such as 
 
-   * haz_int_grd.py -> extracts the hazard intensity per grid
-   * impact.py -> calculates impact per event and subarea and so on
+Results for the pooling set up described in Case Study 2 are presented in:
+   * results_main_pool_sub.ipynb
+   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script
+      * master_of_disaster_pooling.py
+      This script makes use of the script:
+         * n_fct_t_rl_thm_ll.py 
+      which includes all the wrapper function to design single-country or multi-country bonds making use of
+         * simulate_multi_cty_bond.py -> simulate multi-country bonds used for derive losses and related metrics as well as returns
+      premiums were calculated with the same scripts as in Case Study 1.
+      Tranches were calculated with the script:
+         * functions.py
+   Optimal pools for the set of countries were cacluated with:
+      * pooling_n_pools.py 
+      based on the optimization function from Ciullo et al. (2022) and Elsener (2024) saved in:
+         * pooling_functions_ciullo.py
 
-There are a lot of other scripts on github, but not all of them are currently used. The ones I named in this document are the core of my product and if they work the results should be fine. The other notebooks are mostly only simple functions without much complicated code. 
-The jupyter notebooks are in constant evolution and only use functions from the scripts. Its difficult to check them because I always try out new stuff so often they do not run properly. If you want to have a look at one, it makes sense to use those from the climada workshop because they work probably.
+          
+
+
+Results for the financial scheme described in Case Study 3 are presented in:
+   * results_fs_pools.ipynb
+   The notebook first imports the data on the respective single country bonds which were calculated on euler with the script
+      * master_of_disaster_pooling.py
+      This script makes use of the script:
+         * n_fct_t_rl_thm_ll.py 
+      which includes all the wrapper function to design single-country or multi-country bonds making use of
+         * simulate_multi_cty_bond.py -> simulate multi-country bonds used for derive losses and related metrics as well as returns
+      premiums were calculated with the same scripts as in Case Study 1.
+      Tranches were calculated with the script:
+         * functions.py
+   Optimal pools for the set of countries were cacluated with:
+      * pooling_max_nom.py 
+      based on the optimization function from Ciullo et al. (2022) and Elsener (2024) saved in:
+         * pooling_functions_ciullo.py
+   The share of premium donation calculations is presented in: 
+      * plot_fs_share_pay.ipynb
+      and a automated function to derive premium shares was implemeted in:
+         * functions.py
+   The historical risk-return performance of the Norwegian Pension fund was derived in:
+      * risk_return_profile.ipynb 
+
+
+
+
+TC data was created with the following functions on euler:
+   * IBTRACS_import.py
+   * country_basics_euler.py
+   using 
+      * exposure_euler.py
+   * country_basics_cc_euler.py
+   using
+      * exposures_cc_euler.py
+
+
+
+Other scripts:
+For each country damage for the 250-year return period event was derived with:
+   * assess_tc_danger.py
+And to test the bond simulating functions the following script was used:
+   * hands_on_example_simulate_bond.py
+An analysis what happens to IBRD-Pricing premiums when pooling is presented in:
+   * prem_ibrd_analysis.ipynb
+
+
+
+Other notebooks whcih were not used for final results but could be useful in the future: 
+   * wang_transformation.ipynb -> very popular method to calculate reinsurance prices
+   * model_sofr.ipynb -> implementing Cox-Ingersoll-Ross Model to simulate risk free rate
+
+

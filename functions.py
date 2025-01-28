@@ -1,3 +1,4 @@
+'''Conatains a variety of functions used for analysis and plotting.'''
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,10 +10,8 @@ import prem_ibrd as prib
 import simulate_multi_cty_bond as smcb
 import alt_pay_opt as apo
 import impact as cimp
-import bound_prot_dam as bpd
 
-artemis_multiplier = 4.54
-
+#checks if it is a scaler value
 def check_scalar(variable):
     if np.isscalar(variable):
         cor_var = np.array([variable])
@@ -21,6 +20,7 @@ def check_scalar(variable):
     
     return cor_var
 
+#extract values from dictionary for better display
 def get_all_values(d):
     values = []
     for value in d.values():
@@ -30,6 +30,7 @@ def get_all_values(d):
             values.append(value)
     return values
 
+#print progress bar when doing a for loop
 def print_progress_bar(iteration, total, prefix='Progress', suffix='Complete', decimals=1, length=50, fill='█'):
     """
     Call in a loop to create terminal progress bar
@@ -49,6 +50,7 @@ def print_progress_bar(iteration, total, prefix='Progress', suffix='Complete', d
     if iteration == total: 
         print()
 
+#show results
 def print_sng_bnd_rel_metr(bond_metrics, returns, premium_dic, nominal):
     print('Expected Loss:',round(premium_dic['exp_loss']*100, 1),'%')
     print('Attachment Probability:',round(premium_dic['att_prob']*100,1),'%')
@@ -58,6 +60,7 @@ def print_sng_bnd_rel_metr(bond_metrics, returns, premium_dic, nominal):
     print('Premium Target Sharpe Ratio',round(premium_dic['required']*100,1),'%;',round(premium_dic['required']*nominal, 0),'USD')
     print('Standard Deviation of Returns',round(np.std(returns['Annual'][0]),2))
 
+#show results
 def print_mlt_bnd_rel_metr(countries, returns, premium_dic, tot_coverage_cty, nominal):
     print('Expected Loss: ',round(premium_dic['exp_loss']*100, 1),'%')
     print('Attachment Probability: ',round(premium_dic['att_prob']*100,1),'%')
@@ -68,7 +71,7 @@ def print_mlt_bnd_rel_metr(countries, returns, premium_dic, tot_coverage_cty, no
     print('Premium Target Sharpe Ratio',round(premium_dic['required']*100,1),'%; ',round(premium_dic['required']*nominal, 0),'USD')
     print('Standard Deviation Returns',np.std(returns['Annual'][0]))
 
-
+#calculate return period of losses
 def calc_rp_bnd_lss(ann_losses, return_period):
     """
     Compute impacts/payouts for specific return periods using a DataFrame.
@@ -79,8 +82,6 @@ def calc_rp_bnd_lss(ann_losses, return_period):
         A Series containing annual loss values.
     return_periods : Object
         The return period where we want to compute the exceedance impact/pay.
-    damage : Boolean
-        Indicating if function should return associated damage value or payout for given return period.
 
     Returns
     -------
@@ -99,7 +100,8 @@ def calc_rp_bnd_lss(ann_losses, return_period):
 
     return calc_value
 
-def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0, peak_mulit=1):
+#create tranches for multi country bond
+def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0, peak_mulit=0):
     rows = []
     tranch_df = pd.DataFrame(columns=['RP', 'Loss'])
     for i in rp_array:
@@ -120,7 +122,6 @@ def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0
     tranches['premium_ibrd'] = 0.0
     tranches['premium_regression'] = 0.0
     tranches['premium_required'] = 0.0
-    tranches['premium_artemis'] = 0.0 
     tranche_losses_dic = {}
 
     # Calculate lower and upper bounds, and expected loss
@@ -173,10 +174,10 @@ def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0
     tranches['premium_regression'] = cp.calc_premium_regression(tranches['expected_loss_own'] *100, peak_mulit)/100 + prem_corr
     for i in tranches.index:
         tranches.at[i, 'premium_required'] = smcb.init_prem_sharpe_ratio_tranches(ann_losses_alt, tranches.at[i, 'nominal'], tranche_losses_dic[i], 0.0, 0.5) + prem_corr
-    tranches['premium_artemis'] = tranches['expected_loss_own'] * artemis_multiplier + prem_corr
 
     return tranches
 
+#plot histogram of tc events according to tc category
 def plot_TC_hist(tc, categories, ax):
     #should I limit it to on land centroids?
     dense_intensity = np.squeeze(np.asarray(tc.intensity.todense()).flatten())
@@ -193,12 +194,11 @@ def plot_TC_hist(tc, categories, ax):
     
     return ax
 
-def plot_vulnerability(impf_TC, fun_id, categories, optimized_min, optimized_max, nominal, exp, admin_gdf, ax):
+
+def plot_vulnerability(impf_TC, fun_id, ax):
     ax = plot_impf(impf_TC, fun_id, ax)
-    #ax = plot_payout_structure(optimized_min, optimized_max, nominal, categories, exp, admin_gdf, ax)
 
     handles, labels = plt.gca().get_legend_handles_labels()
-    # labels will be the keys of the dict, handles will be values
     temp = {k:v for k,v in zip(labels, handles)}    
     ax.legend(temp.values(), temp.keys(), loc="lower right")
     ax.set_ylabel('Damage (%)', fontsize=12)
@@ -206,12 +206,14 @@ def plot_vulnerability(impf_TC, fun_id, categories, optimized_min, optimized_max
 
     return ax
 
+
 def plot_impf(impf_TC, fun_id, ax):
     mdd_impf = impf_TC.get_func(fun_id=fun_id)[0].mdd*100
     intensity_mdd = impf_TC.get_func(fun_id=fun_id)[0].intensity
     ax.plot(intensity_mdd, mdd_impf, label='Impact \nfunction', c='k', zorder=2)
     
     return ax 
+
 
 def plot_payout_structure(optimized_min, optimized_max, nominal, categories, exp, admin_gdf, ax):
     exp_crs = exp.gdf
@@ -234,15 +236,17 @@ def plot_payout_structure(optimized_min, optimized_max, nominal, categories, exp
     
     return ax
 
-def plot_vul_his(tc, categories, impf_TC, impf_id, optimized_min, optimized_max, nominal, exp, admin_gdf):
+
+def plot_vul_his(tc, categories, impf_TC, impf_id):
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1 = plot_TC_hist(tc, categories, ax1)
     ax2 = ax1.twinx()
-    ax2 = plot_vulnerability(impf_TC, impf_id, categories, optimized_min, optimized_max, nominal, exp, admin_gdf, ax2)
+    ax2 = plot_vulnerability(impf_TC, impf_id, ax2)
 
     return ax1
 
+#plot mean damage and payout for different damage levels
 def plot_bin_dam_pay(pay_dam_df, nominal):
     # Calculate damage and pay percentages
     dam_perc = pay_dam_df['damage'] / nominal * 100
@@ -269,7 +273,6 @@ def plot_bin_dam_pay(pay_dam_df, nominal):
         'Mean Payout': mean_per_bin_pay.values
     })
 
-    # Melt data for swarmplot
     plot_data_melted = pd.melt(
         result,
         id_vars='bin',
@@ -278,33 +281,28 @@ def plot_bin_dam_pay(pay_dam_df, nominal):
         value_name='value'
     )
 
-    # Plotting
     fig, ax1 = plt.subplots(figsize=(8, 6))
 
-    # Add swarmplot
     sns.swarmplot(data=plot_data_melted, x='bin', y='value', hue='type', palette='Set2', ax=ax1)
     ax1.set_ylabel('Damage/Payout [%]', fontsize=12)
     ax1.set_xlabel('Modeled damage per affected unit and event [%]', fontsize=12)
     ax1.legend(loc='upper center')
 
-    # Add barplot for counts on a secondary y-axis
     ax2 = ax1.twinx()
     sns.barplot(x=x_labels, y=result['count_dam'], alpha=0.4, color='gray', ax=ax2)
     ax2.set_ylabel('Event Count', fontsize=12)
     ax2.tick_params(axis='y')
 
-    # Adjustments
     plt.tight_layout()
     plt.show()
 
 
+#create TC histogram for climate change analysis
 def plot_TC_hist_cc(tc_dic, categories, ax):
     tc_sets = ["CRCL", "CMCC", "CNRM", "ECEARTH", "HADGEM"]
 
-    # Initialize a dictionary to store the share of each tc_set per category
     category_shares = {tc_set: [] for tc_set in tc_sets}
 
-    # Extract intensities and compute shares
     n_tc = {}
     for tc_set in tc_dic:
         tc = tc_dic[tc_set]
@@ -313,54 +311,47 @@ def plot_TC_hist_cc(tc_dic, categories, ax):
         hist, _ = np.histogram(dense_intensity, bins=categories, density=False)
         category_shares[tc_set] = hist
 
-    # Sum the total occurrences per category across all tc_sets
     total_per_category = np.sum([np.array(category_shares[tc_set]) for tc_set in tc_dic.keys()], axis=0)
     
-    # Normalize shares (percentage of total per category for each tc_set)
     for tc_set in tc_dic:
         category_shares[tc_set] = np.array(category_shares[tc_set]) / total_per_category
 
-    # Create a stacked bar plot
-    bottom = np.zeros(len(categories)-1)  # Tracks the bottom of each stack
+    bottom = np.zeros(len(categories)-1) 
     for i, tc_set in enumerate(tc_sets):
-        shares = category_shares[tc_set] * 100  # Convert shares to percentage
+        shares = category_shares[tc_set] * 100 
         bars = ax.bar(
-            categories[:-1],  # Category midpoints for x-axis
-            category_shares[tc_set] * 100,  # Convert shares to percentage
-            width=np.diff(categories),  # Match bin width
-            bottom=bottom * 100,  # Stacking bars
+            categories[:-1],  
+            category_shares[tc_set] * 100, 
+            width=np.diff(categories),
+            bottom=bottom * 100,
             label=f"{tc_set}\nn={n_tc[tc_set]}",
-            color=f"C{i}",  # Cycle through default colors
+            color=f"C{i}", 
             edgecolor="k",
             linewidth=0.5,
             align="edge",
         )
 
-        ## Add share as text inside the bar
         iterator = 0
         for rect, share in zip(bars, shares):
-            if share > 0:  # Only label non-zero shares
+            if share > 0: 
                 if iterator % 5 == 0 and iterator > 0:
                     x = rect.get_x() + rect.get_width() / 2 - 22
                 else:
                     x = rect.get_x() + rect.get_width() / 2
                 y = rect.get_y() + rect.get_height() / 2
                 ax.text(
-                    x,  # X-coordinate (center of bar)
-                    y,  # Y-coordinate (center of stack)
-                    f"{share:.1f}%",  # Label (percentage)
+                    x,  
+                    y,  
+                    f"{share:.1f}%",  
                     ha="center", va="center", fontsize=8, color="white"
                 )
             iterator += 1
 
-        # Update the bottom for the next stack
         bottom += category_shares[tc_set]
 
-    # Label the axes
     ax.set_ylabel("Share per Category (%)", fontsize=12)
     ax.set_xlabel("Tropical Cyclone Category", fontsize=12)
 
-    # Custom x-axis ticks and labels
     newlabel = ['  Trop. storm', '   Cat. 1', ' Cat. 2', '   Cat. 3', '    Cat. 4', '    Cat. 5', '']
     ax.set_xticks(categories, newlabel,horizontalalignment='left')
     ax.set_xlim(18, 90)
@@ -371,6 +362,7 @@ def plot_TC_hist_cc(tc_dic, categories, ax):
     
     return ax
 
+#define function to test the developed CAT bond
 def prod_test_ibtrac(tc_storms, exp, admin_gdf, nominal, optimized_step1, optimized_step2, imp_per_event_flt, imp_admin_evt_flt, lower_share):
     imp_hist, imp_per_event_hist, imp_admin_evt_hist = cimp.init_imp(exp, tc_storms, admin_gdf, plot_frequ=False) 
 
@@ -430,7 +422,6 @@ def prod_test_ibtrac(tc_storms, exp, admin_gdf, nominal, optimized_step1, optimi
 
     min_pay = lower_share * exp.gdf['value'].sum()
 
-    # Filter out rows where `imp` is smaller than `min_pay`
     filtered_data = dam_pay_data_ibtracs[dam_pay_data_ibtracs['imp'] >= min_pay]
 
     squaredDiffs = np.square(filtered_data['imp'] - filtered_data['pay'])
@@ -441,6 +432,7 @@ def prod_test_ibtrac(tc_storms, exp, admin_gdf, nominal, optimized_step1, optimi
     return dam_pay_data_ibtracs, rSquared
 
 
+#define function to calcualte the share of each premium donor in the financial scheme - case study 3
 def plot_prem_share(weighter=1, eu=True, threshold_other=1, file_path="C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data"):    
     OUTPUT_DIR = Path(file_path)
     EU = ['AUT', 'BEL', 'CYP', 'CZE', 'DNK', 'EST', 'FIN', 'FRA', 'DEU', 'GRC', 'HUN', 'IRL', 'ITA', 'LVA', 'LTU', 'LUX', 'MLT', 'NLD', 'PRT', 
