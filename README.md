@@ -4,35 +4,35 @@ The construction of the CAT bond proposed for Samoi in the first case study of t
    * single_country_bond_main.ipynb
 
    The notebook depends on various python scripts each dedicated to a specific part of the CAT bond design. The scripts are the following:
-      * exposures_alt.py -> derive exposure, TC boundary, subareas, and hazard data; this script makes use of 
-         * grider.py -> created TC boundary to filter for eligible hazards
-      * impact.py -> takes the hazard and subarea data and derives the damage per event and subarea 
-      * bound_prot_dam.py -> calculates return periods and sets damages below minimum payout to zero
-      * haz_int_grd.py -> takes the hazard and subarea data and derives the parametric index per event and subarea (wind speed or central pressure)
-      * set_nominal.py -> takes the hazard and damage data and derives the nominal/principal based on return periods of damage or the share of GDP
-      * alt_pay_opt.py -> takes the damage,hazard, and parametric index data and calibrates the payout function and results in a dataframe indicating damage, payout, year, and month per hazard event
-      * simulate_bond.py -> used to simulate the bond using all hazard events. First, the losses as well as the relevant metrics for the losses will be derive (expected loss, attachment probability, and various financial metrics)
-      * calc_prem.py; simulate_bond.py; prem_ibrd.py -> used to derive premiums using various pricing methods based on loss data. calc_prem.py = Chatoro-Pricing; simulate_bond.py = Benchmark-Pricing; prem_ibrd.py = IBRD-Pricing
-      * simulate_bond.py -> using the premium estimates now the returns of the bond can be simulated and the bond set up is complete
+      * exposures_alt.py -> derive exposure, TC boundary, subareas, and hazard data; this script makes use of\
+         * grider.py -> created TC boundary to filter for eligible hazards\
+      * impact.py -> takes the hazard and subarea data and derives the damage per event and subarea\
+      * bound_prot_dam.py -> calculates return periods and sets damages below minimum payout to zero\
+      * haz_int_grd.py -> takes the hazard and subarea data and derives the parametric index per event and subarea (wind speed or central pressure)\
+      * set_nominal.py -> takes the hazard and damage data and derives the nominal/principal based on return periods of damage or the share of GDP\
+      * alt_pay_opt.py -> takes the damage,hazard, and parametric index data and calibrates the payout function and results in a dataframe indicating damage, payout, year, and month per hazard event\
+      * simulate_bond.py -> used to simulate the bond using all hazard events. First, the losses as well as the relevant metrics for the losses will be derive (expected loss, attachment probability, and various financial metrics)\
+      * calc_prem.py; simulate_bond.py; prem_ibrd.py -> used to derive premiums using various pricing methods based on loss data. calc_prem.py = Chatoro-Pricing; simulate_bond.py = Benchmark-Pricing; prem_ibrd.py = IBRD-Pricing\
+      * simulate_bond.py -> using the premium estimates now the returns of the bond can be simulated and the bond set up is complete\
 
    Testing of the bond was done by using:
-      * sng_cty_cc.py -> for testing climate change resilience
-      which made use of the following script to get exposure and hazard data:
+      * sng_cty_cc.py -> for testing climate change resilience\
+      which made use of the following script to get exposure and hazard data:\
          * exposures_cc.py 
-   and
-      * product_test_historic.ipynb -> tests product with historic and perturbed tracks
+   and\
+      * product_test_historic.ipynb -> tests product with historic and perturbed tracks\
    
-   Addtionally, to derive optimal product combinations (subareas and parametric index statistic) the following script was used:
-      * opt_sub_area_euler.py  
-   and to test TC boundary distance:
-      * buffer_test.py
-      which made use of a reduced version of exposures_alt.py saved in:
-         * exposure_buffer_test.py
+   Addtionally, to derive optimal product combinations (subareas and parametric index statistic) the following script was used:\
+      * opt_sub_area_euler.py\
+   and to test TC boundary distance:\
+      * buffer_test.py\
+      which made use of a reduced version of exposures_alt.py saved in:\
+         * exposure_buffer_test.py\
 
-   The dependance of the optimization of the payout function on the number of events was tested in:
-      * testing_optimization.ipynb
-   and the test regarding the sequence of years in the bond set up was done in:
-      * test_simulation_years.ipynb
+   The dependance of the optimization of the payout function on the number of events was tested in:\
+      * testing_optimization.ipynb\
+   and the test regarding the sequence of years in the bond set up was done in:\
+      * test_simulation_years.ipynb\
 
 
 
