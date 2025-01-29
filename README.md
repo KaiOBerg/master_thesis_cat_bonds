@@ -102,8 +102,19 @@ An analysis what happens to IBRD-Pricing premiums when pooling is presented in:
 
 
 
-Other notebooks whcih were not used for final results but could be useful in the future:
+Other notebooks which were not used for final results but could be useful in the future:
    * wang_transformation.ipynb -> very popular method to calculate reinsurance prices
    * model_sofr.ipynb -> implementing Cox-Ingersoll-Ross Model to simulate risk free rate
+
+
+
+
+For the practical part during the CLIMADA days I used the following notebooks:
+   * climada_days_notebook.ipynb
+   * backup_climada_days_notebook.ipynb
+   using functions from the follwowing script:
+      * climada_days_functions.py
+      * exposure_climada.py
+In case there is the necessity for another similar presentation those notebook could be used as basics
 
 
