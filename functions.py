@@ -101,13 +101,13 @@ def calc_rp_bnd_lss(ann_losses, return_period):
     return calc_value
 
 #create tranches for multi country bond
-def create_tranches(rp_array, ann_losses, ann_losses_alt, ibrd_path, prem_corr=0, peak_mulit=0):
+def create_tranches(rp_array, tot_losses, ann_losses_alt, ibrd_path, prem_corr=0, peak_mulit=0):
     rows = []
     tranch_df = pd.DataFrame(columns=['RP', 'Loss'])
     for i in rp_array:
-        loss = calc_rp_bnd_lss(ann_losses, i)
+        loss = calc_rp_bnd_lss(tot_losses, i)
         rows.append({'RP': i, 'Loss': (loss)})
-    rows.append({'RP': 'Max', 'Loss': (calc_rp_bnd_lss(ann_losses, len(ann_losses)))})
+    rows.append({'RP': 'Max', 'Loss': (calc_rp_bnd_lss(tot_losses, len(tot_losses)+1))})
 
     # Combine the rows into a DataFrame
     tranches = pd.concat([tranch_df, pd.DataFrame(rows)], ignore_index=True)

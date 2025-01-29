@@ -8,7 +8,7 @@ from decimal import getcontext
 getcontext().prec = 17  
 
 term = 3
-simulated_years = 10000
+simulated_years = 1000
 
 '''Simulate one term of bond to derive losses'''
 def init_bond_exp_loss(events_per_year, nominal):
