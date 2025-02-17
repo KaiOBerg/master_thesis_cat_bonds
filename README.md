@@ -1,4 +1,4 @@
-## Corresponding code for the Master Thesis: Closing the Insurance Gap - Enhancing Access to the CAT Bond Market by Kai Bergmüller (2025)
+## Corresponding Code for the Master-Thesis: Enhancing Countries’ Access to Natural Disaster Insurance by Addressing Current Challenges in the Catastrophe Bond Market by Kai Bergmüller (2025)
 
 The construction of the CAT bond proposed for Samoa in the first case study of the thesis is saved in:
    * single_country_bond_main.ipynb
@@ -56,7 +56,7 @@ Results for the pooling set up described in Case Study 2 are presented in:
           
 
 
-Results for the financial scheme described in Case Study 3 are presented in:
+Results for the insurance scheme described in Case Study 3 are presented in:
    * results_fs_pools.ipynb\
    The notebook first imports the data on the respective single country bonds which were calculated on euler with the script
       * master_of_disaster_pooling.py\
@@ -117,4 +117,10 @@ For the practical part during the CLIMADA days I used the following notebooks:
       * exposure_climada.py
 In case there is the necessity for another similar presentation those notebook could be used as basics
 
+
+
+
+In Zenodo under the DOI: 10.5281/zenodo.14879604 generated data during Case Study 1 is saved.\ 
+Additionally, the files necessary to run Case Study 2 and 3 are included to allow to run the code without generating all the hazard and exposure data first.\ 
+Moreover, a power-point presentation is saved, which accompanies the script hands_on_example_simulate_bond.py.
 

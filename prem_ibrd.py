@@ -51,7 +51,7 @@ def init_prem_ibrd(file_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Da
                     sizes=(40, 400), alpha=.5)
         plt.plot(x_fit, y_fitted, color = 'orange', label="fitted")
         plt.xlabel('Expected Loss [%]', fontsize=12)
-        plt.ylabel('Risk Multiple []', fontsize=12)
+        plt.ylabel('Risk Multiple', fontsize=12)
         plt.show()
 
     return params_prem_ibrd
