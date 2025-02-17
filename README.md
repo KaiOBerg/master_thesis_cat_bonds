@@ -120,7 +120,7 @@ In case there is the necessity for another similar presentation those notebook c
 
 
 
-In Zenodo under the DOI: 10.5281/zenodo.14879604 generated data during Case Study 1 is saved.
+In Zenodo under the DOI: 10.5281/zenodo.14879604 (https://zenodo.org/records/14879604) generated data during Case Study 1 is saved.
 Additionally, the files necessary to run Case Study 2 and 3 are included to allow to run the code without generating all the hazard and exposure data first. 
 Moreover, a power-point presentation is saved, which accompanies the script hands_on_example_simulate_bond.py.
 
