@@ -438,7 +438,7 @@ def plot_prem_share(weighter=1, eu=True, threshold_other=1, file_path="C:/Users/
     EU = ['AUT', 'BEL', 'CYP', 'CZE', 'DNK', 'EST', 'FIN', 'FRA', 'DEU', 'GRC', 'HUN', 'IRL', 'ITA', 'LVA', 'LTU', 'LUX', 'MLT', 'NLD', 'PRT', 
       'SVK', 'SVN', 'ESP', 'SWE']
 
-    finance_scheme = pd.read_excel(OUTPUT_DIR.joinpath("fs_high_inc.xlsx"))
+    finance_scheme = pd.read_excel(OUTPUT_DIR.joinpath("Data/fs_high_inc.xlsx"))
     finance_scheme = finance_scheme[finance_scheme['Carbon Footprint per Capita (absolute)'] >= 6.5].copy()
     finance_scheme['Relative Carbon Footprint'] = (finance_scheme['Carbon Footprint per Capita (absolute)'] / finance_scheme['Carbon Footprint per Capita (absolute)'].median())**weighter
     finance_scheme['GDP share'] = finance_scheme['GDP (absolute)'] / finance_scheme['GDP (absolute)'].sum() * 100
