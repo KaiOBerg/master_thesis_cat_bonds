@@ -18,12 +18,11 @@ from climada.util.constants import EARTH_RADIUS_KM, SYSTEM_DIR, DEF_CRS
 
 import grider as grd
 
+file_path = "C:/Users/kaibe/Documents/ETH_Zurich/Thesis"
+
 #define directories
-EXPOSURE_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/exposure")
-HAZARD_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard")
-TC_TRACKS_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks/tracks_basins_climada")
-STORM_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks")
-ADMIN_DIR = Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/countries_admin")
+COUNTRY_DIR = "Data/cty_data"
+STORM_DIR = "Data/hazard/tc_tracks/storm_tc_tracks"
 
 
 #define countries per tropical cyclone basin according to STORM dataset
@@ -58,8 +57,11 @@ freq_corr_STORM = 1 / r
 
 
 
-def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard"), storm_path=Path("C:/Users/kaibe/Documents/ETH_Zurich/Thesis/Data/hazard/tc_tracks/storm_tc_tracks"), buffer_grid_size=5, buffer_distance_km=105, min_pol_size=1000, res_exp=150, crs="EPSG:3857", load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True, plt_save=False):
+def init_TC_exp(country, grid_specs, file_path=file_path, buffer_grid_size=5, buffer_distance_km=105, min_pol_size=1000, res_exp=150, crs="EPSG:3857", load_fls=False, plot_exp=True, plot_centrs=True, plt_grd=True, plt_save=False):
 
+    cty_data_path = Path(file_path, COUNTRY_DIR)
+    storm_path = Path(file_path, STORM_DIR)
+    
     """Define STORM Basin"""
     for basin, countries in basins_countries.items():
         if country in countries:
@@ -72,13 +74,13 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
         
     """Define Exposure"""
     exp_str = f"Exp_{country}_{fin}_{year}_{res_exp}.hdf5"
-    if load_fls and Path.is_file(file_path.joinpath(exp_str)):
+    if load_fls and Path.is_file(cty_data_path.joinpath(exp_str)):
         """Loading Exposure"""
-        exp = LitPop.from_hdf5(file_path.joinpath(exp_str))
+        exp = LitPop.from_hdf5(cty_data_path.joinpath(exp_str))
     else:
         """Initiating Exposure"""
         exp = LitPop.from_countries(country, fin_mode=fin, reference_year=year, res_arcsec=res_exp)
-        exp.write_hdf5(file_path.joinpath(exp_str))
+        exp.write_hdf5(cty_data_path.joinpath(exp_str))
     
     if plot_exp:
         plt_name = f"Litpop_{country}.tiff"
@@ -124,7 +126,7 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
         ax.set_yticklabels(new_ylabel)
         if plt_save:
             plt_name = f"bond_structure_{country}.png"
-            plt.savefig(file_path.joinpath(plt_name))
+            plt.savefig(cty_data_path.joinpath(plt_name))
         else:
             plt.show()
 
@@ -133,9 +135,9 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
     # initiate new instance of TropCyclone(Hazard) class:
     haz_str = f"TC_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
     track_str = f"Track_sub_{applicable_basin}_{country}_{res_exp}_STORM.hdf5"
-    if load_fls and Path.is_file(file_path.joinpath(haz_str)):
-        tc_storms = TropCyclone.from_hdf5(file_path.joinpath(haz_str))
-        storm_basin_sub = TCTracks.from_hdf5(file_path.joinpath(track_str))
+    if load_fls and Path.is_file(cty_data_path.joinpath(haz_str)):
+        tc_storms = TropCyclone.from_hdf5(cty_data_path.joinpath(haz_str))
+        storm_basin_sub =TCTracks.from_hdf5(cty_data_path.joinpath(track_str))
 
     else:
         """Generating Centroids"""
@@ -157,13 +159,13 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
         tracks_in_exp = [track for j, track in enumerate(track_dic[applicable_basin].data) if select_tracks[j]]
         storm_basin_sub = TCTracks(tracks_in_exp) 
         storm_basin_sub.equal_timestep(time_step_h=1)
-        storm_basin_sub.write_hdf5(file_path.joinpath(track_str)) 
+        storm_basin_sub.write_hdf5(cty_data_path.joinpath(track_str)) 
 
         #generate TropCyclone class from previously loaded TC tracks for one storm data set
         tc_storms = TropCyclone.from_tracks(storm_basin_sub, centroids=centrs)
         tc_storms.frequency = np.ones(tc_storms.event_id.size) * freq_corr_STORM
         tc_storms.check()
-        tc_storms.write_hdf5(file_path.joinpath(haz_str))   
+        tc_storms.write_hdf5(cty_data_path.joinpath(haz_str))   
 
     print(f"Number of tracks in {applicable_basin} basin:",storm_basin_sub.size) 
 
@@ -172,14 +174,14 @@ def init_TC_exp(country, grid_specs, file_path=Path("C:/Users/kaibe/Documents/ET
 
 
 '''Load all STORM tracks for the basin of interest.'''
-def init_STORM_tracks(basin, file_path, load_fls=False):
+def init_STORM_tracks(basin, storm_path, load_fls=False):
     """Import TC Tracks"""
     all_tracks = []
     storms_basin = {}
     print("----------------------Initiating TC Tracks----------------------")
     fname = lambda i: f"STORM_DATA_IBTRACS_{basin}_1000_YEARS_{i}.txt"
     for i in range(10):
-        tracks_STORM = TCTracks.from_simulations_storm(file_path.joinpath(fname(i)))
+        tracks_STORM = TCTracks.from_simulations_storm(storm_path.joinpath(fname(i)))
         all_tracks.extend(tracks_STORM.data)
     tracks_STORM.data = all_tracks
             
