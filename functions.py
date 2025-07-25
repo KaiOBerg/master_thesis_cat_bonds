@@ -4,12 +4,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+import matplotlib.gridspec as gridspec
+
 
 import calc_premium as cp
 import prem_ibrd as prib
 import simulate_multi_cty_bond as smcb
 import alt_pay_opt as apo
 import impact as cimp
+
 
 #checks if it is a scaler value
 def check_scalar(variable):
@@ -483,3 +486,526 @@ def plot_prem_share(weighter=1, eu=True, threshold_other=1, file_path="C:/Users/
                                "CEFC": finance_scheme['Carbon Footprint per Capita (absolute)']})
 
     return return_df
+
+
+def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret_df_ibrd, countries, prem_diff, scenarios_dic, nominal_dic, x_axis, save_path):
+    #define list of used pricing methods
+    pricing_list = ['IBRD-Pricing', 'Chatoro-Pricing', 'Benchmark-Pricing']
+
+    # get all scenarios and nominal values from dictionaries
+    scenario_1 = scenarios_dic['s1']
+    scenario_3 = scenarios_dic['s3']
+    scenario_5 = scenarios_dic['s5']
+
+    nominal_s1 = nominal_dic['s1']
+    nominal_s3 = nominal_dic['s3']
+    nominal_s5 = nominal_dic['s5']
+
+    for idx, nominal in enumerate(nominal_dic.values()):
+        name = f'nominal_{idx+1}'
+        globals()[name] = nominal  # Assign the nominal value to a variable with the name
+
+    sng_cty_premium_ibrd=[]
+    sng_cty_premium_regr=[]
+    sng_cty_premium_bench=[]
+    sng_cty_im_ibrd=[]
+    sng_cty_im_regr=[]
+    sng_cty_im_bench=[]
+    for cty in bond_metrics_sng_dic:
+                sng_cty_premium_ibrd.append(bond_metrics_sng_dic[cty]['Total Premiums'][0]/len(sng_ann_ret_df_ibrd.iloc[:,1]))
+                sng_cty_premium_regr.append(bond_metrics_sng_dic[cty]['Total Premiums'][1]/len(sng_ann_ret_df_ibrd.iloc[:,1]))
+                sng_cty_premium_bench.append(bond_metrics_sng_dic[cty]['Total Premiums'][2]/len(sng_ann_ret_df_ibrd.iloc[:,1]))
+                sng_cty_im_ibrd.append(bond_metrics_sng_dic[cty]['Total Premiums'][0]/bond_metrics_sng_dic[cty]['Summed Payments'][0])
+                sng_cty_im_regr.append(bond_metrics_sng_dic[cty]['Total Premiums'][1]/bond_metrics_sng_dic[cty]['Summed Payments'][1])
+                sng_cty_im_bench.append(bond_metrics_sng_dic[cty]['Total Premiums'][2]/bond_metrics_sng_dic[cty]['Summed Payments'][2])
+
+    if x_axis == 'ed250_rel':
+
+        x_labels = [
+            50.9, 37.8, 36.4, 35.5, 35.4, 35.3, 35.1, 34.8, 34.0, 34.0,
+            33.7, 31.5, 29.6, 28.2, 25.7, 25.5, 24.6, 24.3, 22.0, 17.7,
+            14.4, 12.7, 11.7, 7.4, 6.1
+        ]
+
+        mauritius_position_mono = (-20, 25)
+        mauritius_position_tric = (-20, 25)
+        mauritius_position_pent = (-20, 25)
+        mauritius_position_attr = (-20, 25)
+        marshall_position_mono = (-15, -40)
+        marshall_position_tric = (40, -15)
+        marshall_position_pent = (40, -45)
+        marshall_position_attr = (0, 55)
+        jamaica_position_mono = (-10, 30)
+        jamaica_position_tric = (40, 0)
+        jamaica_position_pent = (-70, -5)
+        jamaica_position_attr = (40, 0)
+
+    elif x_axis == 'el':
+        x_labels = []
+        for key in premium_dic_sng_dic:
+            x_labels.append(premium_dic_sng_dic[key]['exp_loss']*100)
+
+        mauritius_position_mono = (-20, 20)
+        mauritius_position_tric = (-20, 15)
+        mauritius_position_pent = (-20, 20)
+        mauritius_position_attr = (-20, 20)
+        marshall_position_mono = (-30, -40)
+        marshall_position_tric = (-20, -20)
+        marshall_position_pent = (-20, -20)
+        marshall_position_attr = (-38, 55)
+        jamaica_position_mono = (-20, 20)
+        jamaica_position_tric = (-20, 35)
+        jamaica_position_pent = (-20, -20)
+        jamaica_position_attr = (-20, -20)
+
+    elif x_axis == 'ed250_abs':
+        gdp_per_cty = [11.41, 0.50, 0.87, 14.5, 0.87, 1.41, 13.83, 4.79, 1.5, 0.88,
+                       1.04, 78.87, 9.95, 0.91, 4.43, 20.79, 107.49, 0.01, 2.05, 0.49,
+                       1.53, 1.23, 0.24, 0.24, 0.26]
+        ed_250_rel = [
+            50.9, 37.8, 36.4, 35.5, 35.4, 35.3, 35.1, 34.8, 34.0, 34.0,
+            33.7, 31.5, 29.6, 28.2, 25.7, 25.5, 24.6, 24.3, 22.0, 17.7,
+            14.4, 12.7, 11.7, 7.4, 6.1
+        ]
+
+        x_labels = [gdp *  10e3 * (ed / 100) for gdp, ed in zip(gdp_per_cty, ed_250_rel)]
+
+        mauritius_position_mono = (-20, -20)
+        mauritius_position_tric = (-20, -20)
+        mauritius_position_pent = (20, -20)
+        mauritius_position_attr = (20, 0)
+        marshall_position_mono = (-80, -20)
+        marshall_position_tric = (-20, -20)
+        marshall_position_pent = (-90, -18)
+        marshall_position_attr = (-90, -18)
+        jamaica_position_mono = (40, 0)
+        jamaica_position_tric = (40, 0)
+        jamaica_position_pent = (-40, -20)
+        jamaica_position_attr = (-40, -20)
+
+    else:
+        raise ValueError("Invalid x_axis value. Use 'ed250_rel', 'ed250_abs, or 'el'.")
+
+
+
+    for p_name in pricing_list:
+        if p_name == 'IBRD-Pricing':
+            prem_diff_label = 'ibrd'
+            if x_axis == 'ed250_abs':
+                jamaica_position_attr = (-40, -10)
+                marshall_position_attr = (-90, -10)
+        elif p_name == 'Chatoro-Pricing':
+            prem_diff_label = 'regression'
+            if x_axis == 'ed250_abs':
+                jamaica_position_attr = (-40, -20)
+                marshall_position_attr = (-90, -18)
+        elif p_name == 'Benchmark-Pricing':
+            prem_diff_label = 'required'
+        fig = plt.figure(figsize=(12, 9))
+        gs = gridspec.GridSpec(4, 2, height_ratios=[3, 1, 3, 1])
+        ax1 = fig.add_subplot(gs[0, 0])
+        ax2 = fig.add_subplot(gs[0, 1])
+        ax3 = fig.add_subplot(gs[2, 0])
+        ax4 = fig.add_subplot(gs[2, 1])
+        ax5 = fig.add_subplot(gs[1, 0])
+        ax6 = fig.add_subplot(gs[1, 1])
+        ax7 = fig.add_subplot(gs[3, 0])
+        ax8 = fig.add_subplot(gs[3, 1])
+
+        colors = ['#0072B2',  # Blue
+                  '#D55E00',  # Vermilion (reddish-orange)
+                  '#F0E442',  # Yellow
+                  '#009E73',  # Bluish green
+                  '#CC79A7']  # Reddish purple / Magenta
+        
+        
+
+        for p in range(len(scenario_1)):
+            indices = [countries.index(x) for x in scenario_1[p]]
+            prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P1'][i] for i in indices]
+            x_labels_pool = [x_labels[i] for i in indices]
+
+            ax1.scatter(x_labels_pool, prem_diff_pool_ibrd, color=colors[p], alpha=0.5, marker='o')
+        # Annotate Mauritius
+        ax1.annotate(
+            'Mauritius',
+            (x_labels[0], prem_diff[prem_diff_label]['P1'][0]),
+            textcoords="offset points",
+            xytext=mauritius_position_mono,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Marhsall Islands
+        ax1.annotate(
+            'Marhsall Islands',
+            (x_labels[23], prem_diff[prem_diff_label]['P1'][23]),
+            textcoords="offset points",
+            xytext=marshall_position_mono,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Tonga
+        ax1.annotate(
+            'Jamaica',
+            (x_labels[6], prem_diff[prem_diff_label]['P1'][6]),
+            textcoords="offset points",
+            xytext=jamaica_position_mono,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        ax1.set_title('MonoCAT-Portfolio', fontsize=12, fontweight='bold')
+
+        for p in range(len(scenario_3)):
+            indices = [countries.index(x) for x in scenario_3[p]]
+            prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P3'][i] for i in indices]
+            x_labels_pool = [x_labels[i] for i in indices]
+
+            ax2.scatter(x_labels_pool, prem_diff_pool_ibrd, color=colors[p], alpha=0.5, marker='o')
+
+        # Annotate Mauritius
+        ax2.annotate(
+            'Mauritius',
+            (x_labels[0], prem_diff[prem_diff_label]['P3'][0]),
+            textcoords="offset points",
+            xytext=mauritius_position_tric,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Marhsall Islands
+        ax2.annotate(
+            'Marhsall Islands',
+            (x_labels[23], prem_diff[prem_diff_label]['P3'][23]),
+            textcoords="offset points",
+            xytext=marshall_position_tric,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Tonga
+        ax2.annotate(
+            'Jamaica',
+            (x_labels[6], prem_diff[prem_diff_label]['P3'][6]),
+            textcoords="offset points",
+            xytext=jamaica_position_tric,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        ax2.set_title('TriCAT-Portfolio', fontsize=12, fontweight='bold')
+
+        for p in range(len(scenario_5)):
+            indices = [countries.index(x) for x in scenario_5[p]]
+            prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P5'][i] for i in indices]
+            x_labels_pool = [x_labels[i] for i in indices]
+
+            ax3.scatter(x_labels_pool, prem_diff_pool_ibrd, alpha=0.5, color=colors[p], marker='o')
+
+
+        # Annotate Mauritius
+        ax3.annotate(
+            'Mauritius',
+            (x_labels[0], prem_diff[prem_diff_label]['P5'][0]),
+            textcoords="offset points",
+            xytext=mauritius_position_pent,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Marhsall Islands
+        ax3.annotate(
+            'Marhsall Islands',
+            (x_labels[23], prem_diff[prem_diff_label]['P5'][23]),
+            textcoords="offset points",
+            xytext=marshall_position_pent,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Tonga
+        ax3.annotate(
+            'Jamaica',
+            (x_labels[6], prem_diff[prem_diff_label]['P5'][6]),
+            textcoords="offset points",
+            xytext=jamaica_position_pent,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        ax3.set_title('PentaCAT-Portfolio', fontsize=12, fontweight='bold')
+
+
+        for p in range(len(scenario_5)):
+            indices = [countries.index(x) for x in scenario_5[p]]
+            prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P5A'][i] for i in indices]
+            x_labels_pool = [x_labels[i] for i in indices]
+
+            ax4.scatter(x_labels_pool, prem_diff_pool_ibrd, alpha=0.5, color=colors[p], marker='o')
+
+        # Annotate Mauritius
+        ax4.annotate(
+            'Mauritius',
+            (x_labels[0], prem_diff[prem_diff_label]['P5A'][0]),
+            textcoords="offset points",
+            xytext=mauritius_position_attr,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Marhsall Islands
+        ax4.annotate(
+            'Marhsall Islands',
+            (x_labels[23], prem_diff[prem_diff_label]['P5A'][23]),
+            textcoords="offset points",
+            xytext=marshall_position_attr,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        # Annotate Tonga
+        ax4.annotate(
+            'Jamaica',
+            (x_labels[6], prem_diff[prem_diff_label]['P5A'][6]),
+            textcoords="offset points",
+            xytext=jamaica_position_attr,
+            ha='left',
+            fontsize=10,
+            color='black',
+            arrowprops=dict(arrowstyle='-', color='black', lw=1)
+        )
+
+        ax4.set_title('Premium-Adjusted-PentaCAT-Portfolio', fontsize=12, fontweight='bold')
+
+
+        # Add a single legend underneath the plots
+        handles1, labels1 = ax1.get_legend_handles_labels()
+        fig.legend(
+            handles1,
+            labels1,
+            loc='lower center',
+            bbox_to_anchor=(0.5, -0.15),
+            ncol=3,
+            frameon=False
+        )
+        # Add subplot labels in the top left of each plot
+        ax1.text(-0.05, 1.05, 'a)', transform=ax1.transAxes, fontsize=14, fontweight='bold', va='top', ha='left')
+        ax2.text(-0.05, 1.05, 'b)', transform=ax2.transAxes, fontsize=14, fontweight='bold', va='top', ha='left')
+        ax3.text(-0.05, 1.05, 'c)', transform=ax3.transAxes, fontsize=14, fontweight='bold', va='top', ha='left')
+        ax4.text(-0.05, 1.05, 'd)', transform=ax4.transAxes, fontsize=14, fontweight='bold', va='top', ha='left')
+
+        for ax in [ax1, ax2, ax3, ax4]:
+            ax.set_ylim(-0.22, 0.89)
+            ax.set_ylabel('Premium Saving', fontsize=12)
+            ax.hlines(0, 5, 55000000000, colors='black', linestyles='dashed', linewidth=1)
+            if x_axis == 'ed250_rel':
+                ax.set_xlim(5, 55)
+                ax.set_xlabel(r"$E[D_{250}]$ [%]", fontsize=12)
+            elif x_axis == 'el':
+                ax.set_xlim(0, 4)
+                ax.set_xlabel('Expected Loss [%]', fontsize=12)
+            elif x_axis == 'ed250_abs':
+                ax.set_xlim(10, max(x_labels) + 500000)  # Set x-axis limits to a reasonable range
+                ax.set_xscale('log')
+                ax.set_xlabel('$E[D_{250}]$ [mUSD]', fontsize=12)
+
+
+
+
+        ax5.barh(['Spacer Top', 'Pool 1', 'Spacer Bottom'],
+             [0.0, nominal_s1['1']/1000000, 0.0],
+             height=0.5,
+             color=colors[0],
+             linewidth=1)
+        ax5.set_yticklabels(['','Pool 1', ''])
+
+        iterator = 0
+        for key in nominal_s3:
+            ax6.barh(f'Pool {key}', nominal_s3[key]/1000000, 0.5, color=colors[iterator], linewidth=1)
+            iterator += 1
+        iterator = 0
+        for key in nominal_s5:
+            ax7.barh(f'Pool {key}', nominal_s5[key]/1000000, 0.5, color=colors[iterator], linewidth=1)
+            iterator += 1
+        iterator = 0
+        for key in nominal_s5:
+            ax8.barh(f'Pool {key}', nominal_s5[key]/1000000, 0.5, color=colors[iterator], linewidth=1)
+            iterator += 1
+
+        # Apply log scale to x-axes
+        for ax in [ax5, ax6, ax7, ax8]:
+            ax.set_xscale('log')
+            ax.set_xlim(10,60000000000/1000000)  # Set x-axis limits to a reasonable range
+            ax.set_xlabel('Principal [mUSD]', fontsize=12)
+
+        plt.tight_layout()
+        plt.savefig(f'{save_path}/Plots/cty_level_ps_{x_axis}_{p_name}.svg', bbox_inches='tight')
+        plt.show()
+
+
+def get_prem_diff(premium_dic_pool, bond_metrics_sng_dic, nominal_dic, sng_ann_ret, countries):
+    # use returns, premium payments and payouts to derive efficient frontiers, premium savings and insurance multiples for each scenario and pricing approach
+    premiums_abs_keys = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P6A', 'P6AB']
+    premiums_abs = {key: {} for key in premiums_abs_keys}
+    premium_methods = ['ibrd','required', 'regression'] 
+    premium_methods_title = ['IBRD-Pricing', 'Benchmark-Pricing', 'Chatoro-Pricing'] 
+
+    for idx, nominal in enumerate(nominal_dic.values()):
+        name = f'nominal_{idx+1}'
+        globals()[name] = nominal  # Assign the nominal value to a variable with the name
+    for idx, premium in enumerate(premium_dic_pool.values()):
+        name = f'premium_{idx+1}'
+        globals()[name] = premium  # Assign the premium value to a variable with the name
+
+    prem_diff = {'ibrd': {},'required': {}, 'regression': {}}
+
+    for j, prem_mode in enumerate(premium_methods): 
+        premiums_pool_s1 = {}
+        premiums_pool_s2 = {}
+        premiums_pool_s3 = {}
+        premiums_pool_s4 = {}
+        premiums_pool_s5 = {}
+        premiums_pool_s5_a = {}
+        premiums_pool_s5_a_b = {}
+        premiums_pool_s5_a_r = {}
+        for pool, prem_modes in premiums_s1.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s1: 
+                        premiums_pool_s1[key] += np.sum(values * nominal_s1[pool])
+                    else:  
+                        premiums_pool_s1[key] = np.sum(values * nominal_s1[pool])
+        for pool, prem_modes in premiums_s2.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s2:  
+                        premiums_pool_s2[key] += np.sum(values * nominal_s2[pool])
+                    else:  # Otherwise, initialize it with the current value
+                        premiums_pool_s2[key] = np.sum(values * nominal_s2[pool])
+        for pool, prem_modes in premiums_s3.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s3:  
+                        premiums_pool_s3[key] += np.sum(values * nominal_s3[pool])
+                    else:  # Otherwise, initialize it with the current value
+                        premiums_pool_s3[key] = np.sum(values * nominal_s3[pool])
+        for pool, prem_modes in premiums_s4.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s4:  
+                        premiums_pool_s4[key] += np.sum(values * nominal_s4[pool])
+                    else:  # Otherwise, initialize it with the current value
+                        premiums_pool_s4[key] = np.sum(values * nominal_s4[pool])
+        for pool, prem_modes in premiums_s5.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s5: 
+                        premiums_pool_s5[key] += np.sum(values * nominal_s5[pool])
+                    else:  # Otherwise, initialize it with the current value
+                        premiums_pool_s5[key] = np.sum(values * nominal_s5[pool])
+        for pool, prem_modes in premiums_s5_a.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s5_a:  
+                        premiums_pool_s5_a[key] += np.sum(values * nominal_s5_a[pool])
+                    else:  # Otherwise, initialize it with the current value
+                        premiums_pool_s5_a[key] = np.sum(values * nominal_s5_a[pool])
+        for pool, prem_modes in premiums_s5_a_b.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s5_a_b:  
+                        premiums_pool_s5_a_b[key] += np.sum(values * nominal_s5_a_b[pool])
+                    else:  # Otherwise, initialize it with the current value
+                        premiums_pool_s5_a_b[key] = np.sum(values * nominal_s5_a_b[pool])
+        for pool, prem_modes in premiums_s5_a_r.items():
+            if prem_mode in prem_modes:
+                for key, values in prem_modes[prem_mode].items():
+                    values = np.array(values)
+                    if key in premiums_pool_s5_a_r: 
+                        premiums_pool_s5_a_r[key] += np.sum(values * nominal_s5_a_r[pool])
+                    else:  # Otherwise, initialize it with the current value
+                        premiums_pool_s5_a_r[key] = np.sum(values * nominal_s5_a_r[pool])
+
+        sng_cty_premium = []  
+        s = {'P0': None, 'P1': [], 'P2': [], 'P3': [], 'P4': [], 'P5': [], 'P5A': []}
+        s['P0'] = sng_cty_premium
+
+        if prem_mode == 'ibrd':
+            for cty in bond_metrics_sng_dic:
+                sng_cty_premium.append(bond_metrics_sng_dic[cty]['Total Premiums'][0]/len(sng_ann_ret['212']))
+
+            s['P0'] = sng_cty_premium
+            for cty in countries:
+                s['P1'].append(np.sum(premiums_pool_s1[cty])/len(sng_ann_ret['212']))
+                s['P2'].append(np.sum(premiums_pool_s2[cty])/len(sng_ann_ret['212']))
+                s['P3'].append(np.sum(premiums_pool_s3[cty])/len(sng_ann_ret['212']))
+                s['P4'].append(np.sum(premiums_pool_s4[cty])/len(sng_ann_ret['212']))
+                s['P5'].append(np.sum(premiums_pool_s5[cty])/len(sng_ann_ret['212']))
+                s['P5A'].append(np.sum(premiums_pool_s5_a[cty])/len(sng_ann_ret['212']))
+
+        elif prem_mode == 'regression':
+            for cty in bond_metrics_sng_dic:
+                sng_cty_premium.append(bond_metrics_sng_dic[cty]['Total Premiums'][1]/len(sng_ann_ret['212']))
+
+            s['P0'] = sng_cty_premium
+            for cty in countries:
+                s['P1'].append(np.sum(premiums_pool_s1[cty])/len(sng_ann_ret['212']))
+                s['P2'].append(np.sum(premiums_pool_s2[cty])/len(sng_ann_ret['212']))
+                s['P3'].append(np.sum(premiums_pool_s3[cty])/len(sng_ann_ret['212']))
+                s['P4'].append(np.sum(premiums_pool_s4[cty])/len(sng_ann_ret['212']))
+                s['P5'].append(np.sum(premiums_pool_s5[cty])/len(sng_ann_ret['212']))
+                s['P5A'].append(np.sum(premiums_pool_s5_a_r[cty])/len(sng_ann_ret['212']))
+
+        elif prem_mode == 'required':
+            for cty in bond_metrics_sng_dic:
+                sng_cty_premium.append(bond_metrics_sng_dic[cty]['Total Premiums'][2]/len(sng_ann_ret['212']))
+
+            s['P0'] = sng_cty_premium
+            for cty in countries:
+                s['P1'].append(np.sum(premiums_pool_s1[cty])/len(sng_ann_ret['212']))
+                s['P2'].append(np.sum(premiums_pool_s2[cty])/len(sng_ann_ret['212']))
+                s['P3'].append(np.sum(premiums_pool_s3[cty])/len(sng_ann_ret['212']))
+                s['P4'].append(np.sum(premiums_pool_s4[cty])/len(sng_ann_ret['212']))
+                s['P5'].append(np.sum(premiums_pool_s5[cty])/len(sng_ann_ret['212']))
+                s['P5A'].append(np.sum(premiums_pool_s5_a_b[cty])/len(sng_ann_ret['212']))
+
+        else:
+            print('Wrong input premium mode')
+            continue
+
+        for key in s:
+            prem_diff[prem_mode][key] = (1-(np.array(s[key])/np.array(s['P0']))).tolist()
+
+    return prem_diff
+
