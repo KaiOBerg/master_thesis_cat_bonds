@@ -1,0 +1,208 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15" version="28.0.7">
+  <diagram name="Page-1" id="58TnTUvLrnlwUTc3l9yy">
+    <mxGraphModel dx="1455" dy="829" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="mLufBUS968L27i-inKiL-1" value="User" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="40" y="376" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-1" target="mLufBUS968L27i-inKiL-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="388" y="307" as="sourcePoint" />
+            <mxPoint x="269" y="237" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-3" value="Define country" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="196" y="553" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-4" value="Define hazard data set" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="196" y="386" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-5" value="Define attachment point" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="561" y="553" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-6" value="Define principal" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="384" y="553" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-7" value="Choose pricing approach(es)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="738" y="553" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-8" target="mLufBUS968L27i-inKiL-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-8" value="Find optimal pools" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1631" y="85" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-10" value="Compare risk-return to NPF" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1809" y="386" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-12" target="mLufBUS968L27i-inKiL-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-12" value="Test CAT bond" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="661" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-13" target="mLufBUS968L27i-inKiL-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-13" value="Set number of pools" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="85" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-14" target="mLufBUS968L27i-inKiL-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-14" value="Set maximum principal per pool" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1269" y="85" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-15" value="Create single-country CAT bond" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="915" y="553" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-16" value="Define countries" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="196" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-18" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-4" target="mLufBUS968L27i-inKiL-16">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="151" y="484" as="sourcePoint" />
+            <mxPoint x="229" y="653" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-21" target="mLufBUS968L27i-inKiL-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-63" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-21" target="mLufBUS968L27i-inKiL-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-21" value="Get summary of CAT bond perfomrnance" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="553" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-22" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-3" target="mLufBUS968L27i-inKiL-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="155" y="489" as="sourcePoint" />
+            <mxPoint x="248" y="454" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-23" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-3" target="mLufBUS968L27i-inKiL-6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="686" y="754" as="sourcePoint" />
+            <mxPoint x="948" y="654" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-24" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="mLufBUS968L27i-inKiL-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="504" y="583" as="sourcePoint" />
+            <mxPoint x="409" y="575" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-25" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-5" target="mLufBUS968L27i-inKiL-7">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="530" y="620" as="sourcePoint" />
+            <mxPoint x="587" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-26" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-7" target="mLufBUS968L27i-inKiL-15">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="782" y="624" as="sourcePoint" />
+            <mxPoint x="839" y="624" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-27" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-15" target="mLufBUS968L27i-inKiL-21">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="945" y="640" as="sourcePoint" />
+            <mxPoint x="1002" y="640" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-28" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-21" target="mLufBUS968L27i-inKiL-12">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1222" y="714" as="sourcePoint" />
+            <mxPoint x="1294" y="637" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-31" value="Define attachment point per country" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="561" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-32" value="Define principal per country" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="384" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-33" value="Choose pricing approach(es)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="738" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-34" target="mLufBUS968L27i-inKiL-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-34" value="Test CAT bonds" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="325" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-35" value="Create single-country CAT bonds" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="915" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-36" target="mLufBUS968L27i-inKiL-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-36" target="mLufBUS968L27i-inKiL-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-36" target="mLufBUS968L27i-inKiL-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-36" value="Get summary of CAT bond perfomrnances" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1092" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-37" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="mLufBUS968L27i-inKiL-31">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="504" y="247" as="sourcePoint" />
+            <mxPoint x="409" y="239" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-38" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-31" target="mLufBUS968L27i-inKiL-33">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="530" y="284" as="sourcePoint" />
+            <mxPoint x="587" y="284" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-39" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-33" target="mLufBUS968L27i-inKiL-35">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="782" y="288" as="sourcePoint" />
+            <mxPoint x="839" y="288" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-40" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-35" target="mLufBUS968L27i-inKiL-36">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="945" y="304" as="sourcePoint" />
+            <mxPoint x="1002" y="304" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-41" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-36" target="mLufBUS968L27i-inKiL-34">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1222" y="378" as="sourcePoint" />
+            <mxPoint x="1294" y="301" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-44" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-16" target="mLufBUS968L27i-inKiL-32">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="483" y="582" as="sourcePoint" />
+            <mxPoint x="717" y="582" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-45" target="mLufBUS968L27i-inKiL-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-45" value="Create multi-country CAT bonds" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1631" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-46" target="mLufBUS968L27i-inKiL-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-46" value="Get summary of CAT bond performances" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1809" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-48" target="mLufBUS968L27i-inKiL-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mLufBUS968L27i-inKiL-48" value="Assign individual pools" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1269" y="217" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
