@@ -12,6 +12,7 @@ import prem_ibrd as prib
 import simulate_multi_cty_bond as smcb
 import alt_pay_opt as apo
 import impact as cimp
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 
 #checks if it is a scaler value
@@ -505,19 +506,6 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
         name = f'nominal_{idx+1}'
         globals()[name] = nominal  # Assign the nominal value to a variable with the name
 
-    sng_cty_premium_ibrd=[]
-    sng_cty_premium_regr=[]
-    sng_cty_premium_bench=[]
-    sng_cty_im_ibrd=[]
-    sng_cty_im_regr=[]
-    sng_cty_im_bench=[]
-    for cty in bond_metrics_sng_dic:
-                sng_cty_premium_ibrd.append(bond_metrics_sng_dic[cty]['Total Premiums'][0]/len(sng_ann_ret_df_ibrd.iloc[:,1]))
-                sng_cty_premium_regr.append(bond_metrics_sng_dic[cty]['Total Premiums'][1]/len(sng_ann_ret_df_ibrd.iloc[:,1]))
-                sng_cty_premium_bench.append(bond_metrics_sng_dic[cty]['Total Premiums'][2]/len(sng_ann_ret_df_ibrd.iloc[:,1]))
-                sng_cty_im_ibrd.append(bond_metrics_sng_dic[cty]['Total Premiums'][0]/bond_metrics_sng_dic[cty]['Summed Payments'][0])
-                sng_cty_im_regr.append(bond_metrics_sng_dic[cty]['Total Premiums'][1]/bond_metrics_sng_dic[cty]['Summed Payments'][1])
-                sng_cty_im_bench.append(bond_metrics_sng_dic[cty]['Total Premiums'][2]/bond_metrics_sng_dic[cty]['Summed Payments'][2])
 
     if x_axis == 'ed250_rel':
 
@@ -534,7 +522,7 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
         marshall_position_mono = (-15, -40)
         marshall_position_tric = (40, -15)
         marshall_position_pent = (40, -45)
-        marshall_position_attr = (0, 55)
+        marshall_position_attr = (0, 95)
         jamaica_position_mono = (-10, 30)
         jamaica_position_tric = (40, 0)
         jamaica_position_pent = (-70, -5)
@@ -601,8 +589,8 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
                 marshall_position_attr = (-90, -18)
         elif p_name == 'Benchmark-Pricing':
             prem_diff_label = 'required'
-        fig = plt.figure(figsize=(12, 9))
-        gs = gridspec.GridSpec(4, 2, height_ratios=[3, 1, 3, 1])
+        fig = plt.figure(figsize=(12,9))
+        gs = gridspec.GridSpec(4, 2, height_ratios=[1, 0.33, 1, 0.33])
         ax1 = fig.add_subplot(gs[0, 0])
         ax2 = fig.add_subplot(gs[0, 1])
         ax3 = fig.add_subplot(gs[2, 0])
@@ -625,40 +613,53 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
             prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P1'][i] for i in indices]
             x_labels_pool = [x_labels[i] for i in indices]
 
-            ax1.scatter(x_labels_pool, prem_diff_pool_ibrd, color=colors[p], alpha=0.5, marker='o')
+            ax1.scatter(x_labels_pool, np.array(prem_diff_pool_ibrd)*100, color=colors[p], alpha=0.5, marker='o', zorder=2)
+        ax1.hlines(
+            prem_diff[prem_diff_label]['P1'][-1]*100,
+            5,
+            55000000000,
+            colors='red',
+            linestyles='solid',
+            linewidth=2,
+            zorder=1  # Lower zorder puts the line in the background
+        )
+
         # Annotate Mauritius
         ax1.annotate(
             'Mauritius',
-            (x_labels[0], prem_diff[prem_diff_label]['P1'][0]),
+            (x_labels[0], prem_diff[prem_diff_label]['P1'][0]*100),
             textcoords="offset points",
             xytext=mauritius_position_mono,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Marhsall Islands
         ax1.annotate(
             'Marhsall Islands',
-            (x_labels[23], prem_diff[prem_diff_label]['P1'][23]),
+            (x_labels[23], prem_diff[prem_diff_label]['P1'][23]*100),
             textcoords="offset points",
             xytext=marshall_position_mono,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Tonga
         ax1.annotate(
             'Jamaica',
-            (x_labels[6], prem_diff[prem_diff_label]['P1'][6]),
+            (x_labels[6], prem_diff[prem_diff_label]['P1'][6]*100),
             textcoords="offset points",
             xytext=jamaica_position_mono,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
@@ -669,41 +670,53 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
             prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P3'][i] for i in indices]
             x_labels_pool = [x_labels[i] for i in indices]
 
-            ax2.scatter(x_labels_pool, prem_diff_pool_ibrd, color=colors[p], alpha=0.5, marker='o')
+            ax2.scatter(x_labels_pool, np.array(prem_diff_pool_ibrd)*100, color=colors[p], alpha=0.5, marker='o', zorder=2)
+        ax2.hlines(
+            prem_diff[prem_diff_label]['P3'][-1]*100,
+            5,
+            55000000000,
+            colors='red',
+            linestyles='solid',
+            linewidth=2,
+            zorder=1  # Lower zorder puts the line in the background
+        )
 
         # Annotate Mauritius
         ax2.annotate(
             'Mauritius',
-            (x_labels[0], prem_diff[prem_diff_label]['P3'][0]),
+            (x_labels[0], prem_diff[prem_diff_label]['P3'][0]*100),
             textcoords="offset points",
             xytext=mauritius_position_tric,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Marhsall Islands
         ax2.annotate(
             'Marhsall Islands',
-            (x_labels[23], prem_diff[prem_diff_label]['P3'][23]),
+            (x_labels[23], prem_diff[prem_diff_label]['P3'][23]*100),
             textcoords="offset points",
             xytext=marshall_position_tric,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Tonga
         ax2.annotate(
             'Jamaica',
-            (x_labels[6], prem_diff[prem_diff_label]['P3'][6]),
+            (x_labels[6], prem_diff[prem_diff_label]['P3'][6]*100),
             textcoords="offset points",
             xytext=jamaica_position_tric,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
@@ -714,42 +727,53 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
             prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P5'][i] for i in indices]
             x_labels_pool = [x_labels[i] for i in indices]
 
-            ax3.scatter(x_labels_pool, prem_diff_pool_ibrd, alpha=0.5, color=colors[p], marker='o')
-
+            ax3.scatter(x_labels_pool, np.array(prem_diff_pool_ibrd)*100, alpha=0.5, color=colors[p], marker='o', zorder=2)
+        ax3.hlines(
+            prem_diff[prem_diff_label]['P5'][-1]*100,
+            5,
+            55000000000,
+            colors='red',
+            linestyles='solid',
+            linewidth=2,
+            zorder=1  # Lower zorder puts the line in the background
+        )
 
         # Annotate Mauritius
         ax3.annotate(
             'Mauritius',
-            (x_labels[0], prem_diff[prem_diff_label]['P5'][0]),
+            (x_labels[0], prem_diff[prem_diff_label]['P5'][0]*100),
             textcoords="offset points",
             xytext=mauritius_position_pent,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Marhsall Islands
         ax3.annotate(
             'Marhsall Islands',
-            (x_labels[23], prem_diff[prem_diff_label]['P5'][23]),
+            (x_labels[23], prem_diff[prem_diff_label]['P5'][23]*100),
             textcoords="offset points",
             xytext=marshall_position_pent,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Tonga
         ax3.annotate(
             'Jamaica',
-            (x_labels[6], prem_diff[prem_diff_label]['P5'][6]),
+            (x_labels[6], prem_diff[prem_diff_label]['P5'][6]*100),
             textcoords="offset points",
             xytext=jamaica_position_pent,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
@@ -761,57 +785,68 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
             prem_diff_pool_ibrd = [prem_diff[prem_diff_label]['P5A'][i] for i in indices]
             x_labels_pool = [x_labels[i] for i in indices]
 
-            ax4.scatter(x_labels_pool, prem_diff_pool_ibrd, alpha=0.5, color=colors[p], marker='o')
+            ax4.scatter(x_labels_pool, np.array(prem_diff_pool_ibrd)*100, alpha=0.5, color=colors[p], marker='o', zorder=2)
+        ax4.hlines(
+            prem_diff[prem_diff_label]['P5A'][-1]*100,
+            5,
+            55000000000,
+            colors='red',
+            linestyles='solid',
+            linewidth=2,
+            zorder=1  # Lower zorder puts the line in the background
+        )
+
+
+        # Annotate Premium savings
+        #ax4.text(
+        #    20, 
+        #    78,
+        #    f'Premium Saving: {prem_diff[prem_diff_label]["P5A"][-1]*100:.0f}%',
+        #    fontsize=12,
+        #    color='black',
+        #)
 
         # Annotate Mauritius
         ax4.annotate(
             'Mauritius',
-            (x_labels[0], prem_diff[prem_diff_label]['P5A'][0]),
+            (x_labels[0], prem_diff[prem_diff_label]['P5A'][0]*100),
             textcoords="offset points",
             xytext=mauritius_position_attr,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Marhsall Islands
         ax4.annotate(
             'Marhsall Islands',
-            (x_labels[23], prem_diff[prem_diff_label]['P5A'][23]),
+            (x_labels[23], prem_diff[prem_diff_label]['P5A'][23]*100),
             textcoords="offset points",
             xytext=marshall_position_attr,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         # Annotate Tonga
         ax4.annotate(
             'Jamaica',
-            (x_labels[6], prem_diff[prem_diff_label]['P5A'][6]),
+            (x_labels[6], prem_diff[prem_diff_label]['P5A'][6]*100),
             textcoords="offset points",
             xytext=jamaica_position_attr,
             ha='left',
             fontsize=10,
             color='black',
+            bbox=dict(boxstyle='round,pad=0.2', fc='white', ec='none', alpha=0.8),
             arrowprops=dict(arrowstyle='-', color='black', lw=1)
         )
 
         ax4.set_title('Premium-Adjusted-PentaCAT-Portfolio', fontsize=12, fontweight='bold')
 
-
-        # Add a single legend underneath the plots
-        handles1, labels1 = ax1.get_legend_handles_labels()
-        fig.legend(
-            handles1,
-            labels1,
-            loc='lower center',
-            bbox_to_anchor=(0.5, -0.15),
-            ncol=3,
-            frameon=False
-        )
         # Add subplot labels in the top left of each plot
         ax1.text(-0.05, 1.05, 'a)', transform=ax1.transAxes, fontsize=14, fontweight='bold', va='top', ha='left')
         ax2.text(-0.05, 1.05, 'b)', transform=ax2.transAxes, fontsize=14, fontweight='bold', va='top', ha='left')
@@ -819,12 +854,12 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
         ax4.text(-0.05, 1.05, 'd)', transform=ax4.transAxes, fontsize=14, fontweight='bold', va='top', ha='left')
 
         for ax in [ax1, ax2, ax3, ax4]:
-            ax.set_ylim(-0.22, 0.89)
-            ax.set_ylabel('Premium Saving', fontsize=12)
+            ax.set_ylim(-0.22*100, 0.89*100)
+            ax.set_ylabel('Premium Saving [%]', fontsize=12)
             ax.hlines(0, 5, 55000000000, colors='black', linestyles='dashed', linewidth=1)
             if x_axis == 'ed250_rel':
                 ax.set_xlim(5, 55)
-                ax.set_xlabel(r"$E[D_{250}]$ [%]", fontsize=12)
+                ax.set_xlabel(r"$E[D_{250}]$/GDP [%]", fontsize=12)
             elif x_axis == 'el':
                 ax.set_xlim(0, 4)
                 ax.set_xlabel('Expected Loss [%]', fontsize=12)
@@ -832,38 +867,44 @@ def plt_cty_level_ps_pool(bond_metrics_sng_dic, premium_dic_sng_dic, sng_ann_ret
                 ax.set_xlim(10, max(x_labels) + 500000)  # Set x-axis limits to a reasonable range
                 ax.set_xscale('log')
                 ax.set_xlabel('$E[D_{250}]$ [mUSD]', fontsize=12)
+            ax.set_axisbelow(True)
+            ax.grid(True)
 
 
-
-
-        ax5.barh(['Spacer Top', 'Pool 1', 'Spacer Bottom'],
-             [0.0, nominal_s1['1']/1000000, 0.0],
-             height=0.5,
+        height_bar = 0.8
+        axbarh_y = ['Pool 1', 'Pool 2', 'Pool 3', 'Pool 4', 'Pool 5']
+        ax5.barh(axbarh_y,
+             [nominal_s1['1']/1000000, 0.0, 0.0, 0.0, 0.0],
+             height=height_bar,
              color=colors[0],
              linewidth=1)
-        ax5.set_yticklabels(['','Pool 1', ''])
+        ax5.set_yticklabels(['Pool 1', '', '', '', ''])
 
         iterator = 0
         for key in nominal_s3:
-            ax6.barh(f'Pool {key}', nominal_s3[key]/1000000, 0.5, color=colors[iterator], linewidth=1)
+            ax6.barh(f'Pool {key}', nominal_s3[key]/1000000, height_bar, color=colors[iterator], linewidth=1)
+            iterator += 1
+        ax6.barh('Pool 4', 0.0, height_bar, color=colors[3], linewidth=1)
+        ax6.barh('Pool 5', 0.0, height_bar, color=colors[4], linewidth=1)
+        ax6.set_yticklabels(['Pool 1', 'Pool 2', 'Pool 3', '', ''])
+        iterator = 0
+        for key in nominal_s5:
+            ax7.barh(f'Pool {key}', nominal_s5[key]/1000000, height_bar, color=colors[iterator], linewidth=1)
             iterator += 1
         iterator = 0
         for key in nominal_s5:
-            ax7.barh(f'Pool {key}', nominal_s5[key]/1000000, 0.5, color=colors[iterator], linewidth=1)
-            iterator += 1
-        iterator = 0
-        for key in nominal_s5:
-            ax8.barh(f'Pool {key}', nominal_s5[key]/1000000, 0.5, color=colors[iterator], linewidth=1)
+            ax8.barh(f'Pool {key}', nominal_s5[key]/1000000, height_bar, color=colors[iterator], linewidth=1)
             iterator += 1
 
         # Apply log scale to x-axes
         for ax in [ax5, ax6, ax7, ax8]:
+
             ax.set_xscale('log')
             ax.set_xlim(10,60000000000/1000000)  # Set x-axis limits to a reasonable range
             ax.set_xlabel('Principal [mUSD]', fontsize=12)
 
-        plt.tight_layout()
-        plt.savefig(f'{save_path}/Plots/cty_level_ps_{x_axis}_{p_name}.svg', bbox_inches='tight')
+        fig.tight_layout()
+        fig.savefig(f'{save_path}/Plots/cty_level_ps_{x_axis}_{p_name}.pdf', bbox_inches='tight')
         plt.show()
 
 
