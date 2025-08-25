@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15" version="28.1.1">
   <diagram name="Page-1" id="bdA8GqdW05c_GUF5dtp6">
-    <mxGraphModel dx="2891" dy="1024" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="3235" dy="1229" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -271,6 +271,25 @@
           <mxGeometry x="-0.1325" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="yCh1rvR_kyDRK39HySi6-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="yCh1rvR_kyDRK39HySi6-23" target="eNb5HaGTE31p3M35cZ-F-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1395" y="454" />
+              <mxPoint x="1395" y="386" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="yCh1rvR_kyDRK39HySi6-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="yCh1rvR_kyDRK39HySi6-23" target="eNb5HaGTE31p3M35cZ-F-52">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1396" y="454" />
+              <mxPoint x="1396" y="542" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="yCh1rvR_kyDRK39HySi6-23" value="Market Data" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="1516" y="414" width="80" height="80" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
