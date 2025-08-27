@@ -1,11 +1,11 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15" version="28.1.1">
   <diagram name="Page-1" id="bdA8GqdW05c_GUF5dtp6">
-    <mxGraphModel dx="2594" dy="848" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="2282" dy="1461" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="eNb5HaGTE31p3M35cZ-F-33" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;align=center;labelPosition=center;verticalLabelPosition=top;verticalAlign=middle;" parent="1" vertex="1">
-          <mxGeometry x="430" y="119" width="997" height="504" as="geometry" />
+          <mxGeometry x="430" y="95" width="1076" height="545" as="geometry" />
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-1" target="eNb5HaGTE31p3M35cZ-F-4" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -21,39 +21,27 @@
         <mxCell id="yakTs8DD9-V0mHupV9pz-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-1" target="eNb5HaGTE31p3M35cZ-F-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-1" target="eNb5HaGTE31p3M35cZ-F-16">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-1" target="eNb5HaGTE31p3M35cZ-F-16" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-9" value="maximum protection" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="yCh1rvR_kyDRK39HySi6-8">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-9" value="minimum/maximum protection (share of GDP or return period)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-8" vertex="1" connectable="0">
           <mxGeometry x="-0.0723" relative="1" as="geometry">
-            <mxPoint x="3" y="-1" as="offset" />
+            <mxPoint x="80" y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-1" target="yCh1rvR_kyDRK39HySi6-3">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" target="eNb5HaGTE31p3M35cZ-F-35" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="-160" y="490" />
-              <mxPoint x="179" y="490" />
-              <mxPoint x="179" y="390" />
+              <mxPoint x="-156" y="-17" />
+              <mxPoint x="891" y="-17" />
             </Array>
+            <mxPoint x="-156" y="235.5" as="sourcePoint" />
+            <mxPoint x="896.0000000000005" y="82.49999999999989" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-11" value="maximum/minimum protection" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="yCh1rvR_kyDRK39HySi6-10">
-          <mxGeometry x="0.0562" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-1" target="eNb5HaGTE31p3M35cZ-F-35">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="-160" y="84" />
-              <mxPoint x="807" y="84" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-22" value="pooling constraint" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="yCh1rvR_kyDRK39HySi6-21">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-22" value="pooling constraint" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-21" vertex="1" connectable="0">
           <mxGeometry x="0.0081" y="1" relative="1" as="geometry">
-            <mxPoint y="1" as="offset" />
+            <mxPoint y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-1" value="User" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
@@ -99,26 +87,26 @@
             <mxPoint x="-20" y="1" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-6" target="yakTs8DD9-V0mHupV9pz-8">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-6" target="yakTs8DD9-V0mHupV9pz-8" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="945" y="360" />
-              <mxPoint x="945" y="213" />
+              <mxPoint x="1033" y="360" />
+              <mxPoint x="1033" y="213" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-13" value="annual losses per country&lt;div&gt;principal per country&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="yCh1rvR_kyDRK39HySi6-12">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-13" value="annual losses per country&lt;div&gt;principal per country&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-12" vertex="1" connectable="0">
           <mxGeometry x="-0.2241" y="-1" relative="1" as="geometry">
             <mxPoint x="86" y="-45" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-6" value="Single-Country CAT Bond" style="swimlane;startSize=32;align=center;strokeColor=#FF0000;" parent="1" vertex="1">
-          <mxGeometry x="729" y="360" width="155" height="100" as="geometry">
+          <mxGeometry x="813.5" y="360" width="160" height="86" as="geometry">
             <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="eNb5HaGTE31p3M35cZ-F-8" value="Simulates CAT bonds&amp;nbsp;&lt;div&gt;based on one or multiple&amp;nbsp;&lt;/div&gt;&lt;div&gt;damage and payouts&amp;nbsp;&lt;/div&gt;&lt;div&gt;tables&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="eNb5HaGTE31p3M35cZ-F-6" vertex="1">
-          <mxGeometry x="3" y="32" width="153" height="68" as="geometry" />
+        <mxCell id="eNb5HaGTE31p3M35cZ-F-8" value="Simulates bond based on&amp;nbsp;&lt;div&gt;a damage and payouts&amp;nbsp;&lt;/div&gt;&lt;div&gt;table and the principal&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="eNb5HaGTE31p3M35cZ-F-6" vertex="1">
+          <mxGeometry x="3" y="30" width="157" height="54" as="geometry" />
         </mxCell>
         <mxCell id="yakTs8DD9-V0mHupV9pz-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-5" target="eNb5HaGTE31p3M35cZ-F-16" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -139,32 +127,51 @@
             <mxPoint y="13" as="offset" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#0000FF;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-10" target="9soM9p6cMSrVdUoBVn9r-45">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1416" y="362" />
+              <mxPoint x="1416" y="301" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-10" value="Pricing" style="swimlane;startSize=32;align=center;" parent="1" vertex="1">
-          <mxGeometry x="1182" y="362" width="107" height="82" as="geometry">
+          <mxGeometry x="1264" y="362" width="107" height="82" as="geometry">
             <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-11" value="Store functions to&amp;nbsp;&lt;div&gt;derive premiums&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="eNb5HaGTE31p3M35cZ-F-10" vertex="1">
           <mxGeometry x="5" y="35" width="115" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="eNb5HaGTE31p3M35cZ-F-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.236;entryY=1.002;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-12" target="eNb5HaGTE31p3M35cZ-F-8" edge="1">
+        <mxCell id="eNb5HaGTE31p3M35cZ-F-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-12" target="eNb5HaGTE31p3M35cZ-F-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="IWyzGzTmUGrgQouWK2GI-1" value="data frame of damages vs. payouts&lt;div&gt;per event&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rotation=0;" parent="eNb5HaGTE31p3M35cZ-F-30" vertex="1" connectable="0">
+        <mxCell id="IWyzGzTmUGrgQouWK2GI-1" value="damages vs. payouts per event&lt;div&gt;principal&lt;br&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rotation=0;" parent="eNb5HaGTE31p3M35cZ-F-30" vertex="1" connectable="0">
           <mxGeometry x="0.0794" y="-1" relative="1" as="geometry">
             <mxPoint x="-69" y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;strokeColor=#0000FF;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-12" target="9soM9p6cMSrVdUoBVn9r-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-12" value="Payout vs Damage" style="swimlane;startSize=32;align=center;" parent="1" vertex="1">
-          <mxGeometry x="482" y="492" width="154" height="96" as="geometry">
+          <mxGeometry x="469" y="510" width="154" height="96" as="geometry">
             <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-13" value="Derives payouts based on&amp;nbsp;&lt;div&gt;damages (per subarea)&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="eNb5HaGTE31p3M35cZ-F-12" vertex="1">
           <mxGeometry x="3" y="42" width="160" height="40" as="geometry" />
         </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-16" target="9soM9p6cMSrVdUoBVn9r-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-6" value="geometry of subareas&lt;div&gt;hazard tracks&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="9soM9p6cMSrVdUoBVn9r-3">
+          <mxGeometry x="0.0253" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-16" value="CAT Bond Basics" style="swimlane;startSize=32;align=center;strokeColor=#FF0000;" parent="1" vertex="1">
-          <mxGeometry x="482" y="168" width="156" height="82" as="geometry">
+          <mxGeometry x="542" y="134" width="156" height="82" as="geometry">
             <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -172,7 +179,7 @@
           <mxGeometry x="3" y="35" width="153" height="40" as="geometry" />
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-34" value="&lt;b&gt;climada_petals_CAT_bonds&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="428" y="119" width="182" height="28" as="geometry" />
+          <mxGeometry x="427" y="95" width="182" height="28" as="geometry" />
         </mxCell>
         <mxCell id="yakTs8DD9-V0mHupV9pz-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-35" target="yakTs8DD9-V0mHupV9pz-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -182,69 +189,75 @@
             <mxPoint x="-28" y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeColor=#0000FF;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-35" target="9soM9p6cMSrVdUoBVn9r-24">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1072" y="47.999999999999886" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-35" value="Risk Pooling" style="swimlane;startSize=32;align=center;strokeColor=#FF0000;" parent="1" vertex="1">
-          <mxGeometry x="723.5" y="168" width="166" height="100" as="geometry">
+          <mxGeometry x="808" y="168" width="166" height="100" as="geometry">
             <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-36" value="Takes loss data and&amp;nbsp;&lt;div&gt;creates optimal risk diverse&lt;/div&gt;&lt;div&gt;pools&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="eNb5HaGTE31p3M35cZ-F-35" vertex="1">
           <mxGeometry x="3" y="39" width="163" height="54" as="geometry" />
         </mxCell>
-        <mxCell id="eNb5HaGTE31p3M35cZ-F-46" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=none;" parent="1" source="eNb5HaGTE31p3M35cZ-F-16" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="514" y="251" as="sourcePoint" />
-            <mxPoint x="398" y="278" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-48" target="eNb5HaGTE31p3M35cZ-F-10">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-48" target="eNb5HaGTE31p3M35cZ-F-10" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1051" y="662" />
+              <mxPoint x="242" y="684" />
+              <mxPoint x="1051" y="684" />
               <mxPoint x="1051" y="424" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-28" value="term,&amp;nbsp;&lt;div&gt;risk free rate,&amp;nbsp;&lt;div&gt;target Sharpe ratio,&amp;nbsp;&lt;div&gt;peak peril&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="yCh1rvR_kyDRK39HySi6-27">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-28" value="term,&amp;nbsp;&lt;div&gt;risk free rate,&amp;nbsp;&lt;div&gt;target Sharpe ratio,&amp;nbsp;&lt;div&gt;peak peril&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-27" vertex="1" connectable="0">
           <mxGeometry x="0.6309" relative="1" as="geometry">
-            <mxPoint as="offset" />
+            <mxPoint x="2" y="58" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-48" value="CAT bond settings" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="182" y="647" width="60" height="30" as="geometry" />
+          <mxGeometry x="184" y="668" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="eNb5HaGTE31p3M35cZ-F-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.475;entryY=1.015;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-48" target="eNb5HaGTE31p3M35cZ-F-8" edge="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="eNb5HaGTE31p3M35cZ-F-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-48" target="eNb5HaGTE31p3M35cZ-F-6" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="891" y="445" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="242" y="683" />
+              <mxPoint x="894" y="684" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="IWyzGzTmUGrgQouWK2GI-7" value="term&lt;div&gt;maximum protection&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="eNb5HaGTE31p3M35cZ-F-50" vertex="1" connectable="0">
+        <mxCell id="IWyzGzTmUGrgQouWK2GI-7" value="term" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="eNb5HaGTE31p3M35cZ-F-50" vertex="1" connectable="0">
           <mxGeometry x="-0.2903" y="-1" relative="1" as="geometry">
-            <mxPoint x="290" y="-20" as="offset" />
+            <mxPoint x="341" y="-101" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-52" value="Finance" style="swimlane;startSize=32;align=center;" parent="1" vertex="1">
-          <mxGeometry x="1170.5" y="536" width="148" height="75" as="geometry">
+          <mxGeometry x="1252.5" y="536" width="148" height="75" as="geometry">
             <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-53" value="Derive financial metrics&amp;nbsp;&lt;div&gt;like efficient frontier.&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="eNb5HaGTE31p3M35cZ-F-52" vertex="1">
           <mxGeometry x="3" y="34" width="145" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="IWyzGzTmUGrgQouWK2GI-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" target="yCh1rvR_kyDRK39HySi6-3" edge="1">
+        <mxCell id="IWyzGzTmUGrgQouWK2GI-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" parent="1" target="yCh1rvR_kyDRK39HySi6-3" edge="1" source="eNb5HaGTE31p3M35cZ-F-16">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="558" y="253" as="sourcePoint" />
             <mxPoint x="558" y="326" as="targetPoint" />
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="IWyzGzTmUGrgQouWK2GI-4" value="geometry of subareas&lt;div&gt;hazard tracks&lt;br&gt;&lt;div&gt;damages per selected event&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rotation=0;" parent="IWyzGzTmUGrgQouWK2GI-3" vertex="1" connectable="0">
+        <mxCell id="IWyzGzTmUGrgQouWK2GI-4" value="geometry of subareas&lt;div&gt;&lt;div&gt;damages per selected event&lt;/div&gt;&lt;/div&gt;&lt;div&gt;attachment point&lt;/div&gt;&lt;div&gt;principal&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rotation=0;" parent="IWyzGzTmUGrgQouWK2GI-3" vertex="1" connectable="0">
           <mxGeometry x="0.0794" y="-1" relative="1" as="geometry">
-            <mxPoint x="1" y="-12" as="offset" />
+            <mxPoint x="-2" y="11" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="IWyzGzTmUGrgQouWK2GI-11" value="computational intensive" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FF0000;" parent="1" vertex="1">
           <mxGeometry x="1015" y="725" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="yakTs8DD9-V0mHupV9pz-8" value="Multi-Country CAT Bond" style="swimlane;startSize=32;align=center;strokeColor=#FF0000;" parent="1" vertex="1">
-          <mxGeometry x="1143" y="168" width="185" height="90" as="geometry">
+          <mxGeometry x="1225" y="168" width="185" height="90" as="geometry">
             <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -254,31 +267,15 @@
         <mxCell id="eNb5HaGTE31p3M35cZ-F-2" value="hazard" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="1" y="301" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="yCh1rvR_kyDRK39HySi6-3" target="eNb5HaGTE31p3M35cZ-F-12">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-11" target="eNb5HaGTE31p3M35cZ-F-52" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-6" value="payout function&lt;div&gt;parametric index per event and subarea&lt;br&gt;&lt;div&gt;&lt;div&gt;damages per selected event&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="yCh1rvR_kyDRK39HySi6-5">
-          <mxGeometry x="-0.018" y="1" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-3" value="Payout Function" style="swimlane;startSize=32;align=center;" vertex="1" parent="1">
-          <mxGeometry x="478" y="318.5" width="160" height="96" as="geometry">
-            <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-4" value="Extracts hazard intensity&amp;nbsp;&lt;div&gt;per subarea and&amp;nbsp;&lt;/div&gt;&lt;div&gt;calibrates payout function.&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="yCh1rvR_kyDRK39HySi6-3">
-          <mxGeometry x="3" y="35" width="157" height="54" as="geometry" />
-        </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-11" target="eNb5HaGTE31p3M35cZ-F-52">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-17" value="net cash flow per bond" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="yCh1rvR_kyDRK39HySi6-16">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-17" value="net cash flow per bond" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-16" vertex="1" connectable="0">
           <mxGeometry x="-0.1325" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="yCh1rvR_kyDRK39HySi6-23" target="eNb5HaGTE31p3M35cZ-F-52">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="yCh1rvR_kyDRK39HySi6-23" target="eNb5HaGTE31p3M35cZ-F-52" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1454" y="454" />
@@ -286,7 +283,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="yCh1rvR_kyDRK39HySi6-23" target="eNb5HaGTE31p3M35cZ-F-10">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="yCh1rvR_kyDRK39HySi6-23" target="eNb5HaGTE31p3M35cZ-F-10" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1454" y="454" />
@@ -294,8 +291,105 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-23" value="Market Data" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-23" value="Market Data" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
           <mxGeometry x="1516" y="414" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-1" value="Parametric Index" style="swimlane;startSize=32;align=center;" vertex="1" parent="1">
+          <mxGeometry x="647" y="276" width="144" height="74" as="geometry">
+            <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-2" value="Extracts hazard intensity&amp;nbsp;&lt;div&gt;per subarea.&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-1">
+          <mxGeometry x="3" y="34" width="152" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="yCh1rvR_kyDRK39HySi6-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="yCh1rvR_kyDRK39HySi6-3" target="eNb5HaGTE31p3M35cZ-F-12" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yCh1rvR_kyDRK39HySi6-6" value="payout function&lt;div&gt;parametric index per event and subarea&lt;br&gt;&lt;div&gt;&lt;div&gt;damages per selected event&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;attachment point&lt;/div&gt;&lt;div&gt;principal&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-5" vertex="1" connectable="0">
+          <mxGeometry x="-0.018" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;strokeColor=#0000FF;" edge="1" parent="1" source="yCh1rvR_kyDRK39HySi6-3" target="9soM9p6cMSrVdUoBVn9r-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yCh1rvR_kyDRK39HySi6-3" value="Payout Function" style="swimlane;startSize=32;align=center;" parent="1" vertex="1">
+          <mxGeometry x="466" y="352" width="160" height="62" as="geometry">
+            <mxRectangle x="382" y="140" width="145" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="yCh1rvR_kyDRK39HySi6-4" value="&lt;div&gt;Calibrate payout function.&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="yCh1rvR_kyDRK39HySi6-3" vertex="1">
+          <mxGeometry x="3" y="35" width="154" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0.463;exitY=0.988;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="9soM9p6cMSrVdUoBVn9r-2" target="yCh1rvR_kyDRK39HySi6-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-8" value="parametric index per&amp;nbsp;&lt;div&gt;event and subarea&lt;br&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="9soM9p6cMSrVdUoBVn9r-7">
+          <mxGeometry x="0.0028" y="1" relative="1" as="geometry">
+            <mxPoint x="10" y="2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-19" value="Financial Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="1272" y="680" width="270" height="129" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-20" value="&lt;b&gt;Country related metrics&lt;/b&gt; (coverage, insurance/risk multiple, premiums, etc...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-19">
+          <mxGeometry y="30" width="270" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-21" value="&lt;b&gt;Investor related metrics&lt;/b&gt; (average returns, Sharpe ratio, attachment probability, expected loss/shortfall, value at risk, efficient frontier, etc...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-19">
+          <mxGeometry y="60" width="270" height="69" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#0433ff, #ededed);" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-53" target="9soM9p6cMSrVdUoBVn9r-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-24" value="Pooling Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="1062" y="25" width="163" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-25" value="Optimal risk diverse pools" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-24">
+          <mxGeometry y="30" width="163" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-27" value="Bond Basics Plot" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="550" y="15" width="224" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-28" value="Plot of country with subareas and hazard boundary" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-27">
+          <mxGeometry y="30" width="224" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.314;entryY=1.021;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#0000FF;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-16" target="9soM9p6cMSrVdUoBVn9r-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-30" value="Payout Function Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="216" y="441" width="136" height="82" as="geometry">
+            <mxRectangle x="200" y="444" width="176" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-31" value="Plot of payout function" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-30">
+          <mxGeometry y="30" width="136" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-44" value="Threshold summary" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-30">
+          <mxGeometry y="56" width="136" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-32" value="Damage vs Payout Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="220" y="557" width="136" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-33" value="1:1 scatter plot of damages vs payouts" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-32">
+          <mxGeometry y="30" width="136" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-43" value="Goodness of fit metric" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-32">
+          <mxGeometry y="63" width="136" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-34" value="Exceedance Probability Curve" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="180" y="246" width="176" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-35" value="Plot exceedance probability curve" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-34">
+          <mxGeometry y="30" width="176" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.39;entryY=1.003;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#0000FF;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-5" target="9soM9p6cMSrVdUoBVn9r-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-45" value="Premium Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="1542" y="271" width="125" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-46" value="Premium table" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-45">
+          <mxGeometry y="30" width="125" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
