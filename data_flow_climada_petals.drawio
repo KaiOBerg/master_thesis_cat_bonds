@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15" version="28.1.1">
   <diagram name="Page-1" id="bdA8GqdW05c_GUF5dtp6">
-    <mxGraphModel dx="2282" dy="1461" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="2746" dy="1725" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -29,10 +29,10 @@
             <mxPoint x="80" y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" target="eNb5HaGTE31p3M35cZ-F-35" edge="1">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="eNb5HaGTE31p3M35cZ-F-1" target="eNb5HaGTE31p3M35cZ-F-35" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="-156" y="-17" />
+              <mxPoint x="-160" y="-17" />
               <mxPoint x="891" y="-17" />
             </Array>
             <mxPoint x="-156" y="235.5" as="sourcePoint" />
@@ -99,6 +99,9 @@
           <mxGeometry x="-0.2241" y="-1" relative="1" as="geometry">
             <mxPoint x="86" y="-45" as="offset" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeColor=#0000FF;" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-6" target="9soM9p6cMSrVdUoBVn9r-53">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="eNb5HaGTE31p3M35cZ-F-6" value="Single-Country CAT Bond" style="swimlane;startSize=32;align=center;strokeColor=#FF0000;" parent="1" vertex="1">
           <mxGeometry x="813.5" y="360" width="160" height="86" as="geometry">
@@ -254,7 +257,10 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="IWyzGzTmUGrgQouWK2GI-11" value="computational intensive" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FF0000;" parent="1" vertex="1">
-          <mxGeometry x="1015" y="725" width="120" height="60" as="geometry" />
+          <mxGeometry x="1701" y="676" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeColor=#0000FF;" edge="1" parent="1" source="yakTs8DD9-V0mHupV9pz-8" target="9soM9p6cMSrVdUoBVn9r-48">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="yakTs8DD9-V0mHupV9pz-8" value="Multi-Country CAT Bond" style="swimlane;startSize=32;align=center;strokeColor=#FF0000;" parent="1" vertex="1">
           <mxGeometry x="1225" y="168" width="185" height="90" as="geometry">
@@ -292,7 +298,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="yCh1rvR_kyDRK39HySi6-23" value="Market Data" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
-          <mxGeometry x="1516" y="414" width="80" height="80" as="geometry" />
+          <mxGeometry x="1590" y="417" width="80" height="80" as="geometry" />
         </mxCell>
         <mxCell id="9soM9p6cMSrVdUoBVn9r-1" value="Parametric Index" style="swimlane;startSize=32;align=center;" vertex="1" parent="1">
           <mxGeometry x="647" y="276" width="144" height="74" as="geometry">
@@ -330,13 +336,13 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="9soM9p6cMSrVdUoBVn9r-19" value="Financial Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
-          <mxGeometry x="1272" y="680" width="270" height="129" as="geometry" />
+          <mxGeometry x="1272" y="680" width="270" height="102" as="geometry" />
         </mxCell>
-        <mxCell id="9soM9p6cMSrVdUoBVn9r-20" value="&lt;b&gt;Country related metrics&lt;/b&gt; (coverage, insurance/risk multiple, premiums, etc...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-19">
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-20" value="&lt;b&gt;Country related metrics&lt;/b&gt; (insurance/risk multiple, etc...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-19">
           <mxGeometry y="30" width="270" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="9soM9p6cMSrVdUoBVn9r-21" value="&lt;b&gt;Investor related metrics&lt;/b&gt; (average returns, Sharpe ratio, attachment probability, expected loss/shortfall, value at risk, efficient frontier, etc...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-19">
-          <mxGeometry y="60" width="270" height="69" as="geometry" />
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-21" value="&lt;b&gt;Investor related metrics&lt;/b&gt; (average returns, Sharpe ratio, efficient frontier, etc...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-19">
+          <mxGeometry y="60" width="270" height="42" as="geometry" />
         </mxCell>
         <mxCell id="9soM9p6cMSrVdUoBVn9r-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#0433ff, #ededed);" edge="1" parent="1" source="eNb5HaGTE31p3M35cZ-F-53" target="9soM9p6cMSrVdUoBVn9r-19">
           <mxGeometry relative="1" as="geometry" />
@@ -390,6 +396,18 @@
         </mxCell>
         <mxCell id="9soM9p6cMSrVdUoBVn9r-46" value="Premium table" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-45">
           <mxGeometry y="30" width="125" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-48" value="Bond Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="1552" y="145" width="209" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-49" value="coverage, expected loss/shortfall, attachment probability, value at risk" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-48">
+          <mxGeometry y="30" width="209" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-53" value="Bond Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="926" y="722" width="209" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="9soM9p6cMSrVdUoBVn9r-54" value="coverage, expected loss/shortfall, attachment probability, value at risk" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="9soM9p6cMSrVdUoBVn9r-53">
+          <mxGeometry y="30" width="209" height="37" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
