@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36" version="28.1.1">
   <diagram name="Page-1" id="bdA8GqdW05c_GUF5dtp6">
-    <mxGraphModel dx="3534" dy="2072" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="3206" dy="1921" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -382,15 +382,6 @@
         <mxCell id="9soM9p6cMSrVdUoBVn9r-43" value="Goodness of fit metric" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="9soM9p6cMSrVdUoBVn9r-32" vertex="1">
           <mxGeometry y="63" width="136" height="33" as="geometry" />
         </mxCell>
-        <mxCell id="9soM9p6cMSrVdUoBVn9r-34" value="Exceedance Probability Curve" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" parent="1" vertex="1">
-          <mxGeometry x="180" y="246" width="176" height="67" as="geometry" />
-        </mxCell>
-        <mxCell id="9soM9p6cMSrVdUoBVn9r-35" value="Plot exceedance probability curve" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="9soM9p6cMSrVdUoBVn9r-34" vertex="1">
-          <mxGeometry y="30" width="176" height="37" as="geometry" />
-        </mxCell>
-        <mxCell id="9soM9p6cMSrVdUoBVn9r-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.39;entryY=1.003;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#0000FF;" parent="1" source="eNb5HaGTE31p3M35cZ-F-5" target="9soM9p6cMSrVdUoBVn9r-35" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
         <mxCell id="9soM9p6cMSrVdUoBVn9r-45" value="Premium Summary" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fontColor=light-dark(#0433ff, #ededed);strokeColor=light-dark(#0433ff, #ededed);" parent="1" vertex="1">
           <mxGeometry x="1542" y="271" width="125" height="60" as="geometry" />
         </mxCell>
@@ -409,7 +400,7 @@
         <mxCell id="9soM9p6cMSrVdUoBVn9r-54" value="coverage, expected loss/shortfall, attachment probability, value at risk" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="9soM9p6cMSrVdUoBVn9r-53" vertex="1">
           <mxGeometry y="30" width="209" height="37" as="geometry" />
         </mxCell>
-        <mxCell id="rT63ernw5ahXzCDsqcRR-1" value="outputs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#2054ff, #ff9090);" vertex="1" parent="1">
+        <mxCell id="rT63ernw5ahXzCDsqcRR-1" value="outputs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#2054ff, #ff9090);" parent="1" vertex="1">
           <mxGeometry x="1854" y="676" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
