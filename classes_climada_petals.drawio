@@ -1,71 +1,154 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36" version="28.1.2">
   <diagram name="Page-1" id="XprpBYvdvAr3SRMeaIlC">
-    <mxGraphModel dx="1426" dy="766" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2185" dy="730" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="kZvlra0w-ifi24Rdtalh-5" value="BondBasics" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="90" y="240" width="260" height="250" as="geometry" />
+        <mxCell id="kZvlra0w-ifi24Rdtalh-5" value="BondBasics" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-130" y="80" width="260" height="250" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-6" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Exposure (gdf)&lt;/li&gt;&lt;li&gt;Hazard footprints (CLIMADA hazard)&lt;/li&gt;&lt;li&gt;Grid size (float, optinal)&lt;/li&gt;&lt;li&gt;Boundary distance (float, optional)&lt;/li&gt;&lt;li&gt;Grid specs (tuple, optional)&lt;/li&gt;&lt;li&gt;Grid buffer (float, optional)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-5">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-6" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Exposure (gdf)&lt;/li&gt;&lt;li&gt;Hazard footprints (CLIMADA hazard)&lt;/li&gt;&lt;li&gt;Grid size (float, optinal)&lt;/li&gt;&lt;li&gt;Boundary distance (float, optional)&lt;/li&gt;&lt;li&gt;Grid specs (tuple, optional)&lt;/li&gt;&lt;li&gt;Grid buffer (float, optional)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-5" vertex="1">
           <mxGeometry y="20" width="260" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-7" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;create_subareas -&amp;gt; gdf&lt;/li&gt;&lt;li&gt;create_boundary -&amp;gt; gdf&lt;/li&gt;&lt;li&gt;select_footprings -&amp;gt; CLIMADA hazards&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-5">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-7" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;create_subareas -&amp;gt; gdf&lt;/li&gt;&lt;li&gt;create_boundary -&amp;gt; gdf&lt;/li&gt;&lt;li&gt;select_footprings -&amp;gt; CLIMADA hazards&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-5" vertex="1">
           <mxGeometry y="160" width="260" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-9" value="Payout" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="414" y="240" width="260" height="230" as="geometry" />
+        <mxCell id="kZvlra0w-ifi24Rdtalh-9" value="Payout" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="510" y="100" width="260" height="230" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-10" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Subareas (gdf)&lt;/li&gt;&lt;li&gt;Hazard footprints (CLIMADA hazard)&lt;/li&gt;&lt;li&gt;Damage per hazard (data frame)&lt;/li&gt;&lt;li&gt;Attachment point (float)&lt;/li&gt;&lt;li&gt;Principal (float)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-9">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-10" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Subareas (gdf)&lt;/li&gt;&lt;li&gt;Hazard footprints (CLIMADA hazard)&lt;/li&gt;&lt;li&gt;Damage per hazard (data frame)&lt;/li&gt;&lt;li&gt;Attachment point (float)&lt;/li&gt;&lt;li&gt;Principal (float)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-9" vertex="1">
           <mxGeometry y="20" width="260" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-11" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;get_parametric_index -&amp;gt; data frame&lt;/li&gt;&lt;li&gt;calibrate_payout_function -&amp;gt; data frame&lt;/li&gt;&lt;li&gt;calculate_payout -&amp;gt; data frame&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-9">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-11" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;get_parametric_index -&amp;gt; data frame&lt;/li&gt;&lt;li&gt;calibrate_payout_function -&amp;gt; data frame&lt;/li&gt;&lt;li&gt;calculate_payout -&amp;gt; data frame&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-9" vertex="1">
           <mxGeometry y="140" width="260" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-12" value="SingleBond" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="90" y="540" width="260" height="170" as="geometry" />
+        <mxCell id="kZvlra0w-ifi24Rdtalh-12" value="SingleBond" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="510" y="414" width="260" height="170" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-13" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Payouts vs damages (data frame)&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;term (float)&lt;/span&gt;&lt;/li&gt;&lt;li&gt;Principal (float)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-12">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-13" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Payouts vs damages (data frame)&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;term (float)&lt;/span&gt;&lt;/li&gt;&lt;li&gt;Principal (float)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-12" vertex="1">
           <mxGeometry y="20" width="260" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-14" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;simulate bond -&amp;gt; data frame&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-12">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-14" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;simulate bond -&amp;gt; data frame&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-12" vertex="1">
           <mxGeometry y="110" width="260" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-15" value="MultiBond" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="420" y="540" width="260" height="200" as="geometry" />
+        <mxCell id="kZvlra0w-ifi24Rdtalh-19" value="Pricing" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="510" y="640" width="260" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-16" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Single bond losses (dictionary)&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;term (float)&lt;/span&gt;&lt;/li&gt;&lt;li&gt;Single bond principals (dictionary)&lt;/li&gt;&lt;li&gt;pool allocation (data frame)&lt;/li&gt;&lt;li&gt;trances (list)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-15">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-20" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Bond losses (data frame)&lt;/li&gt;&lt;li&gt;target Sharpe ratio (float)&lt;/li&gt;&lt;li&gt;risk-free rate (float/list)&lt;/li&gt;&lt;li&gt;peak peril indicator (boolean)&lt;/li&gt;&lt;li&gt;term (float)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-19" vertex="1">
           <mxGeometry y="20" width="260" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-17" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;simulate bond -&amp;gt; dictionary&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-15">
-          <mxGeometry y="140" width="260" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-19" value="Pricing" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="90" y="750" width="260" height="240" as="geometry" />
-        </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-20" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Bond losses (data frame)&lt;/li&gt;&lt;li&gt;target Sharpe ratio (float)&lt;/li&gt;&lt;li&gt;risk-free rate (float/list)&lt;/li&gt;&lt;li&gt;peak peril indicator (boolean)&lt;/li&gt;&lt;li&gt;term (float)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-19">
-          <mxGeometry y="20" width="260" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-21" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;ibrd_pricing -&amp;gt;&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;li&gt;chatoro_pricing -&amp;gt;&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;li&gt;bechmark_pricing -&amp;gt;&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;li&gt;all_pricing -&amp;gt; nested&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-19">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-21" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;ibrd_pricing -&amp;gt;&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;li&gt;chatoro_pricing -&amp;gt;&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;li&gt;bechmark_pricing -&amp;gt;&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;li&gt;all_pricing -&amp;gt; nested&amp;nbsp;&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-19" vertex="1">
           <mxGeometry y="140" width="260" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-22" value="Pooling" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="420" y="780" width="260" height="170" as="geometry" />
+        <mxCell id="kZvlra0w-ifi24Rdtalh-22" value="Pooling" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-180" y="710" width="260" height="170" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-23" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;losses -&amp;gt; dictionary&lt;/li&gt;&lt;li&gt;constraints&lt;/li&gt;&lt;li&gt;objective&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-22">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-23" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;losses -&amp;gt; dictionary&lt;/li&gt;&lt;li&gt;constraints&lt;/li&gt;&lt;li&gt;objective&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-22" vertex="1">
           <mxGeometry y="20" width="260" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-24" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;optimal_pool_allocation -&amp;gt; data frame&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-22">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-24" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;optimal_pool_allocation -&amp;gt; data frame&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-22" vertex="1">
           <mxGeometry y="110" width="260" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-26" value="Results" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="420" y="990" width="260" height="360" as="geometry" />
+        <mxCell id="kZvlra0w-ifi24Rdtalh-26" value="Results" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="180" y="240" width="260" height="360" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-27" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Subareas (dictionary of gdfs)&lt;/li&gt;&lt;li&gt;Boundary (&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary of gdfs&lt;/span&gt;)&lt;/li&gt;&lt;li&gt;Payout vs. damage (dictionary of data frames)&lt;/li&gt;&lt;li&gt;Payout function (nested dictionary of data frames)&lt;/li&gt;&lt;li&gt;Simulation results (dictionary of dataframes)&lt;/li&gt;&lt;li&gt;Premiums (dictionary of dictionaries)&lt;/li&gt;&lt;li&gt;Pool allcoation (dictionary of datamframes)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-26">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-27" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Subareas (dictionary of gdfs)&lt;/li&gt;&lt;li&gt;Boundary (&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;dictionary of gdfs&lt;/span&gt;)&lt;/li&gt;&lt;li&gt;Payout vs. damage (dictionary of data frames)&lt;/li&gt;&lt;li&gt;Payout function (nested dictionary of data frames)&lt;/li&gt;&lt;li&gt;Simulation results (dictionary of dataframes)&lt;/li&gt;&lt;li&gt;Premiums (dictionary of dictionaries)&lt;/li&gt;&lt;li&gt;Pool allcoation (dictionary of datamframes)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-26" vertex="1">
           <mxGeometry y="20" width="260" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="kZvlra0w-ifi24Rdtalh-28" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;plot_bond_basics -&amp;gt; graph&lt;/li&gt;&lt;li&gt;plot_payout_function -&amp;gt; graph&lt;/li&gt;&lt;li&gt;plot_payout_damage -&amp;gt; graph&lt;/li&gt;&lt;li&gt;get_bond_summary -&amp;gt; data frame&lt;/li&gt;&lt;li&gt;get_efficient_frontier -&amp;gt; graph&lt;/li&gt;&lt;li&gt;compare bonds -&amp;gt; dataframe, graphs&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" vertex="1" parent="kZvlra0w-ifi24Rdtalh-26">
+        <mxCell id="kZvlra0w-ifi24Rdtalh-28" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;plot_bond_basics -&amp;gt; graph&lt;/li&gt;&lt;li&gt;plot_payout_function -&amp;gt; graph&lt;/li&gt;&lt;li&gt;plot_payout_damage -&amp;gt; graph&lt;/li&gt;&lt;li&gt;get_bond_summary -&amp;gt; data frame&lt;/li&gt;&lt;li&gt;get_efficient_frontier -&amp;gt; graph&lt;/li&gt;&lt;li&gt;compare bonds -&amp;gt; dataframe, graphs&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-26" vertex="1">
           <mxGeometry y="220" width="260" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="kZvlra0w-ifi24Rdtalh-15" value="MultiBond" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="780" width="260" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="kZvlra0w-ifi24Rdtalh-16" value="&lt;u&gt;Attributes:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Single bond losses (dictionary)&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;term (float)&lt;/span&gt;&lt;/li&gt;&lt;li&gt;Single bond principals (dictionary)&lt;/li&gt;&lt;li&gt;pool allocation (data frame)&lt;/li&gt;&lt;li&gt;tranches (list)&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-15" vertex="1">
+          <mxGeometry y="20" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="kZvlra0w-ifi24Rdtalh-17" value="&lt;u&gt;Methods:&lt;/u&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;simulate bond -&amp;gt; dictionary&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;align=left;" parent="kZvlra0w-ifi24Rdtalh-15" vertex="1">
+          <mxGeometry y="140" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-6" target="kZvlra0w-ifi24Rdtalh-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-10" target="kZvlra0w-ifi24Rdtalh-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="120" />
+              <mxPoint x="810" y="414" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-6" target="kZvlra0w-ifi24Rdtalh-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="100" />
+              <mxPoint x="150" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-20" target="kZvlra0w-ifi24Rdtalh-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="480" y="660" />
+              <mxPoint x="480" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-13" target="kZvlra0w-ifi24Rdtalh-19">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="434" />
+              <mxPoint x="810" y="640" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-13" target="kZvlra0w-ifi24Rdtalh-15">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="434" />
+              <mxPoint x="810" y="1020" />
+              <mxPoint x="170" y="1020" />
+              <mxPoint x="170" y="780" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-23" target="kZvlra0w-ifi24Rdtalh-15">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="730" />
+              <mxPoint x="140" y="780" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-13" target="kZvlra0w-ifi24Rdtalh-22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="434" />
+              <mxPoint x="810" y="1020" />
+              <mxPoint x="-230" y="1020" />
+              <mxPoint x="-230" y="710" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-23" target="kZvlra0w-ifi24Rdtalh-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="730" />
+              <mxPoint x="160" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pkShMBxmrbvElPLnC4b0-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kZvlra0w-ifi24Rdtalh-16" target="kZvlra0w-ifi24Rdtalh-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="480" y="800" />
+              <mxPoint x="480" y="240" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
