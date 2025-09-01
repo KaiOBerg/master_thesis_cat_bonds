@@ -72,7 +72,7 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="IWyzGzTmUGrgQouWK2GI-6" value="annual losses per country&lt;div&gt;principal per country&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="eNb5HaGTE31p3M35cZ-F-37" vertex="1" connectable="0">
+        <mxCell id="IWyzGzTmUGrgQouWK2GI-6" value="monthly losses per country&lt;div&gt;principal per country&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="eNb5HaGTE31p3M35cZ-F-37" vertex="1" connectable="0">
           <mxGeometry x="0.0932" y="1" relative="1" as="geometry">
             <mxPoint x="-7" y="4" as="offset" />
           </mxGeometry>
@@ -82,7 +82,7 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="yakTs8DD9-V0mHupV9pz-17" value="annual losses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yakTs8DD9-V0mHupV9pz-16" vertex="1" connectable="0">
+        <mxCell id="yakTs8DD9-V0mHupV9pz-17" value="monthly losses" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yakTs8DD9-V0mHupV9pz-16" vertex="1" connectable="0">
           <mxGeometry x="0.346" y="1" relative="1" as="geometry">
             <mxPoint x="-20" y="1" as="offset" />
           </mxGeometry>
@@ -95,7 +95,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="yCh1rvR_kyDRK39HySi6-13" value="annual losses per country&lt;div&gt;principal per country&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-12" vertex="1" connectable="0">
+        <mxCell id="yCh1rvR_kyDRK39HySi6-13" value="monthly losses per country&lt;div&gt;principal per country&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yCh1rvR_kyDRK39HySi6-12" vertex="1" connectable="0">
           <mxGeometry x="-0.2241" y="-1" relative="1" as="geometry">
             <mxPoint x="86" y="-45" as="offset" />
           </mxGeometry>
@@ -125,7 +125,7 @@
         <mxCell id="yakTs8DD9-V0mHupV9pz-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="yakTs8DD9-V0mHupV9pz-8" target="eNb5HaGTE31p3M35cZ-F-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="yakTs8DD9-V0mHupV9pz-13" value="annual losses per bond" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yakTs8DD9-V0mHupV9pz-12" vertex="1" connectable="0">
+        <mxCell id="yakTs8DD9-V0mHupV9pz-13" value="monthly losses per bond" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="yakTs8DD9-V0mHupV9pz-12" vertex="1" connectable="0">
           <mxGeometry x="-0.3587" relative="1" as="geometry">
             <mxPoint y="13" as="offset" />
           </mxGeometry>
