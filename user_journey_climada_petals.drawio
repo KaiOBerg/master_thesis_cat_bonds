@@ -1,13 +1,13 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36" version="28.1.1">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15" version="28.2.3">
   <diagram name="Page-1" id="58TnTUvLrnlwUTc3l9yy">
-    <mxGraphModel dx="1678" dy="901" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1577" dy="918" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="qsCXxjklibZktx6M7vEJ-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-1" target="qsCXxjklibZktx6M7vEJ-23">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="mLufBUS968L27i-inKiL-1" target="qsCXxjklibZktx6M7vEJ-23" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-1" target="qsCXxjklibZktx6M7vEJ-52">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" parent="1" source="mLufBUS968L27i-inKiL-1" target="qsCXxjklibZktx6M7vEJ-52" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="467.5" y="669" as="targetPoint" />
           </mxGeometry>
@@ -15,69 +15,67 @@
         <mxCell id="mLufBUS968L27i-inKiL-1" value="User" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
           <mxGeometry x="119" y="35" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-15" target="qsCXxjklibZktx6M7vEJ-43">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="848" y="174" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-15" target="qsCXxjklibZktx6M7vEJ-44">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" parent="1" source="mLufBUS968L27i-inKiL-15" target="qsCXxjklibZktx6M7vEJ-44" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="mLufBUS968L27i-inKiL-15" value="Create single-country CAT bond(s)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="1131" y="146" width="222" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-23" target="qsCXxjklibZktx6M7vEJ-52">
+        <mxCell id="kvsH329DIrdlZDI53jpL-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mLufBUS968L27i-inKiL-15" target="kvsH329DIrdlZDI53jpL-3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-23" value="Set county/countries" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="mLufBUS968L27i-inKiL-15" value="Simulate damages and payouts per bond term" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1681" y="146" width="222" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qsCXxjklibZktx6M7vEJ-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-23" target="qsCXxjklibZktx6M7vEJ-52" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qsCXxjklibZktx6M7vEJ-23" value="Set county/countries" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="306" y="45" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-58" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-43" target="qsCXxjklibZktx6M7vEJ-57">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-58" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-43" target="qsCXxjklibZktx6M7vEJ-57" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-43" target="qsCXxjklibZktx6M7vEJ-60">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" parent="1" source="qsCXxjklibZktx6M7vEJ-43" target="qsCXxjklibZktx6M7vEJ-60" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-43" target="qsCXxjklibZktx6M7vEJ-59">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" parent="1" source="qsCXxjklibZktx6M7vEJ-43" target="qsCXxjklibZktx6M7vEJ-59" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-43" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Save annual losses and CAT bond performance metrics&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-43" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Calculate Premiums&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="577" y="146" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-44" target="qsCXxjklibZktx6M7vEJ-43">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" parent="1" source="qsCXxjklibZktx6M7vEJ-44" target="kvsH329DIrdlZDI53jpL-3" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-44" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Test CAT bond&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="860" y="206" width="222" height="61" as="geometry" />
+        <mxCell id="qsCXxjklibZktx6M7vEJ-44" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Test CAT bond&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1406" y="206" width="222" height="61" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-50" target="mLufBUS968L27i-inKiL-15">
+        <mxCell id="kvsH329DIrdlZDI53jpL-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-50" target="kvsH329DIrdlZDI53jpL-1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-50" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set pricing basics (peak peril, target Sharpe ratio, risk-free rate)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-50" value="Create subareas (&amp;amp; hazard boundary) and plot results" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="1131" y="45" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-51" target="qsCXxjklibZktx6M7vEJ-50">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-51" target="qsCXxjklibZktx6M7vEJ-50" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-51" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set CAT bond basics (minimum/maximum protection, term)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-51" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set CAT bond basics (minimum/maximum protection, term)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="860" y="45" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-52" target="qsCXxjklibZktx6M7vEJ-51">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-52" target="qsCXxjklibZktx6M7vEJ-51" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-52" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set CLIMADA b&lt;/span&gt;&lt;span style=&quot;caret-color: light-dark(rgba(0, 0, 0, 0), rgb(237, 237, 237)); background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;asics (exposure, hazard data, vulnerabiliy&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-52" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set CLIMADA b&lt;/span&gt;&lt;span style=&quot;caret-color: light-dark(rgba(0, 0, 0, 0), rgb(237, 237, 237)); background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;asics (exposure, hazard data, vulnerabiliy&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="585" y="45" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-57" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Compare risk-return of CAT bonds to other investment assets&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-57" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Inspect price related metrics of CAT bond(s)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="306" y="146" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-67" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-59" target="qsCXxjklibZktx6M7vEJ-63">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-67" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-59" target="qsCXxjklibZktx6M7vEJ-63" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-59" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set risk pooling constrain (e.g. number of pools/maximum principal)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-59" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set risk pooling constrain (e.g. number of pools/maximum principal)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="449" y="351" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-60" target="qsCXxjklibZktx6M7vEJ-64">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-60" target="qsCXxjklibZktx6M7vEJ-64" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="815" y="534" />
@@ -85,31 +83,67 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-60" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Risk Pooling: Manually Assign individual pools&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-60" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Risk Pooling: Manually Assign individual pools&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="704" y="351" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-69" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-63" target="qsCXxjklibZktx6M7vEJ-64">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-69" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-63" target="qsCXxjklibZktx6M7vEJ-64" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="636.6470588235293" y="539.5294117647059" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-63" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Find optimal pools&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-63" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Find optimal pools&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="449" y="453" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-64" target="qsCXxjklibZktx6M7vEJ-65">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-64" target="qsCXxjklibZktx6M7vEJ-65" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-64" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Create multi-country CAT bonds&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-64" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Simulate payouts and losses for each bond term&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="577" y="549" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-71" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="qsCXxjklibZktx6M7vEJ-65" target="qsCXxjklibZktx6M7vEJ-66">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-71" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="qsCXxjklibZktx6M7vEJ-65" target="qsCXxjklibZktx6M7vEJ-66" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-65" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Save annual losses and CAT bond performance metrics&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-65" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Calculate premiums per country&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="577" y="646" width="222" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="qsCXxjklibZktx6M7vEJ-66" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Compare CAT bond risk returns to other investment assets/portfolios&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="qsCXxjklibZktx6M7vEJ-66" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Inspect/plot performance results of CAT bond(s)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="577" y="744" width="222" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="kvsH329DIrdlZDI53jpL-1" target="kvsH329DIrdlZDI53jpL-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-1" value="Plot basic set up of the bond" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1406" y="45" width="222" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="kvsH329DIrdlZDI53jpL-3" target="kvsH329DIrdlZDI53jpL-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-3" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Inspect performance metrics of the bond&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1131" y="146" width="222" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="kvsH329DIrdlZDI53jpL-4" target="kvsH329DIrdlZDI53jpL-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-4" value="Calculate damages per event and and derive damages per return periods" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1681" y="45" width="222" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kvsH329DIrdlZDI53jpL-6" target="kvsH329DIrdlZDI53jpL-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-6" value="Generate payout functions per subarea and plot it" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1956" y="45" width="222" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="kvsH329DIrdlZDI53jpL-8" target="mLufBUS968L27i-inKiL-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-8" value="Derive damages and payout per event and create 1:1 plot" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1956" y="146" width="222" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="kvsH329DIrdlZDI53jpL-14" target="qsCXxjklibZktx6M7vEJ-43">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kvsH329DIrdlZDI53jpL-14" value="&lt;span style=&quot;caret-color: rgba(0, 0, 0, 0);&quot;&gt;Set pricing basics (peak peril, target Sharpe ratio, risk-free rate)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="146" width="222" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
