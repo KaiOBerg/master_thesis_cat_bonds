@@ -436,7 +436,7 @@
           <mxGeometry y="30" width="209" height="37" as="geometry" />
         </mxCell>
         <mxCell id="rT63ernw5ahXzCDsqcRR-1" value="outputs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#2054ff, #ff9090);" parent="1" vertex="1">
-          <mxGeometry x="1854" y="676" width="120" height="60" as="geometry" />
+          <mxGeometry x="1701" y="753" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="W9ry0LsnXwSuwarqN_zJ-1" value="Impact Function" style="swimlane;startSize=32;align=center;" vertex="1" parent="1">
           <mxGeometry x="153" y="325" width="160" height="68" as="geometry">
